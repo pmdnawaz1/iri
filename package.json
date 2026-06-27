@@ -18,6 +18,7 @@
     "rir": "node --import tsx apps/cli/src/index.ts",
     "eos:compile": "tsx eos/compiler/compile.ts",
     "eos:prompts": "tsx eos/compiler/make-prompts.ts",
+    "eos:mega": "tsx eos/compiler/make-mega-prompt.ts",
     "format": "prettier --write \"packages/**/*.ts\" \"apps/**/*.ts\" \"tests/**/*.ts\" \"eos/compiler/**/*.ts\" \"*.ts\"",
     "format:check": "prettier --check \"packages/**/*.ts\" \"apps/**/*.ts\" \"tests/**/*.ts\" \"eos/compiler/**/*.ts\" \"*.ts\""
   },

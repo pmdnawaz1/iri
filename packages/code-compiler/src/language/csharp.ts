@@ -99,19 +99,28 @@ function extractExports(root: Node): string[] {
 }
 function extractCalls(root: Node): CallFact[] {
   const calls: CallFact[] = [];
-  const visit = (node: Node): void => {
+  const visit = (node: Node, enclosing?: string): void => {
+    let childEnclosing = enclosing;
+
+    if (node.type === "class_declaration" || node.type === "interface_declaration") {
+      const nameNode = node.childForFieldName("name");
+      if (nameNode) {
+        childEnclosing = nameNode.text;
+      }
+    }
+
     if (node.type === "invocation_expression") {
       const funcNode = node.childForFieldName("function") ?? node.child(0);
       if (funcNode) {
-        calls.push({ callee: funcNode.text, span: getSpan(node) });
+        calls.push({ callee: funcNode.text, enclosing: childEnclosing, span: getSpan(node) });
       }
     }
     for (let i = 0; i < node.childCount; i++) {
       const child = node.child(i);
-      if (child) visit(child);
+      if (child) visit(child, childEnclosing);
     }
   };
-  visit(root);
+  visit(root, undefined);
   return calls;
 }
 export class CSharpAdapter implements LanguageAdapter {

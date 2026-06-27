@@ -16,6 +16,7 @@ const ctx: CompilationContext = {
   },
 };
 const fixture = `use std::collections::HashMap;pub struct UserRepository {    db: Database,}impl UserRepository {    pub fn find_by_email(&self, email: &str) -> User {        self.db.query(email)    }}fn main() {    println!("hello");}`;
+const fixtureNoFunc = `println!("hello");`;
 describe("RustAdapter", () => {
   it("is assignable to LanguageAdapter", () => {
     const adapter: LanguageAdapter = new RustAdapter();
@@ -37,10 +38,26 @@ describe("RustAdapter", () => {
     const result = adapter.parse("test.rs", fixture, ctx);
     expect(result.imports.some((i) => i.specifier.includes("std::collections::HashMap"))).toBe(true);
   });
-  it("calls include println!", () => {
+  it("calls include println! and have enclosing function main", () => {
     const adapter = new RustAdapter();
     const result = adapter.parse("test.rs", fixture, ctx);
-    expect(result.calls.some((c) => c.callee.includes("println"))).toBe(true);
+    const call = result.calls.find((c) => c.callee.includes("println"));
+    expect(call).toBeDefined();
+    expect(call?.enclosing).toBe("main");
+  });
+  it("calls inside impl have enclosing class", () => {
+    const adapter = new RustAdapter();
+    const result = adapter.parse("test.rs", fixture, ctx);
+    const call = result.calls.find((c) => c.callee.includes("self.db.query"));
+    expect(call).toBeDefined();
+    expect(call?.enclosing).toBe("UserRepository");
+  });
+  it("call outside function/impl reports undefined enclosing", () => {
+    const adapter = new RustAdapter();
+    const result = adapter.parse("test.rs", fixtureNoFunc, ctx);
+    const call = result.calls.find((c) => c.callee.includes("println"));
+    expect(call).toBeDefined();
+    expect(call?.enclosing).toBeUndefined();
   });
   it("determinism: two parses deep-equal", () => {
     const adapter = new RustAdapter();

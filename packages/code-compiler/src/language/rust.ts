@@ -106,24 +106,38 @@ function extractExports(root: Parser.SyntaxNode): string[] {
 }
 function extractCalls(root: Parser.SyntaxNode): CallFact[] {
   const calls: CallFact[] = [];
-  const visit = (node: Parser.SyntaxNode): void => {
+  const visit = (node: Parser.SyntaxNode, enclosing?: string): void => {
+    let childEnclosing = enclosing;
+
+    if (node.type === "impl_item") {
+      const typeNode = getChildByType(node, "type_identifier");
+      if (typeNode) {
+        childEnclosing = typeNode.text;
+      }
+    } else if (node.type === "function_item" && enclosing === undefined) {
+      const nameNode = getChildByType(node, "identifier");
+      if (nameNode) {
+        childEnclosing = nameNode.text;
+      }
+    }
+
     if (node.type === "call_expression") {
       const funcNode = getChildByType(node, "field_expression") ?? getChildByType(node, "identifier");
       if (funcNode) {
-        calls.push({ callee: funcNode.text, span: getSpan(node) });
+        calls.push({ callee: funcNode.text, enclosing: childEnclosing, span: getSpan(node) });
       }
     } else if (node.type === "macro_invocation") {
       const macroNode = getChildByType(node, "identifier");
       if (macroNode) {
-        calls.push({ callee: macroNode.text + "!", span: getSpan(node) });
+        calls.push({ callee: macroNode.text + "!", enclosing: childEnclosing, span: getSpan(node) });
       }
     }
     for (let i = 0; i < node.childCount; i++) {
       const child = node.child(i);
-      if (child) visit(child);
+      if (child) visit(child, childEnclosing);
     }
   };
-  visit(root);
+  visit(root, undefined);
   return calls;
 }
 const parser = new Parser();

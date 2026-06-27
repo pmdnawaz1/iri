@@ -136,13 +136,26 @@ function extractExports(sf: import("typescript").SourceFile): string[] {
 
 function extractCalls(sf: import("typescript").SourceFile): CallFact[] {
   const calls: CallFact[] = [];
-  const visit = (node: import("typescript").Node): void => {
-    if (ts.isCallExpression(node)) {
-      calls.push({ callee: node.expression.getText(sf), span: getSpan(sf, node) });
+  const visit = (node: import("typescript").Node, enclosing?: string): void => {
+    let childEnclosing = enclosing;
+
+    if (ts.isClassDeclaration(node) && node.name) {
+      childEnclosing = node.name.text;
+    } else if (ts.isFunctionDeclaration(node) && node.name && enclosing === undefined) {
+      childEnclosing = node.name.text;
     }
-    ts.forEachChild(node, visit);
+
+    if (ts.isCallExpression(node)) {
+      calls.push({
+        callee: node.expression.getText(sf),
+        enclosing: childEnclosing,
+        span: getSpan(sf, node),
+      });
+    }
+
+    ts.forEachChild(node, (child) => visit(child, childEnclosing));
   };
-  visit(sf);
+  visit(sf, undefined);
   return calls;
 }
 

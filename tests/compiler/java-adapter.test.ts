@@ -16,6 +16,7 @@ const ctx: CompilationContext = {
   },
 };
 const fixture = `import com.app.UserRepository;public class AuthService {    private UserRepository repo;    public void login(String email) {        repo.findByEmail(email);    }}`;
+const fixtureNoClass = `System.out.println("hello");`;
 describe("JavaAdapter", () => {
   it("is assignable to LanguageAdapter", () => {
     const adapter: LanguageAdapter = new JavaAdapter();
@@ -37,10 +38,19 @@ describe("JavaAdapter", () => {
     const result = adapter.parse("test.java", fixture, ctx);
     expect(result.imports.some((i) => i.specifier.includes("com.app.UserRepository"))).toBe(true);
   });
-  it("calls include repo.findByEmail", () => {
+  it("calls include repo.findByEmail and have enclosing class", () => {
     const adapter = new JavaAdapter();
     const result = adapter.parse("test.java", fixture, ctx);
-    expect(result.calls.some((c) => c.callee.includes("repo.findByEmail"))).toBe(true);
+    const call = result.calls.find((c) => c.callee.includes("repo.findByEmail"));
+    expect(call).toBeDefined();
+    expect(call?.enclosing).toBe("AuthService");
+  });
+  it("call not inside class reports undefined enclosing", () => {
+    const adapter = new JavaAdapter();
+    const result = adapter.parse("test.java", fixtureNoClass, ctx);
+    const call = result.calls.find((c) => c.callee.includes("System.out.println"));
+    expect(call).toBeDefined();
+    expect(call?.enclosing).toBeUndefined();
   });
   it("determinism: two parses deep-equal", () => {
     const adapter = new JavaAdapter();

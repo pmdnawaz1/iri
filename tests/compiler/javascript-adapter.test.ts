@@ -18,6 +18,8 @@ const ctx: CompilationContext = {
 };
 
 const fixture = `class AuthService { login(email) { return this.repo.find(email); } }
+function someFunc() { return doSomething(); }
+console.log("hello");
 router.post("/login", (req, res) => res.json({}));`;
 
 describe("JavaScriptAdapter", () => {
@@ -49,10 +51,28 @@ describe("JavaScriptAdapter", () => {
     expect(result.routes[0]).toEqual(expect.objectContaining({ method: "POST", path: "/login" }));
   });
 
-  it("calls include this.repo.find", () => {
+  it("calls inside class method report enclosing class", () => {
     const adapter = new JavaScriptAdapter();
     const result = adapter.parse("test.js", fixture, ctx);
-    expect(result.calls.some((c) => c.callee.includes("this.repo.find"))).toBe(true);
+    const call = result.calls.find((c) => c.callee.includes("this.repo.find"));
+    expect(call).toBeDefined();
+    expect(call?.enclosing).toBe("AuthService");
+  });
+
+  it("calls inside top-level function report enclosing function", () => {
+    const adapter = new JavaScriptAdapter();
+    const result = adapter.parse("test.js", fixture, ctx);
+    const call = result.calls.find((c) => c.callee.includes("doSomething"));
+    expect(call).toBeDefined();
+    expect(call?.enclosing).toBe("someFunc");
+  });
+
+  it("module-top-level call reports undefined enclosing", () => {
+    const adapter = new JavaScriptAdapter();
+    const result = adapter.parse("test.js", fixture, ctx);
+    const call = result.calls.find((c) => c.callee.includes("console.log"));
+    expect(call).toBeDefined();
+    expect(call?.enclosing).toBeUndefined();
   });
 
   it("determinism: two parses deep-equal", () => {

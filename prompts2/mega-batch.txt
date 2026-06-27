@@ -1,0 +1,599 @@
+================================================================================
+RIR — MEGA-BRANCH IMPLEMENTER PROMPT
+================================================================================
+You are ROLE_IMPLEMENTER for the RIR repository. Implement ALL 12 work orders
+below on ONE branch and open ONE pull request.
+
+Hard rules (from decision1.md):
+- Implement ONLY what each work order specifies. Make NO architectural decisions.
+- Do NOT change the Repository IR, Requirement IR, ontology, the compiler pipeline,
+  builder order, or any item in a work order's "Forbidden changes".
+- Write REAL multi-line, formatted source. NEVER minify or strip newlines (CI runs
+  prettier --check). No TODOs, no placeholder code, no dead code.
+- ADDITIVE: create the new files each work order lists. Only edit a shared file when a
+  work order explicitly says to. Import from package names / file paths as the work order shows.
+- If a work order is ambiguous or seems wrong, STOP and report it — do not guess.
+
+Workflow:
+1. git checkout main && git pull, then: git checkout -b feature/mega-batch
+2. Implement the work orders BELOW IN ORDER (they are sorted by dependency wave).
+   Commit after each with: <type>(<tspec-id>): <summary>  (e.g. feat(tspec-p05): sql pass)
+3. After ALL of them: pnpm install && pnpm format && pnpm build && pnpm typecheck && pnpm test
+   — everything must be green.
+4. Open ONE PR titled "feat: mega-batch (P04-P06, P15, APPs, CI, CE04-07, FX08)".
+
+Order of work orders:
+  1. TSPEC-CI01  CI/CD gates workflow
+  2. TSPEC-APP3  Worker
+  3. TSPEC-P04  ComponentPass
+  4. TSPEC-P05  SQLPass
+  5. TSPEC-P06  EventPass
+  6. TSPEC-P15  GitPass
+  7. TSPEC-CE04  java adapter: emit CallFact.enclosing
+  8. TSPEC-CE05  rust adapter: emit CallFact.enclosing
+  9. TSPEC-CE06  csharp adapter: emit CallFact.enclosing
+  10. TSPEC-CE07  javascript adapter: emit CallFact.enclosing
+  11. TSPEC-FX08  Fixture: microservices
+  12. TSPEC-APP2  Compiler API
+
+The architect reviews the single PR, wires any new passes into the pipeline, and deploys.
+================================================================================
+
+################################################################################
+# WORK ORDER 1 / 12 — TSPEC-CI01: CI/CD gates workflow
+# Branch: feature/mega-batch (shared)   Depends on: TSPEC-I001
+################################################################################
+
+# TSPEC-CI01 — ESLint config + lint gate (Work Order)
+
+> Authored by ROLE_ARCHITECT. Add a real ESLint setup so the CI `lint` step can stop being
+> `continue-on-error`.
+
+- **TSPEC:** TSPEC-CI01 · **Owner:** ROLE_IMPLEMENTER · **Header:** `eos/tspecs/TSPEC-CI01.yaml`
+- **Depends on:** TSPEC-I001 — COMPLETE · **Wave:** 3
+
+## Objective
+Add a flat ESLint config for the TypeScript workspace and make `pnpm lint` pass on the
+current tree, then turn the CI lint gate on.
+
+## Files
+- create `eslint.config.js` (flat config) at repo root
+- modify root `package.json` (add devDeps: `eslint`, `typescript-eslint`, `@eslint/js`)
+- modify `.github/workflows/eos.yml` (remove `continue-on-error` from the Lint step)
+
+## Behavior
+- Use `typescript-eslint` flat config (`tseslint.config(...)`) extending the recommended
+  (non-type-checked) rules. Lint `packages/**/*.ts`, `apps/**/*.ts`, `tests/**/*.ts`,
+  `eos/compiler/**/*.ts`. Ignore `**/dist`, `node_modules`, `eos/state`, `eos/tspecs`.
+- Keep rules pragmatic: the goal is a passing baseline, not a strict overhaul. Disable or
+  downgrade any rule that would require touching unrelated code (e.g. allow `no-explicit-any`
+  as warn). `pnpm lint` MUST exit 0 on the current tree.
+- The existing root `lint` script is `eslint .` — keep or scope it to the globs above.
+
+## Acceptance
+1. `pnpm lint` exits 0 on the current repository.
+2. `eslint.config.js` is a valid flat config loaded by ESLint v9.
+3. the CI `Lint` step no longer has `continue-on-error: true`.
+
+## Forbidden
+Do NOT change product source to satisfy lint beyond trivial, safe auto-fixes. Do NOT change
+the IR / ontology / pipeline. Do NOT minify.
+
+## References
+typescript-eslint flat config: https://typescript-eslint.io/getting-started/
+ESLint flat config: https://eslint.org/docs/latest/use/configure/configuration-files
+
+## Done
+`pnpm lint` green · build · typecheck · PR `chore(tspec-ci01): eslint config + lint gate`.
+
+################################################################################
+# WORK ORDER 2 / 12 — TSPEC-APP3: Worker
+# Branch: feature/mega-batch (shared)   Depends on: TSPEC-I004, TSPEC-I006
+################################################################################
+
+# TSPEC-APP3 — Worker: CompileRepository job (Work Order)
+
+> Authored by ROLE_ARCHITECT. Implement the first real background job using `@rir/compiler`.
+
+- **TSPEC:** TSPEC-APP3 · **Owner:** ROLE_IMPLEMENTER · **Header:** `eos/tspecs/TSPEC-APP3.yaml`
+- **Depends on:** TSPEC-I004, TSPEC-I006, @rir/compiler — COMPLETE · **Wave:** 7
+
+## Objective
+Implement the `CompileRepository` job: compile a directory and persist the resulting
+snapshot via `@rir/storage`.
+
+## Files
+- create `apps/worker/src/jobs/compile-repository.ts` (the `Job`)
+- modify `apps/worker/src/index.ts` (register the job with the `Worker`)
+- modify `apps/worker/package.json` (add `@rir/compiler`, `@rir/ir`)
+- create `tests/integration/worker-compile.test.ts`
+
+## Behavior
+- Implement a `Job` named `CompileRepository` (matching the existing `JobName` union) whose
+  `run(logger)` compiles a configured directory via `compileRepository(dir)`, wraps the IR
+  in a `SnapshotIR` (`{ id: makeId("snap", dir, hash), createdAt: new Date().toISOString(),
+  repositoryHash: <hash of dir path>, ir }`), and saves it via an injected `Storage`
+  (default `new InMemoryStorage()`).
+- Make the job constructable with `(dir, storage)` so the test can inject `InMemoryStorage`
+  and a known dir. Register it in `index.ts` via `new Worker().register(...)`.
+
+## Acceptance (each a test)
+1. dispatching `CompileRepository` on `fixtures/express-auth` saves exactly one snapshot.
+2. the saved snapshot's `ir.capabilities` includes `AUTH.LOGIN`.
+3. `latestSnapshot()` returns the saved snapshot.
+
+## Forbidden
+Do NOT change `@rir/compiler`, `@rir/storage` interfaces, or the `Worker` framework. Do NOT minify.
+
+## References
+`apps/worker/src/index.ts` (`Worker`, `Job`, `JobName`); `@rir/compiler`; `@rir/storage`
+(`InMemoryStorage`, `SnapshotIR`); `@rir/common` (`makeId`, `hash64`).
+
+## Done
+format:check · build · typecheck · the tests · PR `feat(tspec-app3): worker compile job`.
+
+################################################################################
+# WORK ORDER 3 / 12 — TSPEC-P04: ComponentPass
+# Branch: feature/mega-batch (shared)   Depends on: TSPEC-A006, TSPEC-I006
+################################################################################
+
+# TSPEC-P04 — ComponentPass (Work Order)
+
+> Same harness/conventions as **TSPEC-P02 (read it first)** + ADR-0016. COLLISION-FREE:
+> only your pass file + test. Heuristic below is the architect's decision; apply it exactly.
+
+- **TSPEC:** TSPEC-P04 · **Owner:** ROLE_IMPLEMENTER · **Depends on:** TSPEC-A006, TSPEC-I006, ADR-0016 (COMPLETE) · **Wave:** 5
+
+## Objective
+Detect frontend components from symbols and add `COMPONENT` nodes, so closure can see the
+`COMPONENT` execution stage. Heuristic and deterministic.
+
+## Files (ADDITIVE ONLY)
+- create `packages/passes/src/ComponentPass.ts`
+- create `tests/passes/component-pass.test.ts`
+
+## Behavior
+`name = "ComponentPass"`, `priority = PASS_PRIORITY.ComponentPass`, `supports()` true.
+`run(ctx, draft)`: for each `pr` whose `artifact.path` ends with `.tsx` or `.jsx`, for each
+`sym` in `pr.symbols`:
+- if `sym.kind` is `function` or `class`, and `sym.name` is PascalCase (first character is an
+  uppercase letter), create a `COMPONENT` node: id = `makeId("component", sym.name)`,
+  name = `sym.name`, language = `pr.artifact.language`, artifactId = `pr.artifact.id`,
+  span = `sym.span`, hash = "0", default execution, evidence `[AST]`.
+- otherwise skip. (Only `.tsx`/`.jsx` files; lowercase-named functions are not components.)
+
+Idempotent (replace by id).
+
+## Acceptance (each a test; DefaultIRDraft + CompilationContext stub)
+1. a `function LoginForm()` symbol in a `.tsx` artifact → a `COMPONENT` node named `LoginForm`.
+2. a lowercase `function helper()` in a `.tsx` artifact → no component node.
+3. a PascalCase symbol in a `.ts` (non-tsx) artifact → no component node.
+4. determinism: two runs yield equal sealed IR.
+5. coverage ≥ 95%.
+
+## Forbidden
+Edit no shared file/roster/`@rir/core`/adapter. Do NOT change the heuristic. Package-name imports only.
+
+## References
+ADR-0016; `@rir/ir` (`NodeKind.Component`); `@rir/closure` (`STAGE_OF_NODE_KIND` maps COMPONENT→COMPONENT stage); DefaultIRDraft.
+
+## Done
+format:check · build · typecheck · the tests · PR `feat(tspec-p04): component pass`.
+
+################################################################################
+# WORK ORDER 4 / 12 — TSPEC-P05: SQLPass
+# Branch: feature/mega-batch (shared)   Depends on: TSPEC-A006, TSPEC-I006
+################################################################################
+
+# TSPEC-P05 — SQLPass (Work Order)
+
+> Same harness/conventions as **TSPEC-P02 (read it first)** + ADR-0016. COLLISION-FREE:
+> only your pass file + test. Do NOT edit `packages/passes/src/index.ts`. Package-name imports.
+> The detection heuristic below is the architect's decision (amends ADR-0016); apply it exactly.
+
+- **TSPEC:** TSPEC-P05 · **Owner:** ROLE_IMPLEMENTER · **Depends on:** TSPEC-A006, TSPEC-I006, ADR-0016 (COMPLETE) · **Wave:** 5
+
+## Objective
+Detect database access from call facts and add `SQL_QUERY` nodes + edges, so closure can
+see the `DATABASE` stage. Heuristic and deterministic.
+
+## Files (ADDITIVE ONLY)
+- create `packages/passes/src/SQLPass.ts`
+- create `tests/passes/sql-pass.test.ts`
+
+## Behavior
+`name = "SQLPass"`, `priority = PASS_PRIORITY.SQLPass`, `supports()` true. `run(ctx, draft)`:
+for each `pr` in `ctx.parseResults ?? []`, for each `call` in `pr.calls`:
+- let `method` = the last `.`-segment of `call.callee`. If `method` (lower-cased) is in the
+  fixed set `{ query, execute, exec, raw, insert, update, delete, find, findone, save }`:
+  - create a `SQL_QUERY` node: id = `makeId("sql", pr.artifact.path, String(call.span.startLine))`,
+    name = `method`, language = `pr.artifact.language`, artifactId = `pr.artifact.id`,
+    span = `call.span`, hash = "0", default execution, evidence `[AST]`.
+  - if `call.enclosing` resolves to an existing node (`draft.getNode(makeId("decl", call.enclosing))`),
+    add an edge from it to the SQL node: kind `WRITES` if `method` ∈ `{ insert, update, delete, save, exec, execute }`, else `READS`. id = `makeId("edge","sql", from, sqlId)`, evidence `[AST]`.
+- otherwise no node/edge. (`SQL_QUERY` maps to the `DATABASE` execution stage in closure.)
+
+## Acceptance (each a test; DefaultIRDraft + CompilationContext stub)
+1. a call `this.db.query(...)` (enclosing a known decl) yields a `SQL_QUERY` node and a `READS` edge.
+2. `this.db.insert(...)` yields a `WRITES` edge.
+3. a non-DB call (e.g. `foo.bar()`) yields no SQL node.
+4. determinism: two runs yield equal sealed IR.
+5. coverage ≥ 95%.
+
+## Forbidden
+Edit no shared file/roster/`@rir/core`/adapter. Do NOT change the method set. Package-name imports only.
+
+## References
+ADR-0016; `@rir/ir` (`NodeKind.SqlQuery`); `@rir/closure` (`STAGE_OF_NODE_KIND` maps SQL_QUERY→DATABASE); DefaultIRDraft.
+
+## Done
+format:check · build · typecheck · the tests · PR `feat(tspec-p05): sql pass`.
+
+################################################################################
+# WORK ORDER 5 / 12 — TSPEC-P06: EventPass
+# Branch: feature/mega-batch (shared)   Depends on: TSPEC-A006, TSPEC-I006
+################################################################################
+
+# TSPEC-P06 — EventPass (Work Order)
+
+> Same harness/conventions as **TSPEC-P02 (read it first)** + ADR-0016. COLLISION-FREE:
+> only your pass file + test. Heuristic below is the architect's decision; apply it exactly.
+
+- **TSPEC:** TSPEC-P06 · **Owner:** ROLE_IMPLEMENTER · **Depends on:** TSPEC-A006, TSPEC-I006, ADR-0016 (COMPLETE) · **Wave:** 5
+
+## Objective
+Detect event emit/consume from call facts and add `EVENT` / `EVENT_CONSUMER` nodes + edges.
+
+## Files (ADDITIVE ONLY)
+- create `packages/passes/src/EventPass.ts`
+- create `tests/passes/event-pass.test.ts`
+
+## Behavior
+`name = "EventPass"`, `priority = PASS_PRIORITY.EventPass`, `supports()` true. `run(ctx, draft)`:
+for each `pr`, for each `call`, let `method` = last `.`-segment of `call.callee` (lower-cased):
+- if `method` ∈ `{ emit, publish, dispatch }`: create an `EVENT` node (id =
+  `makeId("event", pr.artifact.path, String(call.span.startLine))`, name = `method`,
+  artifactId = `pr.artifact.id`, span, default execution, evidence `[AST]`); if
+  `call.enclosing` resolves to a node, add an `EMITS` edge from it to the EVENT node.
+- if `method` ∈ `{ on, subscribe, addlistener, handle }`: create an `EVENT_CONSUMER` node
+  (id = `makeId("consumer", ...)`); if `call.enclosing` resolves, add a `CONSUMES` edge.
+- otherwise no node/edge.
+
+Edge ids `makeId("edge","emits"|"consumes", from, to)`, evidence `[AST]`. Idempotent.
+
+## Acceptance (each a test; DefaultIRDraft + CompilationContext stub)
+1. `bus.emit(...)` (enclosing a known decl) → an `EVENT` node + `EMITS` edge.
+2. `bus.on(...)` → an `EVENT_CONSUMER` node + `CONSUMES` edge.
+3. a plain call → no event node.
+4. determinism: two runs yield equal sealed IR.
+5. coverage ≥ 95%.
+
+## Forbidden
+Edit no shared file/roster/`@rir/core`/adapter. Do NOT change the method sets. Package-name imports only.
+
+## References
+ADR-0016; `@rir/ir` (`NodeKind.Event`, `NodeKind.EventConsumer`, `EdgeKind.Emits`, `EdgeKind.Consumes`); DefaultIRDraft.
+
+## Done
+format:check · build · typecheck · the tests · PR `feat(tspec-p06): event pass`.
+
+################################################################################
+# WORK ORDER 6 / 12 — TSPEC-P15: GitPass
+# Branch: feature/mega-batch (shared)   Depends on: TSPEC-A006, TSPEC-I006
+################################################################################
+
+# TSPEC-P15 — GitPass (Work Order)
+
+> Same harness/conventions as **TSPEC-P02 (read it first)** + ADR-0016. COLLISION-FREE:
+> only your pass file + test. Not added to the default pipeline by you — the architect
+> wires it. Package-name imports.
+
+- **TSPEC:** TSPEC-P15 · **Owner:** ROLE_IMPLEMENTER · **Depends on:** TSPEC-A006, TSPEC-I006, ADR-0016 (COMPLETE) · **Wave:** 5
+
+## Objective
+Attach `GIT` provenance evidence to nodes from the git history of their source file.
+Deterministic given the injected git runner; testable without a real git repo.
+
+## Files (ADDITIVE ONLY)
+- create `packages/passes/src/GitPass.ts`
+- create `tests/passes/git-pass.test.ts`
+
+## Behavior
+`name = "GitPass"`, `priority = PASS_PRIORITY.GitPass`, `supports()` true. Constructor takes
+an injectable runner so it is testable:
+```ts
+type GitRunner = (filePath: string) => string | null; // returns last-commit sha or null
+constructor(private readonly runGit: GitRunner = defaultRunner) {}
+```
+`defaultRunner(path)` runs `git log -1 --format=%H -- <path>` via `node:child_process`
+`execFileSync` (cwd = the file's directory), returning the trimmed sha or `null` on error.
+
+`run(ctx, draft)`:
+- build a map `artifactId → path` from `ctx.artifacts`.
+- for each `node` in `draft.getNodes()` with a known `artifactId`, call `this.runGit(path)`.
+  If it returns a sha, re-add the node with an extra evidence entry
+  `{ source: "GIT", locator: sha, confidence: 1 }` (do not duplicate an identical entry).
+- nodes whose file has no sha are unchanged. Idempotent.
+
+## Acceptance (each a test; DefaultIRDraft + CompilationContext stub)
+1. with an injected runner returning `"abc123"`, a node gets a `GIT` evidence entry with `locator === "abc123"`.
+2. with a runner returning `null`, the node's evidence is unchanged.
+3. re-running does not duplicate the GIT evidence.
+4. determinism: two runs with the same runner yield equal sealed IR.
+5. coverage ≥ 95%.
+
+## Forbidden
+Edit no shared file/roster/`@rir/core`/adapter. Do NOT add GitPass to any builder. Package-name imports only.
+
+## References
+ADR-0016; `@rir/ir` (`EvidenceSource.Git`); `node:child_process` `execFileSync`; DefaultIRDraft.
+
+## Done
+format:check · build · typecheck · the tests · PR `feat(tspec-p15): git pass`.
+
+################################################################################
+# WORK ORDER 7 / 12 — TSPEC-CE04: java adapter: emit CallFact.enclosing
+# Branch: feature/mega-batch (shared)   Depends on: TSPEC-AD04
+################################################################################
+
+# TSPEC-CE04 — Java adapter: emit CallFact.enclosing (Work Order)
+
+> Same shape as **TSPEC-CE01 (read it first)**. COLLISION-FREE: touches ONLY `java.ts`
+> and its test.
+
+- **TSPEC:** TSPEC-CE04 · **Owner:** ROLE_IMPLEMENTER · **Depends on:** TSPEC-AD04 (COMPLETE) · **Wave:** 6
+
+## Objective
+Populate `CallFact.enclosing` in the Java adapter (nearest enclosing class) so CallPass can
+build the call graph.
+
+## Files (ADDITIVE-TO-ONE-FILE)
+- modify `packages/code-compiler/src/language/java.ts` (only the call extraction)
+- modify `tests/compiler/java-adapter.test.ts` (add the assertions)
+
+## Behavior (deltas from CE01 §4)
+Track `enclosing` down the recursive Tree-sitter visit: a `class_declaration` (or
+`interface_declaration`) with a `name` field sets the child enclosing to that name (a
+class always wins over nested methods); a `method_invocation` node gets the current
+enclosing. Methods live inside classes, so a call inside `AuthController.login` reports
+`enclosing === "AuthController"`.
+
+## Acceptance (added to the adapter test)
+1. a `method_invocation` inside a method of `class AuthService` reports `enclosing === "AuthService"`.
+2. a call not inside any class reports `undefined`.
+3. existing call assertions (callee) still hold.
+4. coverage ≥ 95%.
+
+## Forbidden
+Change no contract/other adapter/`index.ts`/`package.json`. Never minify.
+
+## References
+TSPEC-CE01; `packages/code-compiler/src/language/java.ts`; ADR-0016.
+
+## Done
+format:check · build · typecheck · the tests · PR `feat(tspec-ce04): java enclosing`.
+
+################################################################################
+# WORK ORDER 8 / 12 — TSPEC-CE05: rust adapter: emit CallFact.enclosing
+# Branch: feature/mega-batch (shared)   Depends on: TSPEC-AD06
+################################################################################
+
+# TSPEC-CE05 — Rust adapter: emit CallFact.enclosing (Work Order)
+
+> Same shape as **TSPEC-CE01 (read it first)**. COLLISION-FREE: touches ONLY `rust.ts`
+> and its test.
+
+- **TSPEC:** TSPEC-CE05 · **Owner:** ROLE_IMPLEMENTER · **Depends on:** TSPEC-AD06 (COMPLETE) · **Wave:** 6
+
+## Objective
+Populate `CallFact.enclosing` in the Rust adapter so CallPass can build the call graph.
+
+## Files (ADDITIVE-TO-ONE-FILE)
+- modify `packages/code-compiler/src/language/rust.ts` (only the call extraction)
+- modify `tests/compiler/rust-adapter.test.ts` (add the assertions)
+
+## Behavior (deltas from CE01 §4)
+Track `enclosing` down the recursive visit. The "class" of a Rust method is the type its
+`impl_item` implements: an `impl_item` sets the child enclosing to its `type` field name
+(e.g. `impl AuthService { ... }` → enclosing `AuthService` for calls inside). A top-level
+`function_item` sets enclosing to its name when none is set. A `call_expression` gets the
+current enclosing.
+
+## Acceptance (added to the adapter test)
+1. a `call_expression` inside `impl AuthService { fn login() { ... } }` reports `enclosing === "AuthService"`.
+2. a call inside a top-level `fn main()` reports `"main"`.
+3. a call outside any function/impl reports `undefined`.
+4. existing call assertions still hold.
+5. coverage ≥ 95%.
+
+## Forbidden
+Change no contract/other adapter/`index.ts`/`package.json`. Never minify.
+
+## References
+TSPEC-CE01; `packages/code-compiler/src/language/rust.ts`; ADR-0016.
+
+## Done
+format:check · build · typecheck · the tests · PR `feat(tspec-ce05): rust enclosing`.
+
+################################################################################
+# WORK ORDER 9 / 12 — TSPEC-CE06: csharp adapter: emit CallFact.enclosing
+# Branch: feature/mega-batch (shared)   Depends on: TSPEC-AD07
+################################################################################
+
+# TSPEC-CE06 — C# adapter: emit CallFact.enclosing (Work Order)
+
+> Same shape as **TSPEC-CE01 (read it first)**. COLLISION-FREE: touches ONLY `csharp.ts`
+> and its test. Note: the C# adapter uses web-tree-sitter (WASM) with a top-level-await init.
+
+- **TSPEC:** TSPEC-CE06 · **Owner:** ROLE_IMPLEMENTER · **Depends on:** TSPEC-AD07 (COMPLETE) · **Wave:** 6
+
+## Objective
+Populate `CallFact.enclosing` in the C# adapter (nearest enclosing class) so CallPass can
+build the call graph.
+
+## Files (ADDITIVE-TO-ONE-FILE)
+- modify `packages/code-compiler/src/language/csharp.ts` (only the call extraction)
+- modify `tests/compiler/csharp-adapter.test.ts` (add the assertions)
+
+## Behavior (deltas from CE01 §4)
+Track `enclosing` down the recursive visit: a `class_declaration` (or
+`interface_declaration`) with a `name` field sets the child enclosing to that name; an
+`invocation_expression` gets the current enclosing. A call inside `AuthController.Login`
+reports `enclosing === "AuthController"`.
+
+## Acceptance (added to the adapter test)
+1. an `invocation_expression` inside a method of `class AuthService` reports `enclosing === "AuthService"`.
+2. a call not inside any class reports `undefined`.
+3. existing call assertions still hold.
+4. coverage ≥ 95%.
+
+## Forbidden
+Change no contract/other adapter/`index.ts`/`package.json`. Never minify.
+
+## References
+TSPEC-CE01; `packages/code-compiler/src/language/csharp.ts`; ADR-0016.
+
+## Done
+format:check · build · typecheck · the tests · PR `feat(tspec-ce06): csharp enclosing`.
+
+################################################################################
+# WORK ORDER 10 / 12 — TSPEC-CE07: javascript adapter: emit CallFact.enclosing
+# Branch: feature/mega-batch (shared)   Depends on: TSPEC-AD02
+################################################################################
+
+# TSPEC-CE07 — JavaScript adapter: emit CallFact.enclosing (Work Order)
+
+> Same shape as **TSPEC-CE01 (read it first)**. COLLISION-FREE: touches ONLY `javascript.ts`
+> and its test. The JS adapter uses the TypeScript Compiler API, so the algorithm is
+> identical to CE01 (the TypeScript enclosing enhancement).
+
+- **TSPEC:** TSPEC-CE07 · **Owner:** ROLE_IMPLEMENTER · **Depends on:** TSPEC-AD02 (COMPLETE) · **Wave:** 6
+
+## Objective
+Populate `CallFact.enclosing` in the JavaScript adapter (nearest enclosing class, else
+top-level function) so CallPass can build the call graph.
+
+## Files (ADDITIVE-TO-ONE-FILE)
+- modify `packages/code-compiler/src/language/javascript.ts` (only `extractCalls`)
+- modify `tests/compiler/javascript-adapter.test.ts` (add the assertions)
+
+## Behavior
+Apply CE01 §4 verbatim (the JS adapter parses with the TS Compiler API): walk
+`(node, enclosing)`; a `ClassDeclaration` with a name sets the child enclosing to the
+class name; a named `FunctionDeclaration` sets it when none is set; a `CallExpression`
+records the current enclosing. If CE01 exposed a shared `extractCalls` helper, reuse it;
+otherwise implement the same logic standalone.
+
+## Acceptance (added to the adapter test)
+1. a call inside a method of `class AuthService` reports `enclosing === "AuthService"`.
+2. a call inside a named top-level function reports that function's name.
+3. a module-top-level call reports `undefined`.
+4. existing call assertions still hold.
+5. coverage ≥ 95%.
+
+## Forbidden
+Change no contract/other adapter/`index.ts`/`package.json`. Never minify.
+
+## References
+TSPEC-CE01 (identical algorithm); `packages/code-compiler/src/language/javascript.ts`; ADR-0016.
+
+## Done
+format:check · build · typecheck · the tests · PR `feat(tspec-ce07): javascript enclosing`.
+
+################################################################################
+# WORK ORDER 11 / 12 — TSPEC-FX08: Fixture: microservices
+# Branch: feature/mega-batch (shared)   Depends on: TSPEC-AD01
+################################################################################
+
+# TSPEC-FX08 — Microservices fixture + full-pipeline test (Work Order)
+
+> Same shape as **TSPEC-FX02 (read it first)**. COLLISION-FREE: only new files in your
+> fixture folder + one new test. Unlike the adapter-validation fixtures, this one exercises
+> the WHOLE compiler via `@rir/compiler`.
+
+- **TSPEC:** TSPEC-FX08 · **Owner:** ROLE_IMPLEMENTER · **Depends on:** TSPEC-AD01 (COMPLETE) · **Wave:** 7
+
+## Objective
+A small two-service TypeScript repo (an `auth-service` and a `user-service`, each with a
+route → controller → service → repository chain), plus a test that compiles the whole
+directory through the real pipeline (`compileRepository`) and asserts the discovered
+capabilities and closure verdicts.
+
+## Files (ADDITIVE ONLY)
+- create `fixtures/microservices/auth-service/routes.ts` + `app.ts` (login flow)
+- create `fixtures/microservices/user-service/routes.ts` + `app.ts` (a register or profile flow)
+- create `tests/e2e/microservices.test.ts` (the tests below)
+
+Keep each file realistic, multi-line, formatted, Express-style (so route handlers call a
+`SomethingController`, which calls a `SomethingService`, which calls a `SomethingRepository`).
+Use `POST "/login"` in auth-service and `POST "/register"` in user-service so the routes
+resolve to ontology capabilities (AUTH.LOGIN, AUTH.REGISTER).
+
+## Behavior
+The test imports `compileRepository` from `@rir/compiler` and runs it on
+`"fixtures/microservices"` with a TypeScript-only `AdapterRegistry`
+(`new AdapterRegistry().register(new TypeScriptAdapter())` from `@rir/code-compiler`),
+exactly as `tests/e2e/pipeline.test.ts` does.
+
+## Acceptance (each a test in tests/e2e/microservices.test.ts)
+1. compiling `fixtures/microservices` yields ≥ 2 capabilities.
+2. `AUTH.LOGIN` is among the discovered capabilities (from auth-service).
+3. `AUTH.REGISTER` is among them (from user-service).
+4. each capability's closure result has its backend stages (`CONTROLLER`/`SERVICE`/`REPOSITORY`) present.
+5. determinism: two compiles produce the same node/edge counts.
+
+## Forbidden
+- Do NOT modify any adapter, pass, `@rir/compiler`, `index.ts`, or `package.json`.
+- Do NOT minify the fixture files.
+
+## References
+`tests/e2e/pipeline.test.ts` (the pattern to copy); `@rir/compiler` (`compileRepository`);
+`packages/code-compiler/src/language/typescript.ts`.
+
+## Done
+format:check · build · typecheck · the §-acceptance tests · PR `feat(tspec-fx08): microservices fixture`.
+
+################################################################################
+# WORK ORDER 12 / 12 — TSPEC-APP2: Compiler API
+# Branch: feature/mega-batch (shared)   Depends on: TSPEC-E01, TSPEC-E02, TSPEC-E03, TSPEC-E04
+################################################################################
+
+# TSPEC-APP2 — Compiler API: wire the real /compile endpoints (Work Order)
+
+> Authored by ROLE_ARCHITECT. The pipeline is now real (`@rir/compiler`); wire it into the
+> Fastify app, replacing the 501 stubs for compilation.
+
+- **TSPEC:** TSPEC-APP2 · **Owner:** ROLE_IMPLEMENTER · **Header:** `eos/tspecs/TSPEC-APP2.yaml`
+- **Depends on:** TSPEC-E01..E04, @rir/compiler — COMPLETE · **Wave:** 7
+
+## Objective
+Make `POST /compile/repository` run the real compiler and return the Repository IR + closure,
+instead of returning 501.
+
+## Files
+- modify `apps/compiler-api/src/index.ts` (the `/compile/repository` route)
+- modify `apps/compiler-api/package.json` (add `@rir/compiler`)
+- create `tests/api/compile-repository.test.ts`
+
+## Behavior
+- Add `@rir/compiler` import. Replace the `/compile/repository` 501 handler with one that
+  reads `{ dir: string }` from the body (validate with the existing Zod pattern), calls
+  `await compileRepository(dir)`, and returns `{ ir, closure }` (200).
+- Leave `/compile/code` and `/compile/document` as 501 (still need single-file / document
+  paths). Keep all other routes unchanged.
+
+## Acceptance (each a test using the existing `buildServer()` + Fastify `inject`)
+1. `POST /compile/repository` with `{ dir: "fixtures/express-auth" }` returns 200 with a
+   body containing `ir.capabilities` including `AUTH.LOGIN` and a `closure` array.
+2. a missing `dir` returns a 400 (Zod validation).
+3. `/compile/code` still returns 501.
+
+## Forbidden
+Do NOT change `@rir/compiler`, the IR, or other routes' behavior. Do NOT minify.
+
+## References
+`apps/compiler-api/src/index.ts`; `@rir/compiler` (`compileRepository`); `tests/e2e/pipeline.test.ts`;
+Fastify inject: https://fastify.dev/docs/latest/Guides/Testing/
+
+## Done
+format:check · build · typecheck · the tests · PR `feat(tspec-app2): compiler-api compile endpoint`.

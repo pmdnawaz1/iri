@@ -3,7 +3,7 @@
 id: "TSPEC-APP1"
 title: "CLI"
 owner: "ROLE_IMPLEMENTER"
-state: "DRAFT"
+state: "COMPLETE"
 package: "cli"
 module: "app"
 repository_path: "apps/cli"

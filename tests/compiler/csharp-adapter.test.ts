@@ -16,6 +16,7 @@ const ctx: CompilationContext = {
   },
 };
 const fixture = `using System;public class AuthService{    private UserRepository repo;    public void Login(string email)    {        repo.FindByEmail(email);    }}`;
+const fixtureNoClass = `Console.WriteLine("hello");`;
 describe("CSharpAdapter", () => {
   it("is assignable to LanguageAdapter", () => {
     const adapter: LanguageAdapter = new CSharpAdapter();
@@ -37,10 +38,19 @@ describe("CSharpAdapter", () => {
     const result = adapter.parse("test.cs", fixture, ctx);
     expect(result.imports.some((i) => i.specifier === "System")).toBe(true);
   });
-  it("calls include repo.FindByEmail", () => {
+  it("calls include repo.FindByEmail and have enclosing class", () => {
     const adapter = new CSharpAdapter();
     const result = adapter.parse("test.cs", fixture, ctx);
-    expect(result.calls.some((c) => c.callee.includes("repo.FindByEmail"))).toBe(true);
+    const call = result.calls.find((c) => c.callee.includes("repo.FindByEmail"));
+    expect(call).toBeDefined();
+    expect(call?.enclosing).toBe("AuthService");
+  });
+  it("call not inside class reports undefined enclosing", () => {
+    const adapter = new CSharpAdapter();
+    const result = adapter.parse("test.cs", fixtureNoClass, ctx);
+    const call = result.calls.find((c) => c.callee.includes("Console.WriteLine"));
+    expect(call).toBeDefined();
+    expect(call?.enclosing).toBeUndefined();
   });
   it("determinism: two parses deep-equal", () => {
     const adapter = new CSharpAdapter();

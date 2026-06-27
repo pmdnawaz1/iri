@@ -173,7 +173,7 @@ states:
   - id: "TSPEC-FX12"
     state: "COMPLETE"
   - id: "TSPEC-APP1"
-    state: "DRAFT"
+    state: "COMPLETE"
   - id: "TSPEC-APP2"
     state: "DRAFT"
   - id: "TSPEC-SC01"
