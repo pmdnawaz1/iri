@@ -1,0 +1,15 @@
+{
+  "name": "@rir/storage",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Storage abstraction over SQLite/Postgres/Neo4j/filesystem. Initially SQLite.",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": { ".": { "types": "./dist/index.d.ts", "default": "./dist/index.js" } },
+  "scripts": { "build": "tsc -b", "clean": "tsc -b --clean" },
+  "dependencies": {
+    "@rir/ir": "workspace:*",
+    "@rir/common": "workspace:*"
+  }
+}

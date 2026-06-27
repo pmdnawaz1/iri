@@ -1,0 +1,23 @@
+{
+  "name": "@rir/cli",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Developer CLI: rir compile | diff | query | graph | validate | snapshot",
+  "bin": { "rir": "./dist/index.js" },
+  "scripts": {
+    "build": "tsc -b",
+    "clean": "tsc -b --clean",
+    "start": "node --import tsx src/index.ts"
+  },
+  "dependencies": {
+    "@rir/core": "workspace:*",
+    "@rir/ir": "workspace:*",
+    "@rir/ontology": "workspace:*",
+    "@rir/storage": "workspace:*",
+    "@rir/closure": "workspace:*",
+    "@rir/coverage": "workspace:*",
+    "@rir/query-engine": "workspace:*",
+    "@rir/common": "workspace:*"
+  }
+}

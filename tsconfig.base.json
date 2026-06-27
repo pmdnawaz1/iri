@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["ES2023"],
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    "composite": true,
+    "incremental": true,
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "noImplicitOverride": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true,
+    "resolveJsonModule": true,
+    "verbatimModuleSyntax": true,
+    "paths": {
+      "@rir/common": ["./packages/common/src/index.ts"],
+      "@rir/core": ["./packages/core/src/index.ts"],
+      "@rir/ir": ["./packages/ir/src/index.ts"],
+      "@rir/graph": ["./packages/graph/src/index.ts"],
+      "@rir/ontology": ["./packages/ontology/src/index.ts"],
+      "@rir/storage": ["./packages/storage/src/index.ts"],
+      "@rir/code-compiler": ["./packages/code-compiler/src/index.ts"],
+      "@rir/document-compiler": ["./packages/document-compiler/src/index.ts"],
+      "@rir/builder-engine": ["./packages/builder-engine/src/index.ts"],
+      "@rir/passes": ["./packages/passes/src/index.ts"],
+      "@rir/closure": ["./packages/closure/src/index.ts"],
+      "@rir/coverage": ["./packages/coverage/src/index.ts"],
+      "@rir/consistency": ["./packages/consistency/src/index.ts"],
+      "@rir/query-engine": ["./packages/query-engine/src/index.ts"],
+      "@rir/semantic": ["./packages/semantic/src/index.ts"],
+      "@rir/telemetry": ["./packages/telemetry/src/index.ts"]
+    }
+  }
+}

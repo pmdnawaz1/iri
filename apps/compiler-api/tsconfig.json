@@ -1,0 +1,18 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "rootDir": "./src",
+    "outDir": "./dist"
+  },
+  "include": ["src/**/*"],
+  "references": [
+    { "path": "../../packages/common" },
+    { "path": "../../packages/core" },
+    { "path": "../../packages/ir" },
+    { "path": "../../packages/storage" },
+    { "path": "../../packages/closure" },
+    { "path": "../../packages/coverage" },
+    { "path": "../../packages/consistency" },
+    { "path": "../../packages/query-engine" }
+  ]
+}

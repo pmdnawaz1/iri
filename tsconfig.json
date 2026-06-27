@@ -1,0 +1,24 @@
+{
+  "files": [],
+  "references": [
+    { "path": "./packages/common" },
+    { "path": "./packages/core" },
+    { "path": "./packages/ir" },
+    { "path": "./packages/graph" },
+    { "path": "./packages/ontology" },
+    { "path": "./packages/storage" },
+    { "path": "./packages/code-compiler" },
+    { "path": "./packages/document-compiler" },
+    { "path": "./packages/builder-engine" },
+    { "path": "./packages/passes" },
+    { "path": "./packages/closure" },
+    { "path": "./packages/coverage" },
+    { "path": "./packages/consistency" },
+    { "path": "./packages/query-engine" },
+    { "path": "./packages/semantic" },
+    { "path": "./packages/telemetry" },
+    { "path": "./apps/cli" },
+    { "path": "./apps/compiler-api" },
+    { "path": "./apps/worker" }
+  ]
+}

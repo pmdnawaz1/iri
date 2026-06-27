@@ -1,0 +1,52 @@
+{
+  "version": "1.0.0",
+  "artifacts": [
+    { "id": "art|src/auth.ts", "kind": "CODE", "path": "src/auth.ts", "language": "typescript", "hash": "0000000000000000" }
+  ],
+  "nodes": [
+    {
+      "id": "node|route|POST /login",
+      "kind": "ROUTE",
+      "name": "POST /login",
+      "language": "typescript",
+      "artifactId": "art|src/auth.ts",
+      "span": null,
+      "hash": "0000000000000001",
+      "execution": { "reachable": true, "entryDistance": 0, "runtimeObserved": false, "tested": false },
+      "evidence": [{ "source": "AST", "locator": "src/auth.ts", "confidence": 1 }]
+    },
+    {
+      "id": "node|controller|AuthController.login",
+      "kind": "CONTROLLER",
+      "name": "AuthController.login",
+      "language": "typescript",
+      "artifactId": "art|src/auth.ts",
+      "span": null,
+      "hash": "0000000000000002",
+      "execution": { "reachable": true, "entryDistance": 1, "runtimeObserved": false, "tested": false },
+      "evidence": [{ "source": "AST", "locator": "src/auth.ts", "confidence": 1 }]
+    }
+  ],
+  "edges": [
+    {
+      "id": "edge|calls|route->controller",
+      "kind": "CALLS",
+      "from": "node|route|POST /login",
+      "to": "node|controller|AuthController.login",
+      "evidence": [{ "source": "AST", "locator": "src/auth.ts", "confidence": 1 }]
+    }
+  ],
+  "capabilities": [
+    {
+      "id": "cap|AUTH.LOGIN|1",
+      "feature": "AUTH",
+      "capability": "AUTH.LOGIN",
+      "constraints": [
+        { "key": "LOGIN_IDENTIFIER", "value": "EMAIL", "evidence": [{ "source": "AST", "locator": "src/auth.ts", "confidence": 1 }] }
+      ],
+      "nodes": ["node|route|POST /login", "node|controller|AuthController.login"],
+      "closure": "PARTIAL",
+      "evidence": [{ "source": "AST", "locator": "src/auth.ts", "confidence": 1 }]
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "name": "@rir/semantic",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "The only package allowed to call an LLM. Reads IR, never writes. Produces summaries/explanations/reports.",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": { ".": { "types": "./dist/index.d.ts", "default": "./dist/index.js" } },
+  "scripts": { "build": "tsc -b", "clean": "tsc -b --clean" },
+  "dependencies": {
+    "@rir/ir": "workspace:*",
+    "@rir/query-engine": "workspace:*"
+  }
+}

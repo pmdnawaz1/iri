@@ -1,0 +1,17 @@
+{
+  "name": "@rir/closure",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Execution Closure engine. Expected chain vs actual chain -> closure result.",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": { ".": { "types": "./dist/index.d.ts", "default": "./dist/index.js" } },
+  "scripts": { "build": "tsc -b", "clean": "tsc -b --clean" },
+  "dependencies": {
+    "@rir/ir": "workspace:*",
+    "@rir/ontology": "workspace:*",
+    "@rir/graph": "workspace:*",
+    "@rir/common": "workspace:*"
+  }
+}

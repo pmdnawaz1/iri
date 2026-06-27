@@ -1,0 +1,16 @@
+{
+  "name": "@rir/document-compiler",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Document frontends (markdown/pdf/docx/openapi/asyncapi/json-schema). Compiles to Requirement IR.",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": { ".": { "types": "./dist/index.d.ts", "default": "./dist/index.js" } },
+  "scripts": { "build": "tsc -b", "clean": "tsc -b --clean" },
+  "dependencies": {
+    "@rir/ir": "workspace:*",
+    "@rir/core": "workspace:*",
+    "@rir/common": "workspace:*"
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "name": "@rir/worker",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Background jobs: compile repository/documents, rebuild graph, ontology update, snapshots, git history.",
+  "scripts": {
+    "build": "tsc -b",
+    "clean": "tsc -b --clean",
+    "start": "node --import tsx src/index.ts"
+  },
+  "dependencies": {
+    "@rir/core": "workspace:*",
+    "@rir/storage": "workspace:*",
+    "@rir/common": "workspace:*"
+  }
+}
