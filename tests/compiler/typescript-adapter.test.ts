@@ -98,4 +98,44 @@ describe("TypeScriptAdapter", () => {
     const r2 = adapter.parse("app.ts", appSource, ctx);
     expect(r1).toEqual(r2);
   });
+
+  it("yields enclosing === 'AuthController' for calls inside its methods", () => {
+    const adapter = new TypeScriptAdapter();
+    const result = adapter.parse("app.ts", appSource, ctx);
+    const authServiceLoginCall = result.calls.find((c) => c.callee.includes("this.authService.login"));
+    expect(authServiceLoginCall).toBeDefined();
+    expect(authServiceLoginCall!.enclosing).toBe("AuthController");
+  });
+
+  it("yields a function's name for calls inside top-level functions", () => {
+    const source = `
+      function myHelper() {
+        doSomething();
+      }
+    `;
+    const adapter = new TypeScriptAdapter();
+    const result = adapter.parse("helper.ts", source, ctx);
+    expect(result.calls.length).toBe(1);
+    expect(result.calls[0].callee).toBe("doSomething");
+    expect(result.calls[0].enclosing).toBe("myHelper");
+  });
+
+  it("yields undefined enclosing for module top-level calls", () => {
+    const source = `
+      initApp();
+      class Foo {
+        bar() { doBar(); }
+      }
+    `;
+    const adapter = new TypeScriptAdapter();
+    const result = adapter.parse("top.ts", source, ctx);
+    const initCall = result.calls.find((c) => c.callee === "initApp");
+    const barCall = result.calls.find((c) => c.callee === "doBar");
+
+    expect(initCall).toBeDefined();
+    expect(initCall!.enclosing).toBeUndefined();
+
+    expect(barCall).toBeDefined();
+    expect(barCall!.enclosing).toBe("Foo");
+  });
 });
