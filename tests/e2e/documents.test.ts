@@ -25,6 +25,22 @@ describe("Document Compiler — requirements.md -> Requirement IR", () => {
 describe("Cross-consistency — docs vs code", () => {
   const tsOnly = () => new AdapterRegistry().register(new TypeScriptAdapter());
 
+  it("tracks a documented requirement the ontology cannot place as DOC_UNMAPPED", async () => {
+    const { findings, requirements } = await compileWithDocuments(
+      "fixtures/fullstack-auth",
+      "fixtures/fullstack-auth-docs",
+      tsOnly(),
+    );
+
+    // The "audit log" requirement maps to no ontology capability — never dropped.
+    const unmapped = requirements.requirements.find((r) => r.capability === "UNMAPPED.AUDIT_LOG");
+    expect(unmapped).toBeDefined();
+    expect(unmapped!.feature).toBe("UNMAPPED");
+
+    const finding = findings.find((f) => f.code === "DOC_UNMAPPED" && f.capability === "UNMAPPED.AUDIT_LOG");
+    expect(finding).toBeDefined();
+  });
+
   it("flags a documented-but-unimplemented MUST capability as an ERROR", async () => {
     const { findings } = await compileWithDocuments(
       "fixtures/fullstack-auth",

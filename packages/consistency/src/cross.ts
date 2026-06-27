@@ -10,6 +10,8 @@ export const CrossFindingCode = {
   Undocumented: "UNDOCUMENTED",
   ConstraintMismatch: "CONSTRAINT_MISMATCH",
   MissingConstraint: "MISSING_CONSTRAINT",
+  /** A documented requirement that binds to no ontology capability (needs evolution). */
+  DocUnmapped: "DOC_UNMAPPED",
 } as const;
 export type CrossFindingCode = (typeof CrossFindingCode)[keyof typeof CrossFindingCode];
 
@@ -39,6 +41,19 @@ export class CrossConsistencyEngine {
 
     for (const req of requirements.requirements) {
       const severity = req.priority === "MUST" ? "ERROR" : "WARNING";
+
+      // A documented requirement the ontology cannot place: this is an evolution signal,
+      // not an implementation gap. Surface it so the seam can propose an ontology change.
+      if (req.feature === "UNMAPPED") {
+        findings.push({
+          code: "DOC_UNMAPPED",
+          severity: "WARNING",
+          capability: req.capability,
+          message: "documented requirement maps to no ontology capability (needs ontology evolution)",
+        });
+        continue;
+      }
+
       const impl = implByCap.get(req.capability);
       if (!impl) {
         findings.push({

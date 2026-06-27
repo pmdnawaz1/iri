@@ -41,6 +41,29 @@ function detectPriority(text: string): Priority {
   return "MUST";
 }
 
+/**
+ * Whether a statement asserts a requirement (vs prose/context). Only requirement-like
+ * statements that bind to no ontology capability are tracked as UNMAPPED — we never
+ * pollute the worklist with narrative sentences.
+ */
+const REQUIREMENT_CUE =
+  /\b(must|shall|should|will|can|able to|allows?|supports?|enables?|requires?|provides?|returns?|enforces?|validates?)\b/i;
+function isRequirementLike(text: string): boolean {
+  return REQUIREMENT_CUE.test(text);
+}
+
+/** Synthesize a stable id for an unmapped documented requirement (ADR-0018 worklist). */
+function unmappedId(section: readonly string[], text: string): string {
+  const basis = section.length ? section[section.length - 1]! : text;
+  const slug =
+    basis
+      .toUpperCase()
+      .replace(/[^A-Z0-9]+/g, "_")
+      .replace(/^_+|_+$/g, "")
+      .slice(0, 40) || "REQUIREMENT";
+  return `UNMAPPED.${slug}`;
+}
+
 /** Extract constraint key=value pairs that this statement asserts about `cap` (ADR-0017). */
 function extractConstraints(cap: CapabilityDefinition, text: string): Array<[string, string]> {
   const lower = text.toLowerCase();
@@ -82,8 +105,19 @@ export class DefaultRequirementNormalizer implements RequirementNormalizer {
     for (const struct of structures) {
       for (const stmt of struct.statements) {
         const cap = resolveCapability(stmt.section, stmt.text);
-        if (!cap) continue;
-        const acc = this.accFor(byCap, cap);
+        if (!cap) {
+          // A documented requirement the ontology does not cover yet: track it as
+          // UNMAPPED (never silently drop) so the evolution seam can propose an
+          // ontology addition. Narrative (non-requirement) sentences are ignored.
+          if (isRequirementLike(stmt.text)) {
+            const id = unmappedId(stmt.section, stmt.text);
+            const acc = this.acc(byCap, id, "UNMAPPED", id);
+            acc.priority = detectPriority(stmt.text);
+            acc.evidence.push(this.evidence(struct, stmt));
+          }
+          continue;
+        }
+        const acc = this.acc(byCap, cap.id, cap.id.split(".")[0]!, cap.id);
         for (const [k, v] of extractConstraints(cap, stmt.text)) {
           if (!acc.constraints.has(k)) acc.constraints.set(k, v);
         }
@@ -100,18 +134,18 @@ export class DefaultRequirementNormalizer implements RequirementNormalizer {
     };
   }
 
-  private accFor(byCap: Map<string, Acc>, cap: CapabilityDefinition): Acc {
-    let acc = byCap.get(cap.id);
+  private acc(byCap: Map<string, Acc>, key: string, feature: string, capability: string): Acc {
+    let acc = byCap.get(key);
     if (!acc) {
       acc = {
-        feature: cap.id.split(".")[0]!,
-        capability: cap.id,
+        feature,
+        capability,
         constraints: new Map(),
         outputs: new Set(),
         priority: "MUST",
         evidence: [],
       };
-      byCap.set(cap.id, acc);
+      byCap.set(key, acc);
     }
     return acc;
   }
