@@ -18,13 +18,21 @@ export function validateFeatures(features: readonly FeatureDefinition[]): readon
 
   for (const feature of features) {
     if (featureIds.has(feature.id)) {
-      problems.push({ code: "DUPLICATE_FEATURE", subject: feature.id, message: `Duplicate feature id: ${feature.id}` });
+      problems.push({
+        code: "DUPLICATE_FEATURE",
+        subject: feature.id,
+        message: `Duplicate feature id: ${feature.id}`,
+      });
     }
     featureIds.add(feature.id);
 
     for (const cap of feature.capabilities) {
       if (capabilityIds.has(cap.id)) {
-        problems.push({ code: "DUPLICATE_CAPABILITY", subject: cap.id, message: `Duplicate capability id: ${cap.id}` });
+        problems.push({
+          code: "DUPLICATE_CAPABILITY",
+          subject: cap.id,
+          message: `Duplicate capability id: ${cap.id}`,
+        });
       }
       capabilityIds.add(cap.id);
 
@@ -32,21 +40,37 @@ export function validateFeatures(features: readonly FeatureDefinition[]): readon
         const lower = alias.toLowerCase();
         const existing = aliases.get(lower);
         if (existing && existing !== cap.id) {
-          problems.push({ code: "DUPLICATE_ALIAS", subject: alias, message: `Alias "${alias}" already declared for ${existing}` });
+          problems.push({
+            code: "DUPLICATE_ALIAS",
+            subject: alias,
+            message: `Alias "${alias}" already declared for ${existing}`,
+          });
         }
         aliases.set(lower, cap.id);
       }
 
       if (cap.expectedChain.length === 0) {
-        problems.push({ code: "EMPTY_CHAIN", subject: cap.id, message: `Capability ${cap.id} has empty expectedChain` });
+        problems.push({
+          code: "EMPTY_CHAIN",
+          subject: cap.id,
+          message: `Capability ${cap.id} has empty expectedChain`,
+        });
       }
 
       for (const constraint of cap.constraints) {
         if (constraint.type === ConstraintType.Enum && constraint.enumValues.length === 0) {
-          problems.push({ code: "ENUM_WITHOUT_VALUES", subject: `${cap.id}.${constraint.key}`, message: `Enum constraint ${constraint.key} has no values` });
+          problems.push({
+            code: "ENUM_WITHOUT_VALUES",
+            subject: `${cap.id}.${constraint.key}`,
+            message: `Enum constraint ${constraint.key} has no values`,
+          });
         }
         if (constraint.type !== ConstraintType.Enum && constraint.enumValues.length > 0) {
-          problems.push({ code: "NON_ENUM_WITH_VALUES", subject: `${cap.id}.${constraint.key}`, message: `Non-enum constraint ${constraint.key} has enumValues` });
+          problems.push({
+            code: "NON_ENUM_WITH_VALUES",
+            subject: `${cap.id}.${constraint.key}`,
+            message: `Non-enum constraint ${constraint.key} has enumValues`,
+          });
         }
       }
     }

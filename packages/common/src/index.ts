@@ -91,7 +91,7 @@ export function hash64(input: string): string {
     lo ^= code & 0xff;
     // 32-bit-safe FNV mixing across two 16-bit halves.
     const tmpLo = (lo * 0x01000193) >>> 0;
-    const tmpHi = ((hi * 0x01000193) + Math.floor((lo * 0x0193) / 0x10000)) >>> 0;
+    const tmpHi = (hi * 0x01000193 + Math.floor((lo * 0x0193) / 0x10000)) >>> 0;
     lo = tmpLo & 0xffff;
     hi = tmpHi & 0xffff;
   }

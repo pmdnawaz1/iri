@@ -3,7 +3,19 @@ import { JavaScriptAdapter } from "@rir/code-compiler";
 import type { LanguageAdapter } from "@rir/code-compiler";
 import type { CompilationContext } from "@rir/core";
 
-const ctx: CompilationContext = { repositoryRoot: ".", artifacts: [], logger: { debug() {}, info() {}, warn() {}, error() {}, child() { return this; } } };
+const ctx: CompilationContext = {
+  repositoryRoot: ".",
+  artifacts: [],
+  logger: {
+    debug() {},
+    info() {},
+    warn() {},
+    error() {},
+    child() {
+      return this;
+    },
+  },
+};
 
 const fixture = `class AuthService { login(email) { return this.repo.find(email); } }
 router.post("/login", (req, res) => res.json({}));`;
@@ -26,8 +38,8 @@ describe("JavaScriptAdapter", () => {
   it("yields class AuthService + method login", () => {
     const adapter = new JavaScriptAdapter();
     const result = adapter.parse("test.js", fixture, ctx);
-    expect(result.symbols.some(s => s.name === "AuthService" && s.kind === "class")).toBe(true);
-    expect(result.symbols.some(s => s.name === "login" && s.kind === "method")).toBe(true);
+    expect(result.symbols.some((s) => s.name === "AuthService" && s.kind === "class")).toBe(true);
+    expect(result.symbols.some((s) => s.name === "login" && s.kind === "method")).toBe(true);
   });
 
   it("yields one route POST /login", () => {
@@ -40,7 +52,7 @@ describe("JavaScriptAdapter", () => {
   it("calls include this.repo.find", () => {
     const adapter = new JavaScriptAdapter();
     const result = adapter.parse("test.js", fixture, ctx);
-    expect(result.calls.some(c => c.callee.includes("this.repo.find"))).toBe(true);
+    expect(result.calls.some((c) => c.callee.includes("this.repo.find"))).toBe(true);
   });
 
   it("determinism: two parses deep-equal", () => {

@@ -1,16 +1,12 @@
 import { describe, it, expect } from "vitest";
-import {
-  serializeRepositoryIR,
-  parseRepositoryIR,
-  validateRepositoryIR,
-} from "@rir/ir";
+import { serializeRepositoryIR, parseRepositoryIR, validateRepositoryIR } from "@rir/ir";
 import { emptyRepositoryIR } from "@rir/ir";
 import { InvariantError } from "@rir/common";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 
 const brokenFixture = JSON.parse(
-  readFileSync(join(process.cwd(), "fixtures/broken-repository/repository-ir.json"), "utf8")
+  readFileSync(join(process.cwd(), "fixtures/broken-repository/repository-ir.json"), "utf8"),
 );
 
 describe("serializeRepositoryIR", () => {
@@ -52,14 +48,27 @@ describe("validateRepositoryIR", () => {
   });
 
   it("throws InvariantError for invalid version", () => {
-    expect(() => validateRepositoryIR({ version: "0.0.0", nodes: [], edges: [], artifacts: [], capabilities: [] }))
-      .toThrow(InvariantError);
+    expect(() =>
+      validateRepositoryIR({ version: "0.0.0", nodes: [], edges: [], artifacts: [], capabilities: [] }),
+    ).toThrow(InvariantError);
   });
 
   it("throws for unknown node kind", () => {
     const ir = {
       version: "1.0.0",
-      nodes: [{ id: "n1", kind: "UNKNOWN_KIND", name: "x", language: null, artifactId: "a1", span: null, hash: "0", execution: { reachable: false, entryDistance: null, runtimeObserved: false, tested: false }, evidence: [{ source: "AST", locator: "test", confidence: 1 }] }],
+      nodes: [
+        {
+          id: "n1",
+          kind: "UNKNOWN_KIND",
+          name: "x",
+          language: null,
+          artifactId: "a1",
+          span: null,
+          hash: "0",
+          execution: { reachable: false, entryDistance: null, runtimeObserved: false, tested: false },
+          evidence: [{ source: "AST", locator: "test", confidence: 1 }],
+        },
+      ],
       edges: [],
       artifacts: [],
       capabilities: [],
@@ -70,8 +79,28 @@ describe("validateRepositoryIR", () => {
   it("throws for dangling edge reference", () => {
     const ir = {
       version: "1.0.0",
-      nodes: [{ id: "n1", kind: "MODULE", name: "x", language: null, artifactId: "a1", span: null, hash: "0", execution: { reachable: false, entryDistance: null, runtimeObserved: false, tested: false }, evidence: [{ source: "AST", locator: "test", confidence: 1 }] }],
-      edges: [{ id: "e1", kind: "CALLS", from: "n1", to: "MISSING", evidence: [{ source: "AST", locator: "test", confidence: 1 }] }],
+      nodes: [
+        {
+          id: "n1",
+          kind: "MODULE",
+          name: "x",
+          language: null,
+          artifactId: "a1",
+          span: null,
+          hash: "0",
+          execution: { reachable: false, entryDistance: null, runtimeObserved: false, tested: false },
+          evidence: [{ source: "AST", locator: "test", confidence: 1 }],
+        },
+      ],
+      edges: [
+        {
+          id: "e1",
+          kind: "CALLS",
+          from: "n1",
+          to: "MISSING",
+          evidence: [{ source: "AST", locator: "test", confidence: 1 }],
+        },
+      ],
       artifacts: [],
       capabilities: [],
     };

@@ -4106,7 +4106,7 @@
       "parallel_group": "wave-6",
       "spec_path": "eos/specs/TSPEC-FX02.spec.md",
       "spec_required": true,
-      "spec_status": "MISSING"
+      "spec_status": "WRITTEN"
     },
     {
       "priority": "P2",
@@ -4168,7 +4168,7 @@
       "parallel_group": "wave-6",
       "spec_path": "eos/specs/TSPEC-FX03.spec.md",
       "spec_required": true,
-      "spec_status": "MISSING"
+      "spec_status": "WRITTEN"
     },
     {
       "priority": "P2",
@@ -4354,7 +4354,7 @@
       "parallel_group": "wave-6",
       "spec_path": "eos/specs/TSPEC-FX06.spec.md",
       "spec_required": true,
-      "spec_status": "MISSING"
+      "spec_status": "WRITTEN"
     },
     {
       "priority": "P2",
@@ -4416,7 +4416,7 @@
       "parallel_group": "wave-6",
       "spec_path": "eos/specs/TSPEC-FX07.spec.md",
       "spec_required": true,
-      "spec_status": "MISSING"
+      "spec_status": "WRITTEN"
     },
     {
       "priority": "P2",
@@ -4540,7 +4540,7 @@
       "parallel_group": "wave-6",
       "spec_path": "eos/specs/TSPEC-FX09.spec.md",
       "spec_required": true,
-      "spec_status": "MISSING"
+      "spec_status": "WRITTEN"
     },
     {
       "priority": "P2",

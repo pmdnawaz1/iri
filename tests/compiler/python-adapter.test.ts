@@ -3,7 +3,19 @@ import { PythonAdapter } from "@rir/code-compiler";
 import type { LanguageAdapter } from "@rir/code-compiler";
 import type { CompilationContext } from "@rir/core";
 
-const ctx: CompilationContext = { repositoryRoot: ".", artifacts: [], logger: { debug() {}, info() {}, warn() {}, error() {}, child() { return this; } } };
+const ctx: CompilationContext = {
+  repositoryRoot: ".",
+  artifacts: [],
+  logger: {
+    debug() {},
+    info() {},
+    warn() {},
+    error() {},
+    child() {
+      return this;
+    },
+  },
+};
 
 const fixture = `import os
 from app.db import UserRepository
@@ -27,21 +39,21 @@ describe("PythonAdapter", () => {
   it("yields class AuthService + method login", () => {
     const adapter = new PythonAdapter();
     const result = adapter.parse("test.py", fixture, ctx);
-    expect(result.symbols.some(s => s.name === "AuthService" && s.kind === "class")).toBe(true);
-    expect(result.symbols.some(s => s.name === "login" && s.kind === "method")).toBe(true);
+    expect(result.symbols.some((s) => s.name === "AuthService" && s.kind === "class")).toBe(true);
+    expect(result.symbols.some((s) => s.name === "login" && s.kind === "method")).toBe(true);
   });
 
   it("imports include os and app.db", () => {
     const adapter = new PythonAdapter();
     const result = adapter.parse("test.py", fixture, ctx);
-    expect(result.imports.some(i => i.specifier === "os")).toBe(true);
-    expect(result.imports.some(i => i.specifier === "app.db")).toBe(true);
+    expect(result.imports.some((i) => i.specifier === "os")).toBe(true);
+    expect(result.imports.some((i) => i.specifier === "app.db")).toBe(true);
   });
 
   it("calls include self.repo.find", () => {
     const adapter = new PythonAdapter();
     const result = adapter.parse("test.py", fixture, ctx);
-    expect(result.calls.some(c => c.callee.includes("self.repo.find"))).toBe(true);
+    expect(result.calls.some((c) => c.callee.includes("self.repo.find"))).toBe(true);
   });
 
   it("determinism: two parses deep-equal", () => {

@@ -38,13 +38,17 @@ Hard rules (from decision1.md):
 - Do NOT change the Repository IR, Requirement IR, ontology, the compiler pipeline,
   builder order, or any item in the work order's "Forbidden changes".
 - No TODOs, no placeholder code, no dead code. Deterministic output only.
+- Write REAL multi-line, formatted source. NEVER minify or strip newlines. CI runs
+  \`prettier --check\` and rejects single-line / unformatted files.
+- ADDITIVE ONLY: create only the new files the work order lists. Do NOT edit shared
+  files (barrels/registries/package.json) unless told to; import directly from file paths.
 - If anything is ambiguous or the work order seems wrong, STOP and report — do not guess.
 
 Workflow:
 1. Create the branch named in the header below (from \`main\`).
 2. Implement the deliverables in the listed files only.
 3. Write the tests from section 7 (acceptance criteria) and make them pass.
-4. Run: pnpm install && pnpm build && pnpm typecheck && pnpm test  — all must be green.
+4. Run: pnpm install && pnpm format && pnpm build && pnpm typecheck && pnpm test  — all must be green.
 5. Open a PR using .github/pull_request_template.md with commit message
    \`<type>(<tspec-id>): <summary>\` (e.g. feat(tspec-i002): ir serializer and validator).
 
@@ -102,4 +106,6 @@ ready.forEach((t, i) => {
 indexLines.push("");
 writeFileSync(resolve(OUT, "README.txt"), indexLines.join("\n"), "utf8");
 
-process.stdout.write(`Wrote ${ready.length} prompt file(s) to prompts/ (prompt1..prompt${ready.length}.txt) + README.txt\n`);
+process.stdout.write(
+  `Wrote ${ready.length} prompt file(s) to prompts/ (prompt1..prompt${ready.length}.txt) + README.txt\n`,
+);

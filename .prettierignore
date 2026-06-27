@@ -1,0 +1,9 @@
+node_modules
+dist
+**/dist
+*.tsbuildinfo
+pnpm-lock.yaml
+coverage
+eos/state
+eos/tspecs
+prompts

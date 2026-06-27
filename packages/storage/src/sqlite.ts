@@ -19,20 +19,25 @@ export class SqliteStorage implements Storage {
     this.db.exec(SQLITE_SCHEMA);
 
     this.insertSnapshot = this.db.prepare(
-      "INSERT OR REPLACE INTO snapshots (id, created_at, repository_hash, data) VALUES (?, ?, ?, ?)"
+      "INSERT OR REPLACE INTO snapshots (id, created_at, repository_hash, data) VALUES (?, ?, ?, ?)",
     );
     this.selectSnapshotById = this.db.prepare("SELECT data FROM snapshots WHERE id = ?");
     this.selectLatestSnapshot = this.db.prepare("SELECT data FROM snapshots ORDER BY rowid DESC LIMIT 1");
     this.selectAllSnapshots = this.db.prepare("SELECT data FROM snapshots ORDER BY rowid ASC");
     this.deleteRequirements = this.db.prepare("DELETE FROM requirements");
     this.insertRequirement = this.db.prepare(
-      "INSERT INTO requirements (id, feature, capability, priority, data) VALUES (?, ?, ?, ?, ?)"
+      "INSERT INTO requirements (id, feature, capability, priority, data) VALUES (?, ?, ?, ?, ?)",
     );
     this.selectAllRequirements = this.db.prepare("SELECT data FROM requirements ORDER BY rowid ASC");
   }
 
   async saveSnapshot(snapshot: SnapshotIR): Promise<void> {
-    this.insertSnapshot.run(snapshot.id, snapshot.createdAt, snapshot.repositoryHash, JSON.stringify(snapshot));
+    this.insertSnapshot.run(
+      snapshot.id,
+      snapshot.createdAt,
+      snapshot.repositoryHash,
+      JSON.stringify(snapshot),
+    );
   }
 
   async loadSnapshot(id: string): Promise<SnapshotIR | undefined> {
@@ -47,7 +52,7 @@ export class SqliteStorage implements Storage {
 
   async listSnapshots(): Promise<readonly SnapshotIR[]> {
     const rows = this.selectAllSnapshots.all() as { data: string }[];
-    return rows.map(r => JSON.parse(r.data) as SnapshotIR);
+    return rows.map((r) => JSON.parse(r.data) as SnapshotIR);
   }
 
   async saveRequirements(set: RequirementSet): Promise<void> {
@@ -65,7 +70,7 @@ export class SqliteStorage implements Storage {
     if (rows.length === 0) return undefined;
     return {
       version: REQUIREMENT_IR_VERSION,
-      requirements: rows.map(r => JSON.parse(r.data)),
+      requirements: rows.map((r) => JSON.parse(r.data)),
     };
   }
 

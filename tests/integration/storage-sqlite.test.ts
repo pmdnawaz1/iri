@@ -78,15 +78,17 @@ describe("SqliteStorage", () => {
     const store = createStore();
     const reqSet: RequirementSet = {
       version: "1.0.0",
-      requirements: [{
-        id: "req|1",
-        feature: "AUTH",
-        capability: "AUTH.LOGIN",
-        constraints: [],
-        outputs: [],
-        priority: "MUST",
-        evidence: [{ source: "AST", locator: "test", confidence: 1 }],
-      }],
+      requirements: [
+        {
+          id: "req|1",
+          feature: "AUTH",
+          capability: "AUTH.LOGIN",
+          constraints: [],
+          outputs: [],
+          priority: "MUST",
+          evidence: [{ source: "AST", locator: "test", confidence: 1 }],
+        },
+      ],
     };
     await store.saveRequirements(reqSet);
     const loaded = await store.loadRequirements();

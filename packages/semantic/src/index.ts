@@ -27,9 +27,7 @@ export class SemanticProjector {
 
   /** Build the deterministic, IR-grounded prompt (no IR mutation). */
   buildPrompt(question: string, subgraph: Subgraph): string {
-    const nodes = subgraph.nodes
-      .map((n) => `- ${n.kind} ${n.name} (${n.id})`)
-      .join("\n");
+    const nodes = subgraph.nodes.map((n) => `- ${n.kind} ${n.name} (${n.id})`).join("\n");
     const edges = subgraph.edges.map((e) => `- ${e.from} --${e.kind}--> ${e.to}`).join("\n");
     return [
       "You are explaining software using ONLY the canonical facts below.",

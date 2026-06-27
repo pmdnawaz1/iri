@@ -28,6 +28,9 @@ jobs:
       - name: Typecheck
         run: pnpm typecheck
 
+      - name: Format check (rejects minified / unformatted code)
+        run: pnpm format:check
+
       - name: Lint
         run: pnpm lint
         continue-on-error: true # enabled once TSPEC-CI lands an eslint config

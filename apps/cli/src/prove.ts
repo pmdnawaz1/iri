@@ -102,7 +102,8 @@ export function prove(dir: string): ProveResult {
     if (!ts.isPropertyAccessExpression(expr)) return null;
     const obj = expr.expression;
     let key: string | null = null;
-    if (ts.isIdentifier(obj)) key = obj.text; // v.method()
+    if (ts.isIdentifier(obj))
+      key = obj.text; // v.method()
     else if (ts.isPropertyAccessExpression(obj) && obj.expression.kind === ts.SyntaxKind.ThisKeyword) {
       key = obj.name.text; // this.p.method()
     }
@@ -169,11 +170,18 @@ export function prove(dir: string): ProveResult {
   for (const info of classes.values()) allNodes.push(makeNode(info.nodeId, info.kind, info.name, dir));
   for (const n of allNodes) graph.addNode(n.id);
   for (const [from, to] of edges) graph.addEdge(from, to);
-  const reachable = reachableFrom(graph, routeNodes.map((r) => r.id));
+  const reachable = reachableFrom(
+    graph,
+    routeNodes.map((r) => r.id),
+  );
 
   const nodes: NodeIR[] = allNodes.map((n) => ({
     ...n,
-    execution: { ...n.execution, reachable: reachable.has(n.id), entryDistance: reachable.has(n.id) ? 0 : null },
+    execution: {
+      ...n.execution,
+      reachable: reachable.has(n.id),
+      entryDistance: reachable.has(n.id) ? 0 : null,
+    },
   }));
   const irEdges: EdgeIR[] = edges.map(([from, to], i) => ({
     id: makeId("edge", String(i), from, to),

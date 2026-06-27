@@ -55,12 +55,21 @@ export interface ClosureResult {
  *   - BROKEN:      some stage is present but an earlier required stage is missing
  *                  (the chain is interrupted).
  */
-export function evaluateClosure(capability: CapabilityIR, nodesById: ReadonlyMap<string, NodeIR>): ClosureResult {
+export function evaluateClosure(
+  capability: CapabilityIR,
+  nodesById: ReadonlyMap<string, NodeIR>,
+): ClosureResult {
   const def = getCapability(capability.capability);
   const expected: readonly ExecutionStage[] = def?.expectedChain ?? [];
 
   if (capability.closure === ClosureState.Conflicting) {
-    return { capabilityId: capability.id, state: ClosureState.Conflicting, expected, present: [], missing: expected };
+    return {
+      capabilityId: capability.id,
+      state: ClosureState.Conflicting,
+      expected,
+      present: [],
+      missing: expected,
+    };
   }
 
   const participating = capability.nodes
@@ -68,12 +77,24 @@ export function evaluateClosure(capability: CapabilityIR, nodesById: ReadonlyMap
     .filter((n): n is NodeIR => n !== undefined);
 
   if (participating.length === 0) {
-    return { capabilityId: capability.id, state: ClosureState.Orphan, expected, present: [], missing: expected };
+    return {
+      capabilityId: capability.id,
+      state: ClosureState.Orphan,
+      expected,
+      present: [],
+      missing: expected,
+    };
   }
 
   const reachable = participating.filter((n) => n.execution.reachable);
   if (reachable.length === 0) {
-    return { capabilityId: capability.id, state: ClosureState.Unreachable, expected, present: [], missing: expected };
+    return {
+      capabilityId: capability.id,
+      state: ClosureState.Unreachable,
+      expected,
+      present: [],
+      missing: expected,
+    };
   }
 
   const presentStages = new Set<ExecutionStage>();
@@ -99,7 +120,10 @@ export function evaluateClosure(capability: CapabilityIR, nodesById: ReadonlyMap
 
 /** A chain is BROKEN (not merely PARTIAL) when a present stage follows a missing one,
  *  i.e. execution resumes after a gap rather than simply stopping short. */
-function isChainInterrupted(expected: readonly ExecutionStage[], present: ReadonlySet<ExecutionStage>): boolean {
+function isChainInterrupted(
+  expected: readonly ExecutionStage[],
+  present: ReadonlySet<ExecutionStage>,
+): boolean {
   let seenMissing = false;
   for (const stage of expected) {
     if (present.has(stage)) {

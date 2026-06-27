@@ -62,10 +62,11 @@ export class QueryEngine {
   }
 
   private slice(nodeIds: ReadonlySet<string>, caps?: readonly CapabilityIR[]): Subgraph {
-    const nodes = [...nodeIds].map((id) => this.nodesById.get(id)).filter((n): n is NodeIR => n !== undefined);
+    const nodes = [...nodeIds]
+      .map((id) => this.nodesById.get(id))
+      .filter((n): n is NodeIR => n !== undefined);
     const edges = this.ir.edges.filter((e) => nodeIds.has(e.from) && nodeIds.has(e.to));
-    const capabilities =
-      caps ?? this.ir.capabilities.filter((c) => c.nodes.some((id) => nodeIds.has(id)));
+    const capabilities = caps ?? this.ir.capabilities.filter((c) => c.nodes.some((id) => nodeIds.has(id)));
     return { nodes, edges, capabilities };
   }
 }

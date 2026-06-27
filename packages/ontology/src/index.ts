@@ -99,7 +99,12 @@ const AUTH: FeatureDefinition = {
         ExecutionStage.RenderedUi,
       ],
       constraints: [
-        { key: "LOGIN_IDENTIFIER", type: ConstraintType.Enum, enumValues: ["EMAIL", "USERNAME", "PHONE"], required: true },
+        {
+          key: "LOGIN_IDENTIFIER",
+          type: ConstraintType.Enum,
+          enumValues: ["EMAIL", "USERNAME", "PHONE"],
+          required: true,
+        },
         { key: "OTP_REQUIRED", type: ConstraintType.Boolean, enumValues: [], required: false },
         { key: "OTP_CHANNEL", type: ConstraintType.Enum, enumValues: ["EMAIL", "SMS"], required: false },
         { key: "OTP_EXPIRY", type: ConstraintType.Integer, enumValues: [], required: false },
@@ -123,7 +128,12 @@ const AUTH: FeatureDefinition = {
         ExecutionStage.Response,
       ],
       constraints: [
-        { key: "LOGIN_IDENTIFIER", type: ConstraintType.Enum, enumValues: ["EMAIL", "USERNAME", "PHONE"], required: true },
+        {
+          key: "LOGIN_IDENTIFIER",
+          type: ConstraintType.Enum,
+          enumValues: ["EMAIL", "USERNAME", "PHONE"],
+          required: true,
+        },
       ],
       outputs: [],
       aliases: ["signup", "sign_up"],

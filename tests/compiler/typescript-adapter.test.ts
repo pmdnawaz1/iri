@@ -3,7 +3,19 @@ import { TypeScriptAdapter } from "@rir/code-compiler";
 import type { LanguageAdapter } from "@rir/code-compiler";
 import type { CompilationContext } from "@rir/core";
 
-const ctx: CompilationContext = { repositoryRoot: ".", artifacts: [], logger: { debug() {}, info() {}, warn() {}, error() {}, child() { return this; } } };
+const ctx: CompilationContext = {
+  repositoryRoot: ".",
+  artifacts: [],
+  logger: {
+    debug() {},
+    info() {},
+    warn() {},
+    error() {},
+    child() {
+      return this;
+    },
+  },
+};
 
 const appSource = `export class UserRepository {
   findByEmail(email: string) {
@@ -51,9 +63,9 @@ describe("TypeScriptAdapter", () => {
   it("parses app.ts yields 3 exported classes", () => {
     const adapter = new TypeScriptAdapter();
     const result = adapter.parse("app.ts", appSource, ctx);
-    const classes = result.symbols.filter(s => s.kind === "class");
+    const classes = result.symbols.filter((s) => s.kind === "class");
     expect(classes.length).toBe(3);
-    expect(classes.every(c => c.exported)).toBe(true);
+    expect(classes.every((c) => c.exported)).toBe(true);
   });
 
   it("parses routes.ts yields one POST /login route", () => {
@@ -66,7 +78,7 @@ describe("TypeScriptAdapter", () => {
   it("calls include this.authService.login for app.ts", () => {
     const adapter = new TypeScriptAdapter();
     const result = adapter.parse("app.ts", appSource, ctx);
-    expect(result.calls.some(c => c.callee.includes("this.authService.login"))).toBe(true);
+    expect(result.calls.some((c) => c.callee.includes("this.authService.login"))).toBe(true);
   });
 
   it("empty source yields empty arrays + valid artifact", () => {

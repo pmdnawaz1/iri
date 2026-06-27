@@ -50,7 +50,9 @@ async function main(argv: readonly string[]): Promise<number> {
     }
     case "ontology": {
       for (const cap of allCapabilities()) {
-        process.stdout.write(`${cap.id}\t(${cap.expectedChain.length} stages, ${cap.constraints.length} constraints)\n`);
+        process.stdout.write(
+          `${cap.id}\t(${cap.expectedChain.length} stages, ${cap.constraints.length} constraints)\n`,
+        );
       }
       return 0;
     }
@@ -67,7 +69,9 @@ async function main(argv: readonly string[]): Promise<number> {
       const ir = await loadIR(rest[0]);
       const report = new DefaultCoverageEngine().compute(ir, emptyRequirementSet());
       for (const [dim, ratio] of Object.entries(report)) {
-        process.stdout.write(`${dim}\t${(ratio.ratio * 100).toFixed(1)}%\t(${ratio.covered}/${ratio.total})\n`);
+        process.stdout.write(
+          `${dim}\t${(ratio.ratio * 100).toFixed(1)}%\t(${ratio.covered}/${ratio.total})\n`,
+        );
       }
       return 0;
     }
@@ -79,7 +83,9 @@ async function main(argv: readonly string[]): Promise<number> {
       }
       const { directory, fileCount, ir, result, reachableChain } = prove(dir);
       process.stdout.write(`Repository: ${directory}\n`);
-      process.stdout.write(`Parsed ${fileCount} file(s) -> ${ir.nodes.length} nodes, ${ir.edges.length} edges\n`);
+      process.stdout.write(
+        `Parsed ${fileCount} file(s) -> ${ir.nodes.length} nodes, ${ir.edges.length} edges\n`,
+      );
       process.stdout.write(`\nAUTH.LOGIN: ${result.state}\n`);
       process.stdout.write(`  reachable chain: ${reachableChain.join(" -> ") || "(none)"}\n`);
       process.stdout.write(`  present stages:  ${result.present.join(", ") || "(none)"}\n`);

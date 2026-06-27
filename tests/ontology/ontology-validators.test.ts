@@ -20,72 +20,116 @@ describe("validateFeatures", () => {
   it("detects duplicate capability id", () => {
     const features: FeatureDefinition[] = [
       {
-        id: "F1", name: "Feature 1",
-        capabilities: [
-          { id: "F1.CAP", name: "CAP", expectedChain: [ExecutionStage.Handler], constraints: [], outputs: [], aliases: [] },
-        ],
-      },
-      {
-        id: "F2", name: "Feature 2",
-        capabilities: [
-          { id: "F1.CAP", name: "CAP", expectedChain: [ExecutionStage.Handler], constraints: [], outputs: [], aliases: [] },
-        ],
-      },
-    ];
-    const problems = validateFeatures(features);
-    expect(problems.some(p => p.code === "DUPLICATE_CAPABILITY")).toBe(true);
-  });
-
-  it("detects duplicate alias", () => {
-    const features: FeatureDefinition[] = [
-      {
-        id: "F1", name: "Feature 1",
-        capabilities: [
-          { id: "F1.A", name: "A", expectedChain: [ExecutionStage.Handler], constraints: [], outputs: [], aliases: ["signin"] },
-          { id: "F1.B", name: "B", expectedChain: [ExecutionStage.Handler], constraints: [], outputs: [], aliases: ["SignIn"] },
-        ],
-      },
-    ];
-    const problems = validateFeatures(features);
-    expect(problems.some(p => p.code === "DUPLICATE_ALIAS")).toBe(true);
-  });
-
-  it("detects ENUM constraint with no values", () => {
-    const features: FeatureDefinition[] = [
-      {
-        id: "F1", name: "Feature 1",
+        id: "F1",
+        name: "Feature 1",
         capabilities: [
           {
-            id: "F1.CAP", name: "CAP", expectedChain: [ExecutionStage.Handler],
-            constraints: [{ key: "K", type: ConstraintType.Enum, enumValues: [], required: true }],
-            outputs: [], aliases: [],
+            id: "F1.CAP",
+            name: "CAP",
+            expectedChain: [ExecutionStage.Handler],
+            constraints: [],
+            outputs: [],
+            aliases: [],
+          },
+        ],
+      },
+      {
+        id: "F2",
+        name: "Feature 2",
+        capabilities: [
+          {
+            id: "F1.CAP",
+            name: "CAP",
+            expectedChain: [ExecutionStage.Handler],
+            constraints: [],
+            outputs: [],
+            aliases: [],
           },
         ],
       },
     ];
     const problems = validateFeatures(features);
-    expect(problems.some(p => p.code === "ENUM_WITHOUT_VALUES")).toBe(true);
+    expect(problems.some((p) => p.code === "DUPLICATE_CAPABILITY")).toBe(true);
+  });
+
+  it("detects duplicate alias", () => {
+    const features: FeatureDefinition[] = [
+      {
+        id: "F1",
+        name: "Feature 1",
+        capabilities: [
+          {
+            id: "F1.A",
+            name: "A",
+            expectedChain: [ExecutionStage.Handler],
+            constraints: [],
+            outputs: [],
+            aliases: ["signin"],
+          },
+          {
+            id: "F1.B",
+            name: "B",
+            expectedChain: [ExecutionStage.Handler],
+            constraints: [],
+            outputs: [],
+            aliases: ["SignIn"],
+          },
+        ],
+      },
+    ];
+    const problems = validateFeatures(features);
+    expect(problems.some((p) => p.code === "DUPLICATE_ALIAS")).toBe(true);
+  });
+
+  it("detects ENUM constraint with no values", () => {
+    const features: FeatureDefinition[] = [
+      {
+        id: "F1",
+        name: "Feature 1",
+        capabilities: [
+          {
+            id: "F1.CAP",
+            name: "CAP",
+            expectedChain: [ExecutionStage.Handler],
+            constraints: [{ key: "K", type: ConstraintType.Enum, enumValues: [], required: true }],
+            outputs: [],
+            aliases: [],
+          },
+        ],
+      },
+    ];
+    const problems = validateFeatures(features);
+    expect(problems.some((p) => p.code === "ENUM_WITHOUT_VALUES")).toBe(true);
   });
 
   it("detects empty expected chain", () => {
     const features: FeatureDefinition[] = [
       {
-        id: "F1", name: "Feature 1",
+        id: "F1",
+        name: "Feature 1",
         capabilities: [
           { id: "F1.CAP", name: "CAP", expectedChain: [], constraints: [], outputs: [], aliases: [] },
         ],
       },
     ];
     const problems = validateFeatures(features);
-    expect(problems.some(p => p.code === "EMPTY_CHAIN")).toBe(true);
+    expect(problems.some((p) => p.code === "EMPTY_CHAIN")).toBe(true);
   });
 
   it("returns no problems for valid single feature", () => {
     const features: FeatureDefinition[] = [
       {
-        id: "F1", name: "Feature 1",
+        id: "F1",
+        name: "Feature 1",
         capabilities: [
-          { id: "F1.CAP", name: "CAP", expectedChain: [ExecutionStage.Handler], constraints: [], outputs: [], aliases: [] },
+          {
+            id: "F1.CAP",
+            name: "CAP",
+            expectedChain: [ExecutionStage.Handler],
+            constraints: [],
+            outputs: [],
+            aliases: [],
+          },
         ],
       },
     ];

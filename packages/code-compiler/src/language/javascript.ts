@@ -17,17 +17,42 @@ function extractSymbols(sf: import("typescript").SourceFile): SymbolFact[] {
   const symbols: SymbolFact[] = [];
   const visit = (node: import("typescript").Node): void => {
     if (ts.isClassDeclaration(node) && node.name) {
-      symbols.push({ name: node.name.text, kind: "class", exported: hasExportModifier(node), span: getSpan(sf, node) });
+      symbols.push({
+        name: node.name.text,
+        kind: "class",
+        exported: hasExportModifier(node),
+        span: getSpan(sf, node),
+      });
     } else if (ts.isFunctionDeclaration(node) && node.name && isTopLevel(node, sf)) {
-      symbols.push({ name: node.name.text, kind: "function", exported: hasExportModifier(node), span: getSpan(sf, node) });
+      symbols.push({
+        name: node.name.text,
+        kind: "function",
+        exported: hasExportModifier(node),
+        span: getSpan(sf, node),
+      });
     } else if (ts.isMethodDeclaration(node) && node.name) {
       symbols.push({ name: node.name.getText(sf), kind: "method", exported: false, span: getSpan(sf, node) });
     } else if (ts.isInterfaceDeclaration(node) && node.name && isTopLevel(node, sf)) {
-      symbols.push({ name: node.name.text, kind: "interface", exported: hasExportModifier(node), span: getSpan(sf, node) });
+      symbols.push({
+        name: node.name.text,
+        kind: "interface",
+        exported: hasExportModifier(node),
+        span: getSpan(sf, node),
+      });
     } else if (ts.isTypeAliasDeclaration(node) && node.name && isTopLevel(node, sf)) {
-      symbols.push({ name: node.name.text, kind: "type", exported: hasExportModifier(node), span: getSpan(sf, node) });
+      symbols.push({
+        name: node.name.text,
+        kind: "type",
+        exported: hasExportModifier(node),
+        span: getSpan(sf, node),
+      });
     } else if (ts.isVariableDeclaration(node) && ts.isIdentifier(node.name) && isTopLevel(node, sf)) {
-      symbols.push({ name: node.name.text, kind: "variable", exported: hasExportModifier(node), span: getSpan(sf, node) });
+      symbols.push({
+        name: node.name.text,
+        kind: "variable",
+        exported: hasExportModifier(node),
+        span: getSpan(sf, node),
+      });
     }
     ts.forEachChild(node, visit);
   };
@@ -39,14 +64,23 @@ function isTopLevel(node: import("typescript").Node, sf: import("typescript").So
   let current = node.parent;
   while (current) {
     if (current === sf) return true;
-    if (ts.isBlock(current) || ts.isFunctionDeclaration(current) || ts.isClassDeclaration(current) || ts.isMethodDeclaration(current)) return false;
+    if (
+      ts.isBlock(current) ||
+      ts.isFunctionDeclaration(current) ||
+      ts.isClassDeclaration(current) ||
+      ts.isMethodDeclaration(current)
+    )
+      return false;
     current = current.parent;
   }
   return false;
 }
 
 function hasExportModifier(node: import("typescript").Node): boolean {
-  return ts.canHaveModifiers(node) && (ts.getModifiers(node) ?? []).some(m => m.kind === ts.SyntaxKind.ExportKeyword);
+  return (
+    ts.canHaveModifiers(node) &&
+    (ts.getModifiers(node) ?? []).some((m) => m.kind === ts.SyntaxKind.ExportKeyword)
+  );
 }
 
 function extractImports(sf: import("typescript").SourceFile): ImportFact[] {
@@ -142,7 +176,7 @@ export class JavaScriptAdapter implements LanguageAdapter {
   readonly extensions = [".js", ".jsx", ".mjs", ".cjs"];
 
   supports(path: string): boolean {
-    return this.extensions.some(ext => path.endsWith(ext));
+    return this.extensions.some((ext) => path.endsWith(ext));
   }
 
   parse(path: string, source: string, _ctx: CompilationContext): ParseResult {

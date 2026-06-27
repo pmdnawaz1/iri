@@ -46,7 +46,14 @@ export function buildServer() {
     return { subgraph: engine.capabilitySubgraph(capability) };
   });
 
-  for (const route of ["/compile/code", "/compile/document", "/compile/repository", "/diff", "/graph", "/snapshot"]) {
+  for (const route of [
+    "/compile/code",
+    "/compile/document",
+    "/compile/repository",
+    "/diff",
+    "/graph",
+    "/snapshot",
+  ]) {
     app.post(route, async (_req, reply) => {
       reply.code(501);
       return { error: "builder pipeline not yet assembled", route };
