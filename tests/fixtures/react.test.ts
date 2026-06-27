@@ -20,10 +20,7 @@ const ctx: CompilationContext = {
 
 const fixtureDir = join(import.meta.dirname, "../../fixtures/react");
 
-const loginFormSource = readFileSync(
-  join(fixtureDir, "LoginForm.tsx"),
-  "utf-8",
-);
+const loginFormSource = readFileSync(join(fixtureDir, "LoginForm.tsx"), "utf-8");
 const apiSource = readFileSync(join(fixtureDir, "api.ts"), "utf-8");
 
 describe("TSPEC-FX03: React fixture", () => {
@@ -31,43 +28,26 @@ describe("TSPEC-FX03: React fixture", () => {
     const adapter = new TypeScriptAdapter();
     const result = adapter.parse("LoginForm.tsx", loginFormSource, ctx);
     expect(
-      result.symbols.some(
-        (s) =>
-          s.name === "LoginForm" &&
-          (s.kind === "function" || s.kind === "variable"),
-      ),
+      result.symbols.some((s) => s.name === "LoginForm" && (s.kind === "function" || s.kind === "variable")),
     ).toBe(true);
   });
 
   it("imports include the ./api specifier with login imported", () => {
     const adapter = new TypeScriptAdapter();
     const result = adapter.parse("LoginForm.tsx", loginFormSource, ctx);
-    expect(
-      result.imports.some(
-        (i) =>
-          i.specifier === "./api" && i.imported.includes("login"),
-      ),
-    ).toBe(true);
+    expect(result.imports.some((i) => i.specifier === "./api" && i.imported.includes("login"))).toBe(true);
   });
 
   it("calls include the login call or fetch", () => {
     const adapter = new TypeScriptAdapter();
     const result = adapter.parse("LoginForm.tsx", loginFormSource, ctx);
-    expect(
-      result.calls.some(
-        (c) => c.callee.includes("login") || c.callee.includes("fetch"),
-      ),
-    ).toBe(true);
+    expect(result.calls.some((c) => c.callee.includes("login") || c.callee.includes("fetch"))).toBe(true);
   });
 
   it("api.ts login function is extracted", () => {
     const adapter = new TypeScriptAdapter();
     const result = adapter.parse("api.ts", apiSource, ctx);
-    expect(
-      result.symbols.some(
-        (s) => s.name === "login" && s.kind === "function",
-      ),
-    ).toBe(true);
+    expect(result.symbols.some((s) => s.name === "login" && s.kind === "function")).toBe(true);
   });
 
   it("determinism: two parses of LoginForm.tsx are deep-equal", () => {
