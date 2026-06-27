@@ -3,6 +3,7 @@ dist/
 *.tsbuildinfo
 .DS_Store
 coverage/
+!packages/coverage/
 *.log
 .env
 .env.*
