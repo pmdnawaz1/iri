@@ -16,6 +16,7 @@ dependencies:
       - "TSPEC-A001"
     blocks:
       - "TSPEC-A008"
+      - "TSPEC-A020"
       - "TSPEC-I002"
   - id: "TSPEC-A003"
     depends_on:
@@ -25,6 +26,8 @@ dependencies:
       - "TSPEC-A009"
       - "TSPEC-A010"
       - "TSPEC-A011"
+      - "TSPEC-A016"
+      - "TSPEC-A017"
       - "TSPEC-I007"
       - "TSPEC-SC02"
   - id: "TSPEC-A004"
@@ -95,11 +98,14 @@ dependencies:
       - "TSPEC-DF04"
       - "TSPEC-DF05"
       - "TSPEC-DF06"
+      - "TSPEC-DN01"
   - id: "TSPEC-A009"
     depends_on:
       - "TSPEC-A003"
       - "TSPEC-A004"
     blocks:
+      - "TSPEC-A017"
+      - "TSPEC-A019"
       - "TSPEC-E01"
   - id: "TSPEC-A010"
     depends_on:
@@ -110,6 +116,7 @@ dependencies:
     depends_on:
       - "TSPEC-A003"
     blocks:
+      - "TSPEC-A020"
       - "TSPEC-E03"
   - id: "TSPEC-A013"
     depends_on:
@@ -117,6 +124,10 @@ dependencies:
     blocks:
       - "TSPEC-A014"
       - "TSPEC-E04"
+  - id: "TSPEC-A016"
+    depends_on:
+      - "TSPEC-A003"
+    blocks: []
   - id: "TSPEC-E06"
     depends_on:
       - "TSPEC-A015"
@@ -151,7 +162,24 @@ dependencies:
     depends_on:
       - "TSPEC-A013"
     blocks:
+      - "TSPEC-A018"
       - "TSPEC-E05"
+  - id: "TSPEC-A017"
+    depends_on:
+      - "TSPEC-A003"
+      - "TSPEC-A009"
+    blocks:
+      - "TSPEC-A018"
+  - id: "TSPEC-A019"
+    depends_on:
+      - "TSPEC-A009"
+    blocks: []
+  - id: "TSPEC-A020"
+    depends_on:
+      - "TSPEC-A002"
+      - "TSPEC-A011"
+    blocks:
+      - "TSPEC-E07"
   - id: "TSPEC-CI01"
     depends_on:
       - "TSPEC-I001"
@@ -159,7 +187,8 @@ dependencies:
   - id: "TSPEC-DF01"
     depends_on:
       - "TSPEC-A008"
-    blocks: []
+    blocks:
+      - "TSPEC-DN01"
   - id: "TSPEC-DF02"
     depends_on:
       - "TSPEC-A008"
@@ -212,10 +241,24 @@ dependencies:
       - "TSPEC-I001"
     blocks:
       - "TSPEC-I006"
+  - id: "TSPEC-A018"
+    depends_on:
+      - "TSPEC-A014"
+      - "TSPEC-A017"
+    blocks: []
+  - id: "TSPEC-DN01"
+    depends_on:
+      - "TSPEC-A008"
+      - "TSPEC-DF01"
+    blocks: []
   - id: "TSPEC-E05"
     depends_on:
       - "TSPEC-A014"
       - "TSPEC-E04"
+    blocks: []
+  - id: "TSPEC-E07"
+    depends_on:
+      - "TSPEC-A020"
     blocks: []
   - id: "TSPEC-I006"
     depends_on:

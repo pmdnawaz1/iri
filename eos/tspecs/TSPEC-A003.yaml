@@ -20,6 +20,8 @@ blocks:
   - "TSPEC-A009"
   - "TSPEC-A010"
   - "TSPEC-A011"
+  - "TSPEC-A016"
+  - "TSPEC-A017"
   - "TSPEC-I007"
   - "TSPEC-SC02"
 references:

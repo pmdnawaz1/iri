@@ -1,7 +1,7 @@
 ================================================================================
-RIR IMPLEMENTER PROMPT 3 — TSPEC-CE06: csharp adapter: emit CallFact.enclosing
-Branch: feature/tspec-ce06-csharp-adapter-emit-callfact-enclosing
-Depends on: TSPEC-AD07 (already satisfied by the scaffold)
+RIR IMPLEMENTER PROMPT 3 — TSPEC-P04: ComponentPass
+Branch: feature/tspec-p04-componentpass
+Depends on: TSPEC-A006, TSPEC-I006 (already satisfied by the scaffold)
 Paste this ENTIRE file into a fresh session with your implementer model.
 ================================================================================
 
@@ -30,40 +30,47 @@ Definition of done: build + typecheck + lint + the section-7 tests + coverage >=
 
 ----- WORK ORDER -----------------------------------------------------------------
 
-# TSPEC-CE06 — C# adapter: emit CallFact.enclosing (Work Order)
+# TSPEC-P04 — ComponentPass (Work Order)
 
-> Same shape as **TSPEC-CE01 (read it first)**. COLLISION-FREE: touches ONLY `csharp.ts`
-> and its test. Note: the C# adapter uses web-tree-sitter (WASM) with a top-level-await init.
+> Same harness/conventions as **TSPEC-P02 (read it first)** + ADR-0016. COLLISION-FREE:
+> only your pass file + test. Heuristic below is the architect's decision; apply it exactly.
 
-- **TSPEC:** TSPEC-CE06 · **Owner:** ROLE_IMPLEMENTER · **Depends on:** TSPEC-AD07 (COMPLETE) · **Wave:** 6
+- **TSPEC:** TSPEC-P04 · **Owner:** ROLE_IMPLEMENTER · **Depends on:** TSPEC-A006, TSPEC-I006, ADR-0016 (COMPLETE) · **Wave:** 5
 
 ## Objective
-Populate `CallFact.enclosing` in the C# adapter (nearest enclosing class) so CallPass can
-build the call graph.
+Detect frontend components from symbols and add `COMPONENT` nodes, so closure can see the
+`COMPONENT` execution stage. Heuristic and deterministic.
 
-## Files (ADDITIVE-TO-ONE-FILE)
-- modify `packages/code-compiler/src/language/csharp.ts` (only the call extraction)
-- modify `tests/compiler/csharp-adapter.test.ts` (add the assertions)
+## Files (ADDITIVE ONLY)
+- create `packages/passes/src/ComponentPass.ts`
+- create `tests/passes/component-pass.test.ts`
 
-## Behavior (deltas from CE01 §4)
-Track `enclosing` down the recursive visit: a `class_declaration` (or
-`interface_declaration`) with a `name` field sets the child enclosing to that name; an
-`invocation_expression` gets the current enclosing. A call inside `AuthController.Login`
-reports `enclosing === "AuthController"`.
+## Behavior
+`name = "ComponentPass"`, `priority = PASS_PRIORITY.ComponentPass`, `supports()` true.
+`run(ctx, draft)`: for each `pr` whose `artifact.path` ends with `.tsx` or `.jsx`, for each
+`sym` in `pr.symbols`:
+- if `sym.kind` is `function` or `class`, and `sym.name` is PascalCase (first character is an
+  uppercase letter), create a `COMPONENT` node: id = `makeId("component", sym.name)`,
+  name = `sym.name`, language = `pr.artifact.language`, artifactId = `pr.artifact.id`,
+  span = `sym.span`, hash = "0", default execution, evidence `[AST]`.
+- otherwise skip. (Only `.tsx`/`.jsx` files; lowercase-named functions are not components.)
 
-## Acceptance (added to the adapter test)
-1. an `invocation_expression` inside a method of `class AuthService` reports `enclosing === "AuthService"`.
-2. a call not inside any class reports `undefined`.
-3. existing call assertions still hold.
-4. coverage ≥ 95%.
+Idempotent (replace by id).
+
+## Acceptance (each a test; DefaultIRDraft + CompilationContext stub)
+1. a `function LoginForm()` symbol in a `.tsx` artifact → a `COMPONENT` node named `LoginForm`.
+2. a lowercase `function helper()` in a `.tsx` artifact → no component node.
+3. a PascalCase symbol in a `.ts` (non-tsx) artifact → no component node.
+4. determinism: two runs yield equal sealed IR.
+5. coverage ≥ 95%.
 
 ## Forbidden
-Change no contract/other adapter/`index.ts`/`package.json`. Never minify.
+Edit no shared file/roster/`@rir/core`/adapter. Do NOT change the heuristic. Package-name imports only.
 
 ## References
-TSPEC-CE01; `packages/code-compiler/src/language/csharp.ts`; ADR-0016.
+ADR-0016; `@rir/ir` (`NodeKind.Component`); `@rir/closure` (`STAGE_OF_NODE_KIND` maps COMPONENT→COMPONENT stage); DefaultIRDraft.
 
 ## Done
-format:check · build · typecheck · the tests · PR `feat(tspec-ce06): csharp enclosing`.
+format:check · build · typecheck · the tests · PR `feat(tspec-p04): component pass`.
 
 ----------------------------------------------------------------------------------

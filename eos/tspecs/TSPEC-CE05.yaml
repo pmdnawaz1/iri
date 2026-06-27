@@ -3,7 +3,7 @@
 id: "TSPEC-CE05"
 title: "rust adapter: emit CallFact.enclosing"
 owner: "ROLE_IMPLEMENTER"
-state: "DRAFT"
+state: "COMPLETE"
 package: "code-compiler"
 module: "language/rust"
 repository_path: "packages/code-compiler"

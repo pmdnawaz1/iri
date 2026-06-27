@@ -16,6 +16,7 @@ estimated_effort: 2
 depends_on:
   - "TSPEC-A013"
 blocks:
+  - "TSPEC-A018"
   - "TSPEC-E05"
 references: []
 architecture_documents:
