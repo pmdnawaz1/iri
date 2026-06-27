@@ -12,6 +12,8 @@
     "@rir/ir": "workspace:*",
     "@rir/core": "workspace:*",
     "@rir/common": "workspace:*",
+    "tree-sitter": "^0.22.4",
+    "tree-sitter-java": "^0.23.5",
     "typescript": "^5.7.2"
   }
 }
