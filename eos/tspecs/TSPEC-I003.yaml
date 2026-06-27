@@ -3,7 +3,7 @@
 id: "TSPEC-I003"
 title: "Graph algorithms"
 owner: "ROLE_IMPLEMENTER"
-state: "DRAFT"
+state: "COMPLETE"
 package: "graph"
 module: "algorithms"
 repository_path: "packages/graph"

@@ -3,7 +3,7 @@
 id: "TSPEC-I004"
 title: "SQLite storage repository"
 owner: "ROLE_IMPLEMENTER"
-state: "DRAFT"
+state: "COMPLETE"
 package: "storage"
 module: "sqlite"
 repository_path: "packages/storage"

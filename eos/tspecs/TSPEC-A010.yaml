@@ -3,7 +3,7 @@
 id: "TSPEC-A010"
 title: "Coverage Rules"
 owner: "ROLE_ARCHITECT"
-state: "DRAFT"
+state: "COMPLETE"
 package: "coverage"
 module: "rules"
 repository_path: "packages/coverage"

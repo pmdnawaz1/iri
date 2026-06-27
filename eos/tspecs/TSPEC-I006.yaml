@@ -3,7 +3,7 @@
 id: "TSPEC-I006"
 title: "Builder engine pass runner"
 owner: "ROLE_IMPLEMENTER"
-state: "DRAFT"
+state: "COMPLETE"
 package: "builder-engine"
 module: "engine"
 repository_path: "packages/builder-engine"

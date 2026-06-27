@@ -3,7 +3,7 @@
 id: "TSPEC-A014"
 title: "Semantic Projection Contract"
 owner: "ROLE_ARCHITECT"
-state: "DRAFT"
+state: "COMPLETE"
 package: "semantic"
 module: "contract"
 repository_path: "packages/semantic"

@@ -3,7 +3,7 @@
 id: "TSPEC-E05"
 title: "Semantic projector impl"
 owner: "ROLE_IMPLEMENTER"
-state: "DRAFT"
+state: "COMPLETE"
 package: "semantic"
 module: "projector"
 repository_path: "packages/semantic"

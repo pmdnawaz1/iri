@@ -3,7 +3,7 @@
 id: "TSPEC-A012"
 title: "Storage Schema"
 owner: "ROLE_ARCHITECT"
-state: "DRAFT"
+state: "COMPLETE"
 package: "storage"
 module: "schema"
 repository_path: "packages/storage"

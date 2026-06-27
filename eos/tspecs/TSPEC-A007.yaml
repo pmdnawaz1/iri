@@ -3,7 +3,7 @@
 id: "TSPEC-A007"
 title: "Language Adapter Contract"
 owner: "ROLE_ARCHITECT"
-state: "DRAFT"
+state: "COMPLETE"
 package: "code-compiler"
 module: "contract"
 repository_path: "packages/code-compiler"

@@ -1,0 +1,11 @@
+{
+  "_note": "TSPEC ids that are done/merged on main. The Project Compiler reads this and sets state=COMPLETE for these (everything else is DRAFT). Update on every merge, then run `pnpm eos:compile`. Architect contracts (A*) are design+ADR complete; foundation + engines were built during the pre-EOS scaffold; I002/I004/I007/AD01/AD02 landed via reviewed PRs.",
+  "completed": [
+    "TSPEC-A001", "TSPEC-A002", "TSPEC-A003", "TSPEC-A004", "TSPEC-A005",
+    "TSPEC-A006", "TSPEC-A007", "TSPEC-A008", "TSPEC-A009", "TSPEC-A010",
+    "TSPEC-A011", "TSPEC-A012", "TSPEC-A013", "TSPEC-A014", "TSPEC-A015",
+    "TSPEC-I001", "TSPEC-I003", "TSPEC-I005", "TSPEC-I006",
+    "TSPEC-E01", "TSPEC-E02", "TSPEC-E03", "TSPEC-E04", "TSPEC-E05", "TSPEC-E06",
+    "TSPEC-I002", "TSPEC-I004", "TSPEC-I007", "TSPEC-AD01", "TSPEC-AD02"
+  ]
+}

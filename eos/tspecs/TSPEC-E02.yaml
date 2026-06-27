@@ -3,7 +3,7 @@
 id: "TSPEC-E02"
 title: "Coverage engine impl"
 owner: "ROLE_IMPLEMENTER"
-state: "DRAFT"
+state: "COMPLETE"
 package: "coverage"
 module: "engine"
 repository_path: "packages/coverage"

@@ -3,7 +3,7 @@
 id: "TSPEC-AD02"
 title: "javascript language adapter"
 owner: "ROLE_IMPLEMENTER"
-state: "DRAFT"
+state: "COMPLETE"
 package: "code-compiler"
 module: "language/javascript"
 repository_path: "packages/code-compiler"

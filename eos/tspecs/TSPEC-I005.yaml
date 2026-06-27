@@ -3,7 +3,7 @@
 id: "TSPEC-I005"
 title: "Core pipeline, DI & registry impl"
 owner: "ROLE_IMPLEMENTER"
-state: "DRAFT"
+state: "COMPLETE"
 package: "core"
 module: "runtime"
 repository_path: "packages/core"

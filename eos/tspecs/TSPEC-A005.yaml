@@ -3,7 +3,7 @@
 id: "TSPEC-A005"
 title: "Compiler Pipeline & Builder Contracts"
 owner: "ROLE_ARCHITECT"
-state: "DRAFT"
+state: "COMPLETE"
 package: "core"
 module: "pipeline"
 repository_path: "packages/core"

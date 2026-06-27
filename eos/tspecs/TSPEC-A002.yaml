@@ -3,7 +3,7 @@
 id: "TSPEC-A002"
 title: "Requirement IR"
 owner: "ROLE_ARCHITECT"
-state: "DRAFT"
+state: "COMPLETE"
 package: "ir"
 module: "requirement"
 repository_path: "packages/ir"

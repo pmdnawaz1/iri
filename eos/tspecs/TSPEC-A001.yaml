@@ -3,7 +3,7 @@
 id: "TSPEC-A001"
 title: "Repository IR v1"
 owner: "ROLE_ARCHITECT"
-state: "DRAFT"
+state: "COMPLETE"
 package: "ir"
 module: "schema"
 repository_path: "packages/ir"

@@ -3,7 +3,7 @@
 id: "TSPEC-A011"
 title: "Consistency Rules"
 owner: "ROLE_ARCHITECT"
-state: "DRAFT"
+state: "COMPLETE"
 package: "consistency"
 module: "rules"
 repository_path: "packages/consistency"
