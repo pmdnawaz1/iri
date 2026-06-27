@@ -1,7 +1,7 @@
 {
   "version": "1.0.0",
   "generated_at": "2026-06-27T00:00:00Z",
-  "count": 75,
+  "count": 78,
   "tspecs": [
     {
       "priority": "P0",
@@ -2409,6 +2409,7 @@
       "branch": "feature/tspec-ad01-typescript-language-adapter",
       "parent_branch": "main",
       "blocks": [
+        "TSPEC-CE01",
         "TSPEC-FX01",
         "TSPEC-FX02",
         "TSPEC-FX03",
@@ -2555,6 +2556,7 @@
       "branch": "feature/tspec-ad03-python-language-adapter",
       "parent_branch": "main",
       "blocks": [
+        "TSPEC-CE02",
         "TSPEC-FX10"
       ],
       "reviewers": [
@@ -2692,7 +2694,9 @@
       "repository_path": "packages/code-compiler",
       "branch": "feature/tspec-ad05-go-language-adapter",
       "parent_branch": "main",
-      "blocks": [],
+      "blocks": [
+        "TSPEC-CE03"
+      ],
       "reviewers": [
         "ROLE_ARCHITECT"
       ],
@@ -2960,7 +2964,7 @@
       "owner": "ROLE_IMPLEMENTER",
       "package": "passes",
       "module": "ImportPass",
-      "state": "DRAFT",
+      "state": "COMPLETE",
       "repository_path": "packages/passes",
       "branch": "feature/tspec-p01-importpass",
       "parent_branch": "main",
@@ -3027,7 +3031,7 @@
       "owner": "ROLE_IMPLEMENTER",
       "package": "passes",
       "module": "CallPass",
-      "state": "DRAFT",
+      "state": "COMPLETE",
       "repository_path": "packages/passes",
       "branch": "feature/tspec-p02-callpass",
       "parent_branch": "main",
@@ -3094,7 +3098,7 @@
       "owner": "ROLE_IMPLEMENTER",
       "package": "passes",
       "module": "RoutePass",
-      "state": "DRAFT",
+      "state": "COMPLETE",
       "repository_path": "packages/passes",
       "branch": "feature/tspec-p03-routepass",
       "parent_branch": "main",
@@ -3378,7 +3382,7 @@
       "parallel_group": "wave-5",
       "spec_path": "eos/specs/TSPEC-P07.spec.md",
       "spec_required": true,
-      "spec_status": "MISSING"
+      "spec_status": "WRITTEN"
     },
     {
       "priority": "P2",
@@ -3514,7 +3518,7 @@
       "parallel_group": "wave-5",
       "spec_path": "eos/specs/TSPEC-P09.spec.md",
       "spec_required": true,
-      "spec_status": "MISSING"
+      "spec_status": "WRITTEN"
     },
     {
       "priority": "P2",
@@ -3699,7 +3703,7 @@
       "owner": "ROLE_IMPLEMENTER",
       "package": "passes",
       "module": "ReachabilityPass",
-      "state": "DRAFT",
+      "state": "COMPLETE",
       "repository_path": "packages/passes",
       "branch": "feature/tspec-p12-reachabilitypass",
       "parent_branch": "main",
@@ -3921,6 +3925,198 @@
       "spec_status": "MISSING"
     },
     {
+      "priority": "P2",
+      "complexity": "MEDIUM",
+      "risk": "MEDIUM",
+      "estimated_effort": 2,
+      "depends_on": [
+        "TSPEC-AD01"
+      ],
+      "references": [],
+      "architecture_documents": [
+        "repo_structure.md",
+        "requirement.md",
+        "decision1.md"
+      ],
+      "deliverables": [
+        "typescript adapter populates CallFact.enclosing for the call graph"
+      ],
+      "outputs": [],
+      "tests": [
+        "unit",
+        "integration",
+        "golden"
+      ],
+      "acceptance_criteria": [
+        "Builds",
+        "Typechecks",
+        "Lint clean",
+        "Tests pass",
+        "Coverage >= 95%"
+      ],
+      "forbidden_changes": [
+        "Repository IR schema",
+        "Requirement IR schema",
+        "Ontology ids / properties",
+        "Compiler pipeline / builder order",
+        "Closure / coverage / consistency rules"
+      ],
+      "labels": [
+        "implementation",
+        "code-compiler"
+      ],
+      "id": "TSPEC-CE01",
+      "title": "typescript adapter: emit CallFact.enclosing",
+      "owner": "ROLE_IMPLEMENTER",
+      "package": "code-compiler",
+      "module": "language/typescript",
+      "state": "DRAFT",
+      "repository_path": "packages/code-compiler",
+      "branch": "feature/tspec-ce01-typescript-adapter-emit-callfact-enclosing",
+      "parent_branch": "main",
+      "blocks": [],
+      "reviewers": [
+        "ROLE_ARCHITECT"
+      ],
+      "version": "1.0.0",
+      "created_at": "2026-06-27T00:00:00Z",
+      "updated_at": "2026-06-27T00:00:00Z",
+      "wave": 6,
+      "critical_path": false,
+      "parallel_group": "wave-6",
+      "spec_path": "eos/specs/TSPEC-CE01.spec.md",
+      "spec_required": true,
+      "spec_status": "WRITTEN"
+    },
+    {
+      "priority": "P2",
+      "complexity": "MEDIUM",
+      "risk": "MEDIUM",
+      "estimated_effort": 2,
+      "depends_on": [
+        "TSPEC-AD03"
+      ],
+      "references": [],
+      "architecture_documents": [
+        "repo_structure.md",
+        "requirement.md",
+        "decision1.md"
+      ],
+      "deliverables": [
+        "python adapter populates CallFact.enclosing for the call graph"
+      ],
+      "outputs": [],
+      "tests": [
+        "unit",
+        "integration",
+        "golden"
+      ],
+      "acceptance_criteria": [
+        "Builds",
+        "Typechecks",
+        "Lint clean",
+        "Tests pass",
+        "Coverage >= 95%"
+      ],
+      "forbidden_changes": [
+        "Repository IR schema",
+        "Requirement IR schema",
+        "Ontology ids / properties",
+        "Compiler pipeline / builder order",
+        "Closure / coverage / consistency rules"
+      ],
+      "labels": [
+        "implementation",
+        "code-compiler"
+      ],
+      "id": "TSPEC-CE02",
+      "title": "python adapter: emit CallFact.enclosing",
+      "owner": "ROLE_IMPLEMENTER",
+      "package": "code-compiler",
+      "module": "language/python",
+      "state": "DRAFT",
+      "repository_path": "packages/code-compiler",
+      "branch": "feature/tspec-ce02-python-adapter-emit-callfact-enclosing",
+      "parent_branch": "main",
+      "blocks": [],
+      "reviewers": [
+        "ROLE_ARCHITECT"
+      ],
+      "version": "1.0.0",
+      "created_at": "2026-06-27T00:00:00Z",
+      "updated_at": "2026-06-27T00:00:00Z",
+      "wave": 6,
+      "critical_path": false,
+      "parallel_group": "wave-6",
+      "spec_path": "eos/specs/TSPEC-CE02.spec.md",
+      "spec_required": true,
+      "spec_status": "WRITTEN"
+    },
+    {
+      "priority": "P2",
+      "complexity": "MEDIUM",
+      "risk": "MEDIUM",
+      "estimated_effort": 2,
+      "depends_on": [
+        "TSPEC-AD05"
+      ],
+      "references": [],
+      "architecture_documents": [
+        "repo_structure.md",
+        "requirement.md",
+        "decision1.md"
+      ],
+      "deliverables": [
+        "go adapter populates CallFact.enclosing for the call graph"
+      ],
+      "outputs": [],
+      "tests": [
+        "unit",
+        "integration",
+        "golden"
+      ],
+      "acceptance_criteria": [
+        "Builds",
+        "Typechecks",
+        "Lint clean",
+        "Tests pass",
+        "Coverage >= 95%"
+      ],
+      "forbidden_changes": [
+        "Repository IR schema",
+        "Requirement IR schema",
+        "Ontology ids / properties",
+        "Compiler pipeline / builder order",
+        "Closure / coverage / consistency rules"
+      ],
+      "labels": [
+        "implementation",
+        "code-compiler"
+      ],
+      "id": "TSPEC-CE03",
+      "title": "go adapter: emit CallFact.enclosing",
+      "owner": "ROLE_IMPLEMENTER",
+      "package": "code-compiler",
+      "module": "language/go",
+      "state": "DRAFT",
+      "repository_path": "packages/code-compiler",
+      "branch": "feature/tspec-ce03-go-adapter-emit-callfact-enclosing",
+      "parent_branch": "main",
+      "blocks": [],
+      "reviewers": [
+        "ROLE_ARCHITECT"
+      ],
+      "version": "1.0.0",
+      "created_at": "2026-06-27T00:00:00Z",
+      "updated_at": "2026-06-27T00:00:00Z",
+      "wave": 6,
+      "critical_path": false,
+      "parallel_group": "wave-6",
+      "spec_path": "eos/specs/TSPEC-CE03.spec.md",
+      "spec_required": true,
+      "spec_status": "WRITTEN"
+    },
+    {
       "priority": "P1",
       "complexity": "MEDIUM",
       "risk": "HIGH",
@@ -4096,7 +4292,7 @@
       "owner": "ROLE_IMPLEMENTER",
       "package": "fixtures",
       "module": "nestjs",
-      "state": "DRAFT",
+      "state": "COMPLETE",
       "repository_path": "fixtures/nestjs",
       "branch": "feature/tspec-fx02-fixture-nestjs",
       "parent_branch": "main",
@@ -4158,7 +4354,7 @@
       "owner": "ROLE_IMPLEMENTER",
       "package": "fixtures",
       "module": "react",
-      "state": "DRAFT",
+      "state": "COMPLETE",
       "repository_path": "fixtures/react",
       "branch": "feature/tspec-fx03-fixture-react",
       "parent_branch": "main",
@@ -4220,7 +4416,7 @@
       "owner": "ROLE_IMPLEMENTER",
       "package": "fixtures",
       "module": "next",
-      "state": "DRAFT",
+      "state": "COMPLETE",
       "repository_path": "fixtures/next",
       "branch": "feature/tspec-fx04-fixture-next",
       "parent_branch": "main",
@@ -4282,7 +4478,7 @@
       "owner": "ROLE_IMPLEMENTER",
       "package": "fixtures",
       "module": "vue",
-      "state": "DRAFT",
+      "state": "COMPLETE",
       "repository_path": "fixtures/vue",
       "branch": "feature/tspec-fx05-fixture-vue",
       "parent_branch": "main",
@@ -4344,7 +4540,7 @@
       "owner": "ROLE_IMPLEMENTER",
       "package": "fixtures",
       "module": "java",
-      "state": "DRAFT",
+      "state": "COMPLETE",
       "repository_path": "fixtures/java",
       "branch": "feature/tspec-fx06-fixture-java",
       "parent_branch": "main",
@@ -4406,7 +4602,7 @@
       "owner": "ROLE_IMPLEMENTER",
       "package": "fixtures",
       "module": "go",
-      "state": "DRAFT",
+      "state": "COMPLETE",
       "repository_path": "fixtures/go",
       "branch": "feature/tspec-fx07-fixture-go",
       "parent_branch": "main",
@@ -4530,7 +4726,7 @@
       "owner": "ROLE_IMPLEMENTER",
       "package": "fixtures",
       "module": "broken-repository",
-      "state": "DRAFT",
+      "state": "COMPLETE",
       "repository_path": "fixtures/broken-repository",
       "branch": "feature/tspec-fx09-fixture-broken-repository",
       "parent_branch": "main",
@@ -4592,7 +4788,7 @@
       "owner": "ROLE_IMPLEMENTER",
       "package": "fixtures",
       "module": "python",
-      "state": "DRAFT",
+      "state": "COMPLETE",
       "repository_path": "fixtures/python",
       "branch": "feature/tspec-fx10-fixture-python",
       "parent_branch": "main",
@@ -4654,7 +4850,7 @@
       "owner": "ROLE_IMPLEMENTER",
       "package": "fixtures",
       "module": "rust",
-      "state": "DRAFT",
+      "state": "COMPLETE",
       "repository_path": "fixtures/rust",
       "branch": "feature/tspec-fx11-fixture-rust",
       "parent_branch": "main",
@@ -4716,7 +4912,7 @@
       "owner": "ROLE_IMPLEMENTER",
       "package": "fixtures",
       "module": "csharp",
-      "state": "DRAFT",
+      "state": "COMPLETE",
       "repository_path": "fixtures/csharp",
       "branch": "feature/tspec-fx12-fixture-csharp",
       "parent_branch": "main",

@@ -1,7 +1,7 @@
 ================================================================================
-RIR IMPLEMENTER PROMPT 5 — TSPEC-FX02: Fixture: nestjs
-Branch: feature/tspec-fx02-fixture-nestjs
-Depends on: TSPEC-AD01 (already satisfied by the scaffold)
+RIR IMPLEMENTER PROMPT 5 — TSPEC-CE03: go adapter: emit CallFact.enclosing
+Branch: feature/tspec-ce03-go-adapter-emit-callfact-enclosing
+Depends on: TSPEC-AD05 (already satisfied by the scaffold)
 Paste this ENTIRE file into a fresh session with your implementer model.
 ================================================================================
 
@@ -30,82 +30,41 @@ Definition of done: build + typecheck + lint + the section-7 tests + coverage >=
 
 ----- WORK ORDER -----------------------------------------------------------------
 
-# TSPEC-FX02 — NestJS fixture + adapter validation (Work Order)
+# TSPEC-CE03 — Go adapter: emit CallFact.enclosing (Work Order)
 
-> Authored by ROLE_ARCHITECT. Implement using ONLY this document. This is the REFERENCE
-> fixture work order; FX03/FX05/FX06/FX07/FX09 follow the same shape. COLLISION-FREE:
-> you create only files in your own fixture folder + one new test file. Touch NOTHING else.
+> Same shape as **TSPEC-CE01 (read it first)**. COLLISION-FREE: touches ONLY `go.ts`
+> and its test.
 
-- **TSPEC:** TSPEC-FX02 · **Owner:** ROLE_IMPLEMENTER · **Header:** `eos/tspecs/TSPEC-FX02.yaml`
-- **Depends on:** TSPEC-AD01 (TypeScript adapter) — COMPLETE · **Wave:** 6
+- **TSPEC:** TSPEC-CE03 · **Owner:** ROLE_IMPLEMENTER · **Depends on:** TSPEC-AD05 (COMPLETE) · **Wave:** 6
 
-## 1. Objective
+## Objective
+Populate `CallFact.enclosing` in the Go adapter so CallPass can build the call graph.
 
-Provide a small, realistic NestJS-style TypeScript auth module as a test fixture, plus a
-test that asserts `TypeScriptAdapter` extracts the expected facts from it. Golden closure
-IR is OUT OF SCOPE (deferred until the pass pipeline lands); this validates the adapter.
+## Files (ADDITIVE-TO-ONE-FILE)
+- modify `packages/code-compiler/src/language/go.ts` (only the call extraction)
+- modify `tests/compiler/go-adapter.test.ts` (add the assertions)
 
-## 2. Contract (fixed — do not change)
+## Behavior (deltas from CE01 §4)
+Tree-sitter node types: a `method_declaration` whose receiver type is `T` sets the child
+enclosing to `T` (the receiver type name — Go's "class"); a top-level `function_declaration`
+sets enclosing to its name when none is set; a `call_expression` gets the current
+`enclosing`. Track `enclosing` down the recursive visit. (For a method
+`func (r *UserRepository) FindByEmail()`, enclosing = `UserRepository`.)
 
-Use the already-exported `TypeScriptAdapter` from `@rir/code-compiler`. The fixture is
-plain source files (parsed as strings); they are NOT compiled by tsc or run.
+## Acceptance (added to the adapter test)
+1. a call inside `func (r *AuthService) Login()` reports `enclosing === "AuthService"`.
+2. a call inside a top-level `func main()` reports `"main"`.
+3. a call outside any function reports `undefined`.
+4. existing call assertions still hold.
+5. coverage ≥ 95%.
 
-## 3. Files (ADDITIVE ONLY — all new, zero shared files)
+## Forbidden
+Change no contract/other adapter/`index.ts`/`package.json`. Never minify (Go is newline-sensitive).
 
-| Action | Path | Purpose |
-| --- | --- | --- |
-| create | `fixtures/nestjs/auth.controller.ts` | a `@Controller` class with a `login` method |
-| create | `fixtures/nestjs/auth.service.ts` | an `AuthService` calling a repository |
-| create | `fixtures/nestjs/user.repository.ts` | a `UserRepository` class |
-| create | `tests/fixtures/nestjs.test.ts` | the test from §7 |
+## References
+TSPEC-CE01; `packages/code-compiler/src/language/go.ts`; ADR-0016.
 
-> Do NOT edit `index.ts`, `package.json`, or any adapter. Import `TypeScriptAdapter`
-> from `@rir/code-compiler` and read the fixture files with `node:fs`.
-
-## 4. Behavior / Algorithm
-
-1. Write idiomatic, realistic NestJS-flavored TypeScript (decorators allowed; the adapter
-   ignores them). The controller's `login` calls `this.authService.login`, which calls
-   `this.userRepository.findByEmail`. Keep each file ~15–30 lines, multi-line, formatted.
-2. The test reads each fixture file via `readFileSync` and calls
-   `new TypeScriptAdapter().parse(path, source, ctx)` (build a no-op `CompilationContext`
-   like the existing adapter tests).
-3. Assert the extracted facts (see §7). No closure, no IR building.
-
-## 5. Input → Output examples (golden)
-
-For `auth.controller.ts` containing `class AuthController { login() { return this.authService.login(...) } }`:
-- `symbols` includes a `class` named `AuthController` and a `method` named `login`.
-- `calls` includes `this.authService.login`.
-
-## 6. Edge cases
-
-- The fixture must be valid TypeScript (multi-line, real newlines) — never minified.
-- Decorators (`@Controller()`, `@Injectable()`) are present but the adapter need not
-  understand them; assertions target symbols/imports/calls only.
-
-## 7. Acceptance criteria (each is a test in tests/fixtures/nestjs.test.ts)
-
-1. `TypeScriptAdapter` extracts class `AuthController` from `auth.controller.ts`.
-2. it extracts the `login` method.
-3. `calls` from the controller include `this.authService.login`.
-4. `AuthService` is extracted from `auth.service.ts` and its call to the repository appears.
-5. coverage is not regressed (the test is deterministic; two parses are deep-equal).
-
-## 8. Forbidden changes
-
-- Do NOT modify any adapter, `LanguageAdapter`/`ParseResult`, or any package source.
-- Do NOT edit `code-compiler/src/index.ts` or any `package.json`.
-- Do NOT minify the fixture files.
-
-## 9. References
-
-- TypeScript adapter (the thing you validate): `packages/code-compiler/src/language/typescript.ts`
-- Existing adapter test pattern (CompilationContext stub): `tests/compiler/typescript-adapter.test.ts`
-- NestJS structure: https://docs.nestjs.com/controllers
-
-## 10. Definition of done
-
-format:check · build · typecheck · the §7 tests · PR `feat(tspec-fx02): nestjs fixture`.
+## Done
+format:check · build · typecheck · the tests · PR `feat(tspec-ce03): go enclosing`.
 
 ----------------------------------------------------------------------------------

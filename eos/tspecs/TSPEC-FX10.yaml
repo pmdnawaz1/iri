@@ -3,7 +3,7 @@
 id: "TSPEC-FX10"
 title: "Fixture: python"
 owner: "ROLE_IMPLEMENTER"
-state: "DRAFT"
+state: "COMPLETE"
 package: "fixtures"
 module: "python"
 repository_path: "fixtures/python"

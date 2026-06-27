@@ -3,7 +3,7 @@
 id: "TSPEC-FX05"
 title: "Fixture: vue"
 owner: "ROLE_IMPLEMENTER"
-state: "DRAFT"
+state: "COMPLETE"
 package: "fixtures"
 module: "vue"
 repository_path: "fixtures/vue"

@@ -3,7 +3,7 @@
 id: "TSPEC-FX02"
 title: "Fixture: nestjs"
 owner: "ROLE_IMPLEMENTER"
-state: "DRAFT"
+state: "COMPLETE"
 package: "fixtures"
 module: "nestjs"
 repository_path: "fixtures/nestjs"

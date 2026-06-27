@@ -603,6 +603,27 @@ const LANG_FIXTURES: TspecSource[] = LANG_FIXTURE_DEFS.map(([id, name, adapter])
   }),
 );
 
+// Adapter enhancements: populate CallFact.enclosing so CallPass can build the call
+// graph (ADR-0016). Each touches only its own language file + test — collision-free.
+const ENCLOSING_DEFS: Array<[string, string, string, string]> = [
+  ["CE01", "typescript", "language/typescript", "TSPEC-AD01"],
+  ["CE02", "python", "language/python", "TSPEC-AD03"],
+  ["CE03", "go", "language/go", "TSPEC-AD05"],
+];
+const ENHANCEMENTS: TspecSource[] = ENCLOSING_DEFS.map(([id, lang, mod, adapter]) =>
+  T({
+    id: `TSPEC-${id}`,
+    title: `${lang} adapter: emit CallFact.enclosing`,
+    owner: Role.Implementer,
+    package: "code-compiler",
+    module: mod,
+    priority: Priority.P2,
+    estimated_effort: 2,
+    depends_on: [adapter],
+    deliverables: [`${lang} adapter populates CallFact.enclosing for the call graph`],
+  }),
+);
+
 const TOOLING: TspecSource[] = [
   T({
     id: "TSPEC-SC01",
@@ -664,5 +685,6 @@ export const DATASET: readonly TspecSource[] = [
   ...APPS,
   ...FIXTURES,
   ...LANG_FIXTURES,
+  ...ENHANCEMENTS,
   ...TOOLING,
 ];

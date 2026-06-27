@@ -3,7 +3,7 @@
 id: "TSPEC-P03"
 title: "RoutePass"
 owner: "ROLE_IMPLEMENTER"
-state: "DRAFT"
+state: "COMPLETE"
 package: "passes"
 module: "RoutePass"
 repository_path: "packages/passes"

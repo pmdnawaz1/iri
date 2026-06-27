@@ -1,6 +1,6 @@
 ================================================================================
-RIR IMPLEMENTER PROMPT 1 — TSPEC-P01: ImportPass
-Branch: feature/tspec-p01-importpass
+RIR IMPLEMENTER PROMPT 1 — TSPEC-P07: DependencyPass
+Branch: feature/tspec-p07-dependencypass
 Depends on: TSPEC-A006, TSPEC-I006 (already satisfied by the scaffold)
 Paste this ENTIRE file into a fresh session with your implementer model.
 ================================================================================
@@ -30,48 +30,44 @@ Definition of done: build + typecheck + lint + the section-7 tests + coverage >=
 
 ----- WORK ORDER -----------------------------------------------------------------
 
-# TSPEC-P01 — ImportPass (Work Order)
+# TSPEC-P07 — DependencyPass (Work Order)
 
 > Same harness/conventions as **TSPEC-P02 (read it first)** + ADR-0016. COLLISION-FREE:
-> only your pass file + test. Do NOT edit `packages/passes/src/index.ts`.
+> only your pass file + test. Do NOT edit `packages/passes/src/index.ts`. Package-name imports.
 
-- **TSPEC:** TSPEC-P01 · **Owner:** ROLE_IMPLEMENTER · **Depends on:** TSPEC-A006, TSPEC-I006, ADR-0016 (COMPLETE) · **Wave:** 5
+- **TSPEC:** TSPEC-P07 · **Owner:** ROLE_IMPLEMENTER · **Depends on:** TSPEC-A006, TSPEC-I006, ADR-0016 (COMPLETE) · **Wave:** 5
 
 ## Objective
-Lift each artifact into a `MODULE` node and each `ImportFact` into an `IMPORTS` edge.
+Compute module-level dependencies: for every `IMPORTS` edge between `MODULE` nodes, emit a
+`DEPENDS_ON` edge in the same direction. Runs after ImportPass; in unit tests, pre-seed the
+MODULE nodes + IMPORTS edges on the draft.
 
 ## Files (ADDITIVE ONLY)
-- create `packages/passes/src/ImportPass.ts`
-- create `tests/passes/import-pass.test.ts`
+- create `packages/passes/src/DependencyPass.ts`
+- create `tests/passes/dependency-pass.test.ts`
 
 ## Behavior
-`name = "ImportPass"`, `priority = PASS_PRIORITY.ImportPass`, `supports()` true.
-`run(ctx, draft)`: for each `pr` in `ctx.parseResults ?? []`:
-- `draft.addArtifact(pr.artifact)`.
-- add a `MODULE` node for the file: id = `makeId("module", pr.artifact.path)`, name =
-  `pr.artifact.path`, artifactId = `pr.artifact.id`, span = null, hash = "0",
-  default execution, evidence `[{ source:"AST", locator: pr.artifact.path, confidence:1 }]`.
-- for each `imp` in `pr.imports`: add a `MODULE` node for the specifier (id =
-  `makeId("module", imp.specifier)`, name = `imp.specifier`, artifactId = `pr.artifact.id`),
-  then an `IMPORTS` edge `{ id: makeId("edge","imports", fileModuleId, specModuleId),
-  kind:"IMPORTS", from: fileModuleId, to: specModuleId, evidence:[AST] }`.
+`name = "DependencyPass"`, `priority = PASS_PRIORITY.DependencyPass`, `supports()` true.
+`run(_ctx, draft)`:
+- read `draft.getEdges()`; for each edge with `kind === "IMPORTS"` whose `from` and `to`
+  both resolve via `draft.getNode(...)` to `MODULE` nodes, add
+  `{ id: makeId("edge","dependsOn", from, to), kind: "DEPENDS_ON", from, to, evidence:[AST] }`.
+- ignore non-IMPORTS edges. Idempotent.
 
-(Adding the specifier module node keeps every edge endpoint valid in the sealed IR.)
-
-## Acceptance (each a test; use DefaultIRDraft + a CompilationContext stub)
-1. one artifact → one `MODULE` node for the file.
-2. an import `"./app"` → a `MODULE` node for `./app` and an `IMPORTS` edge between them.
-3. multiple imports → one edge each.
+## Acceptance (each a test; DefaultIRDraft + CompilationContext stub)
+1. two MODULE nodes + an `IMPORTS` edge → a matching `DEPENDS_ON` edge.
+2. multiple imports → one `DEPENDS_ON` each.
+3. a non-IMPORTS edge produces no `DEPENDS_ON`.
 4. determinism: two runs yield equal sealed IR.
 5. coverage ≥ 95%.
 
 ## Forbidden
-Edit no shared file/roster/`@rir/core`/adapter. Import via package names only.
+Edit no shared file/roster/`@rir/core`/adapter. Package-name imports only.
 
 ## References
-ADR-0016; `packages/builder-engine/src/index.ts` (DefaultIRDraft).
+ADR-0016; ImportPass (`packages/passes/src/ImportPass.ts`); DefaultIRDraft.
 
 ## Done
-format:check · build · typecheck · the tests · PR `feat(tspec-p01): import pass`.
+format:check · build · typecheck · the tests · PR `feat(tspec-p07): dependency pass`.
 
 ----------------------------------------------------------------------------------

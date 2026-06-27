@@ -3,7 +3,7 @@
 id: "TSPEC-FX09"
 title: "Fixture: broken-repository"
 owner: "ROLE_IMPLEMENTER"
-state: "DRAFT"
+state: "COMPLETE"
 package: "fixtures"
 module: "broken-repository"
 repository_path: "fixtures/broken-repository"

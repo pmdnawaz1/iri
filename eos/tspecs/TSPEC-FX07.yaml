@@ -3,7 +3,7 @@
 id: "TSPEC-FX07"
 title: "Fixture: go"
 owner: "ROLE_IMPLEMENTER"
-state: "DRAFT"
+state: "COMPLETE"
 package: "fixtures"
 module: "go"
 repository_path: "fixtures/go"

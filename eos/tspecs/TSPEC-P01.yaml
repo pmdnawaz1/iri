@@ -3,7 +3,7 @@
 id: "TSPEC-P01"
 title: "ImportPass"
 owner: "ROLE_IMPLEMENTER"
-state: "DRAFT"
+state: "COMPLETE"
 package: "passes"
 module: "ImportPass"
 repository_path: "packages/passes"

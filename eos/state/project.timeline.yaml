@@ -32,18 +32,18 @@ timeline:
     end_unit: 176
     tspecs: 23
   - wave: 6
-    effort: 16
+    effort: 22
     start_unit: 176
-    end_unit: 192
-    tspecs: 13
+    end_unit: 198
+    tspecs: 16
   - wave: 7
     effort: 6
-    start_unit: 192
-    end_unit: 198
+    start_unit: 198
+    end_unit: 204
     tspecs: 2
   - wave: 8
     effort: 4
-    start_unit: 198
-    end_unit: 202
+    start_unit: 204
+    end_unit: 208
     tspecs: 2
-total_effort: 202
+total_effort: 208

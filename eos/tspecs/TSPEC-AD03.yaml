@@ -17,6 +17,7 @@ depends_on:
   - "TSPEC-A007"
   - "TSPEC-I006"
 blocks:
+  - "TSPEC-CE02"
   - "TSPEC-FX10"
 references:
   - "https://tree-sitter.github.io/tree-sitter/"

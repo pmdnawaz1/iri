@@ -3,7 +3,7 @@
 id: "TSPEC-FX12"
 title: "Fixture: csharp"
 owner: "ROLE_IMPLEMENTER"
-state: "DRAFT"
+state: "COMPLETE"
 package: "fixtures"
 module: "csharp"
 repository_path: "fixtures/csharp"

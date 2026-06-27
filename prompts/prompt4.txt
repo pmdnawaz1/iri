@@ -1,7 +1,7 @@
 ================================================================================
-RIR IMPLEMENTER PROMPT 4 — TSPEC-P12: ReachabilityPass
-Branch: feature/tspec-p12-reachabilitypass
-Depends on: TSPEC-A006, TSPEC-I006 (already satisfied by the scaffold)
+RIR IMPLEMENTER PROMPT 4 — TSPEC-CE02: python adapter: emit CallFact.enclosing
+Branch: feature/tspec-ce02-python-adapter-emit-callfact-enclosing
+Depends on: TSPEC-AD03 (already satisfied by the scaffold)
 Paste this ENTIRE file into a fresh session with your implementer model.
 ================================================================================
 
@@ -30,49 +30,40 @@ Definition of done: build + typecheck + lint + the section-7 tests + coverage >=
 
 ----- WORK ORDER -----------------------------------------------------------------
 
-# TSPEC-P12 — ReachabilityPass (Work Order)
+# TSPEC-CE02 — Python adapter: emit CallFact.enclosing (Work Order)
 
-> Same harness/conventions as **TSPEC-P02 (read it first)** + ADR-0016. COLLISION-FREE:
-> only your pass file + test. Do NOT edit `packages/passes/src/index.ts`.
+> Same shape as **TSPEC-CE01 (read it first)**. COLLISION-FREE: touches ONLY `python.ts`
+> and its test.
 
-- **TSPEC:** TSPEC-P12 · **Owner:** ROLE_IMPLEMENTER · **Depends on:** TSPEC-A006, TSPEC-I006, TSPEC-I003, ADR-0016 (COMPLETE) · **Wave:** 5
+- **TSPEC:** TSPEC-CE02 · **Owner:** ROLE_IMPLEMENTER · **Depends on:** TSPEC-AD03 (COMPLETE) · **Wave:** 6
 
 ## Objective
-Compute `reachable` + `entryDistance` for every node from the repository entrypoints and
-rewrite each node's `execution`. Pure graph traversal — uses the read access on `IRDraft`.
+Populate `CallFact.enclosing` in the Python adapter (nearest enclosing class, else top-level
+function) so CallPass can build the call graph.
 
-## Files (ADDITIVE ONLY)
-- create `packages/passes/src/ReachabilityPass.ts`
-- create `tests/passes/reachability-pass.test.ts`
+## Files (ADDITIVE-TO-ONE-FILE)
+- modify `packages/code-compiler/src/language/python.ts` (only the call extraction)
+- modify `tests/compiler/python-adapter.test.ts` (add the assertions)
 
-## Behavior
-`name = "ReachabilityPass"`, `priority = PASS_PRIORITY.ReachabilityPass`, `supports()` true.
-Uses `DirectedGraph`, `distancesFrom` from `@rir/graph`. `run(ctx, draft)`:
-1. read `nodes = draft.getNodes()`, `edges = draft.getEdges()`.
-2. build a `DirectedGraph`: add every node id, then every edge (`from → to`).
-3. entrypoints = node ids whose kind is `ROUTE` or `ENTRYPOINT`.
-4. `dist = distancesFrom(graph, entrypointIds)`.
-5. for each node, `draft.addNode({ ...node, execution: { ...node.execution,
-   reachable: dist.has(node.id), entryDistance: dist.get(node.id) ?? null } })`
-   (idempotent replace by id).
+## Behavior (deltas from CE01 §4)
+Tree-sitter node types: a `class_definition` with a `name` field sets the child enclosing to
+the class name (class wins); a top-level `function_definition` sets enclosing when none is
+set; a `call` node gets the current `enclosing`. Track `enclosing` down the recursive visit.
 
-## Acceptance (each a test; DefaultIRDraft + CompilationContext stub)
-Pre-seed the draft with a `ROUTE` node and `CONTROLLER`/`SERVICE` nodes plus edges
-ROUTE→CONTROLLER→SERVICE, and one disconnected `CLASS` node:
-1. the ROUTE node is reachable with `entryDistance` 0.
-2. CONTROLLER has distance 1, SERVICE distance 2; both reachable.
-3. the disconnected node is `reachable: false`, `entryDistance: null`.
-4. other `execution` fields (runtimeObserved/tested) are preserved.
-5. determinism: two runs yield equal sealed IR.
-6. coverage ≥ 95%.
+## Acceptance (added to the adapter test)
+1. a call inside a method of `class AuthService` reports `enclosing === "AuthService"`.
+2. a call inside a top-level `def` reports that function's name.
+3. a module-top-level call reports `undefined`.
+4. existing call assertions still hold.
+5. coverage ≥ 95%.
 
 ## Forbidden
-Edit no shared file/roster/`@rir/core`/`@rir/graph`/adapter. Import via package names only.
+Change no contract/other adapter/`index.ts`/`package.json`. Never minify.
 
 ## References
-ADR-0016; `@rir/graph` (`distancesFrom`); `apps/cli/src/prove.ts` (reachability step); DefaultIRDraft.
+TSPEC-CE01; `packages/code-compiler/src/language/python.ts`; ADR-0016.
 
 ## Done
-format:check · build · typecheck · the tests · PR `feat(tspec-p12): reachability pass`.
+format:check · build · typecheck · the tests · PR `feat(tspec-ce02): python enclosing`.
 
 ----------------------------------------------------------------------------------

@@ -80,6 +80,9 @@ waves:
   - wave: 6
     parallel_group: "wave-6"
     tspecs:
+      - "TSPEC-CE01"
+      - "TSPEC-CE02"
+      - "TSPEC-CE03"
       - "TSPEC-E01"
       - "TSPEC-FX01"
       - "TSPEC-FX02"

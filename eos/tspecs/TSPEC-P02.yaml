@@ -3,7 +3,7 @@
 id: "TSPEC-P02"
 title: "CallPass"
 owner: "ROLE_IMPLEMENTER"
-state: "DRAFT"
+state: "COMPLETE"
 package: "passes"
 module: "CallPass"
 repository_path: "packages/passes"

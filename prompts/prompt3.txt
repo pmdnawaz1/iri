@@ -1,7 +1,7 @@
 ================================================================================
-RIR IMPLEMENTER PROMPT 3 — TSPEC-P03: RoutePass
-Branch: feature/tspec-p03-routepass
-Depends on: TSPEC-A006, TSPEC-I006 (already satisfied by the scaffold)
+RIR IMPLEMENTER PROMPT 3 — TSPEC-CE01: typescript adapter: emit CallFact.enclosing
+Branch: feature/tspec-ce01-typescript-adapter-emit-callfact-enclosing
+Depends on: TSPEC-AD01 (already satisfied by the scaffold)
 Paste this ENTIRE file into a fresh session with your implementer model.
 ================================================================================
 
@@ -30,49 +30,70 @@ Definition of done: build + typecheck + lint + the section-7 tests + coverage >=
 
 ----- WORK ORDER -----------------------------------------------------------------
 
-# TSPEC-P03 — RoutePass (Work Order)
+# TSPEC-CE01 — TypeScript adapter: emit CallFact.enclosing (Work Order)
 
-> Same harness/conventions as **TSPEC-P02 (read it first)** + ADR-0016. COLLISION-FREE:
-> only your pass file + test. Do NOT edit `packages/passes/src/index.ts`.
+> Authored by ROLE_ARCHITECT. Sanctioned enhancement to the TypeScript adapter so CallPass
+> can build the call graph (ADR-0016). COLLISION-FREE: touches ONLY `typescript.ts` and its
+> test. Do NOT touch any other adapter or shared file.
 
-- **TSPEC:** TSPEC-P03 · **Owner:** ROLE_IMPLEMENTER · **Depends on:** TSPEC-A006, TSPEC-I006, ADR-0016 (COMPLETE) · **Wave:** 5
+- **TSPEC:** TSPEC-CE01 · **Owner:** ROLE_IMPLEMENTER · **Header:** `eos/tspecs/TSPEC-CE01.yaml`
+- **Depends on:** TSPEC-AD01 — COMPLETE · **Wave:** 6
 
-## Objective
-Lift each `RouteFact` into a `ROUTE` node and a `ROUTES_TO` edge to the controller invoked
-by its handler. RoutePass runs after CallPass, so controller nodes already exist; in unit
-tests, pre-seed the controller node on the draft.
+## 1. Objective
 
-## Files (ADDITIVE ONLY)
-- create `packages/passes/src/RoutePass.ts`
-- create `tests/passes/route-pass.test.ts`
+Populate `CallFact.enclosing` (already on the `@rir/core` contract, currently unset) with
+the name of the nearest enclosing **class** (preferred) or top-level **function** that
+contains each call. This is the SOURCE of the CALLS edge CallPass builds.
 
-## Behavior
-`name = "RoutePass"`, `priority = PASS_PRIORITY.RoutePass`, `supports()` true.
-`run(ctx, draft)`: for each `pr` in `ctx.parseResults ?? []`, for each `route` in `pr.routes`:
-- add a `ROUTE` node: id = `makeId("route", `${route.method} ${route.path}`)`, name =
-  `${route.method} ${route.path}`, artifactId = `pr.artifact.id`, span = `route.span`,
-  hash = "0", default execution, evidence `[AST]`.
-- resolve the handler's controller: scan `route.handler` for `<ident>.<method>` patterns;
-  for each `<ident>`, upper-case its first letter (`authController` → `AuthController`) and
-  if `draft.getNode(makeId("decl", that))` exists, add a `ROUTES_TO` edge
-  `{ id: makeId("edge","routesTo", routeId, controllerId), kind:"ROUTES_TO", from: routeId,
-  to: controllerId, evidence:[AST] }`. No match ⇒ no edge.
+## 2. Contract (fixed)
 
-## Acceptance (each a test; DefaultIRDraft + CompilationContext stub)
-1. a `RouteFact { method:"POST", path:"/login" }` → a `ROUTE` node `POST /login`.
-2. with a pre-seeded `CONTROLLER` node `AuthController` and handler text
-   `"authController.login"` → a `ROUTES_TO` edge route→AuthController.
-3. handler that resolves to no existing node → ROUTE node but no edge.
-4. determinism: two runs yield equal sealed IR.
-5. coverage ≥ 95%.
+`CallFact` is `{ callee: string; enclosing?: string; span: Span }`. Only `extractCalls`
+in `packages/code-compiler/src/language/typescript.ts` changes. The `ParseResult` shape and
+all other extraction are unchanged.
 
-## Forbidden
-Edit no shared file/roster/`@rir/core`/adapter. Import via package names only.
+## 3. Files (ADDITIVE-TO-ONE-FILE)
+- modify `packages/code-compiler/src/language/typescript.ts` (only `extractCalls`)
+- modify `tests/compiler/typescript-adapter.test.ts` (add the §6 assertions)
 
-## References
-ADR-0016; `apps/cli/src/prove.ts` (route→controller resolution); DefaultIRDraft.
+## 4. Behavior / Algorithm
 
-## Done
-format:check · build · typecheck · the tests · PR `feat(tspec-p03): route pass`.
+Rewrite `extractCalls` to carry an `enclosing` value down the walk:
+- walk `(node, enclosing)`:
+  - if `node` is a `ClassDeclaration` with a name → child enclosing = the class name
+    (a class always wins over nested methods/functions).
+  - else if `node` is a `FunctionDeclaration` with a name AND `enclosing` is undefined →
+    child enclosing = the function name.
+  - else → child enclosing = `enclosing` (unchanged).
+  - if `node` is a `CallExpression` → push `{ callee: <as today>, enclosing, span }`.
+  - recurse into children with the child enclosing.
+
+So a call inside `AuthController.login`'s body gets `enclosing: "AuthController"`; a call in
+a free top-level `function helper()` gets `enclosing: "helper"`; a call at module top level
+gets `enclosing: undefined`.
+
+## 5. Edge cases
+- Method bodies report the enclosing CLASS, not the method.
+- Top-level calls report `undefined`.
+- Determinism unchanged; existing call tests still pass (callee/span unchanged).
+
+## 6. Acceptance criteria (added to the adapter test)
+1. parsing a class `AuthController` whose `login` method calls `this.authService.login`
+   yields a `CallFact` with `enclosing === "AuthController"`.
+2. a call inside a named top-level function reports that function's name.
+3. a module-top-level call reports `enclosing === undefined`.
+4. the existing call assertions (callee/span) still hold.
+5. coverage for `typescript.ts` ≥ 95%.
+
+## 7. Forbidden changes
+- Do NOT change `CallFact`/`ParseResult`/`LanguageAdapter` (architect-owned).
+- Do NOT touch any other adapter, `index.ts`, or `package.json`.
+- Do NOT minify.
+
+## 8. References
+ADR-0016 (call resolution); `apps/cli/src/prove.ts` (enclosing-class tracking);
+`packages/code-compiler/src/language/typescript.ts`.
+
+## 9. Definition of done
+format:check · build · typecheck · the §6 tests · coverage ≥ 95% · PR `feat(tspec-ce01): typescript enclosing`.
 
 ----------------------------------------------------------------------------------

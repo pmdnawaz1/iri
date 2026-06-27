@@ -180,6 +180,15 @@ reviews:
   - id: "TSPEC-P15"
     reviewers:
       - "ROLE_ARCHITECT"
+  - id: "TSPEC-CE01"
+    reviewers:
+      - "ROLE_ARCHITECT"
+  - id: "TSPEC-CE02"
+    reviewers:
+      - "ROLE_ARCHITECT"
+  - id: "TSPEC-CE03"
+    reviewers:
+      - "ROLE_ARCHITECT"
   - id: "TSPEC-E01"
     reviewers:
       - "ROLE_ARCHITECT"

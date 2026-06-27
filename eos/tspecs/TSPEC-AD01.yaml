@@ -17,6 +17,7 @@ depends_on:
   - "TSPEC-A007"
   - "TSPEC-I006"
 blocks:
+  - "TSPEC-CE01"
   - "TSPEC-FX01"
   - "TSPEC-FX02"
   - "TSPEC-FX03"

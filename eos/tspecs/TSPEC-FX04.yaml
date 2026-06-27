@@ -3,7 +3,7 @@
 id: "TSPEC-FX04"
 title: "Fixture: next"
 owner: "ROLE_IMPLEMENTER"
-state: "DRAFT"
+state: "COMPLETE"
 package: "fixtures"
 module: "next"
 repository_path: "fixtures/next"

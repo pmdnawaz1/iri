@@ -3,7 +3,7 @@
 id: "TSPEC-P12"
 title: "ReachabilityPass"
 owner: "ROLE_IMPLEMENTER"
-state: "DRAFT"
+state: "COMPLETE"
 package: "passes"
 module: "ReachabilityPass"
 repository_path: "packages/passes"

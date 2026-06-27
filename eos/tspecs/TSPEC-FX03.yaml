@@ -3,7 +3,7 @@
 id: "TSPEC-FX03"
 title: "Fixture: react"
 owner: "ROLE_IMPLEMENTER"
-state: "DRAFT"
+state: "COMPLETE"
 package: "fixtures"
 module: "react"
 repository_path: "fixtures/react"

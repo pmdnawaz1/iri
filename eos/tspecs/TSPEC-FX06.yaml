@@ -3,7 +3,7 @@
 id: "TSPEC-FX06"
 title: "Fixture: java"
 owner: "ROLE_IMPLEMENTER"
-state: "DRAFT"
+state: "COMPLETE"
 package: "fixtures"
 module: "java"
 repository_path: "fixtures/java"

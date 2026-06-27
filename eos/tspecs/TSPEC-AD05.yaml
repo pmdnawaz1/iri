@@ -16,7 +16,8 @@ estimated_effort: 3
 depends_on:
   - "TSPEC-A007"
   - "TSPEC-I006"
-blocks: []
+blocks:
+  - "TSPEC-CE03"
 references:
   - "https://tree-sitter.github.io/tree-sitter/"
   - "https://ast-grep.github.io/"

@@ -3,7 +3,7 @@
 id: "TSPEC-FX11"
 title: "Fixture: rust"
 owner: "ROLE_IMPLEMENTER"
-state: "DRAFT"
+state: "COMPLETE"
 package: "fixtures"
 module: "rust"
 repository_path: "fixtures/rust"
