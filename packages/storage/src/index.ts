@@ -130,3 +130,5 @@ export class InMemoryStorage implements Storage {
 export function snapshotIR(snapshot: SnapshotIR | undefined): RepositoryIR | undefined {
   return snapshot?.ir;
 }
+
+export { SqliteStorage } from "./sqlite.js";

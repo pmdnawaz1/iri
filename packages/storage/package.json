@@ -10,6 +10,10 @@
   "scripts": { "build": "tsc -b", "clean": "tsc -b --clean" },
   "dependencies": {
     "@rir/ir": "workspace:*",
-    "@rir/common": "workspace:*"
+    "@rir/common": "workspace:*",
+    "better-sqlite3": "^11.0.0"
+  },
+  "devDependencies": {
+    "@types/better-sqlite3": "^7.6.0"
   }
 }
