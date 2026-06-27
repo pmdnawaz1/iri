@@ -1,8 +1,15 @@
-// Wired backend: Controller -> Service -> Repository are all connected.
+// Wired backend: Controller -> Service -> Repository -> Database are all connected.
+
+class Database {
+  query(sql: string, params: unknown[]) {
+    return [{ sql, params }];
+  }
+}
 
 export class UserRepository {
+  private db = new Database();
   findByEmail(email: string) {
-    return { email }; // pretend DB read
+    return this.db.query("SELECT * FROM users WHERE email = ?", [email]);
   }
 }
 

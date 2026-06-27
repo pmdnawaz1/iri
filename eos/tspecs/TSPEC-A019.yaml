@@ -3,7 +3,7 @@
 id: "TSPEC-A019"
 title: "Full execution closure (stage producers + tiers)"
 owner: "ROLE_ARCHITECT"
-state: "DRAFT"
+state: "COMPLETE"
 package: "closure"
 module: "tiers"
 repository_path: "packages/closure"

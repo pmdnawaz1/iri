@@ -41,6 +41,7 @@ export const NodeKind = {
   Entrypoint: "ENTRYPOINT",
   Test: "TEST",
   Document: "DOCUMENT",
+  Response: "RESPONSE",
 } as const;
 export type NodeKind = (typeof NodeKind)[keyof typeof NodeKind];
 

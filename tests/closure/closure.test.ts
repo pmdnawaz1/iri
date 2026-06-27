@@ -40,7 +40,20 @@ describe("evaluateClosure", () => {
     expect(result.state).toBe(ClosureState.Unreachable);
   });
 
-  it("is BROKEN when a present stage follows a missing earlier stage", () => {
+  it("is BROKEN when a present stage follows a missing earlier stage in the same tier", () => {
+    // BACKEND_ROUTE and REPOSITORY present, CONTROLLER/SERVICE missing between them:
+    // the backend chain resumes after a gap → interrupted → BROKEN.
+    const route = node("r", NodeKind.Route);
+    const repo = node("rp", NodeKind.Repository);
+    const map = new Map([
+      [route.id, route],
+      [repo.id, repo],
+    ]);
+    const result = evaluateClosure(loginCap([route.id, repo.id]), map);
+    expect(result.state).toBe(ClosureState.Broken);
+  });
+
+  it("is PARTIAL when the backend tier simply stops short (no gap)", () => {
     const route = node("r", NodeKind.Route);
     const controller = node("c", NodeKind.Controller);
     const map = new Map([
@@ -48,7 +61,7 @@ describe("evaluateClosure", () => {
       [controller.id, controller],
     ]);
     const result = evaluateClosure(loginCap([route.id, controller.id]), map);
-    expect(result.state).toBe(ClosureState.Broken);
+    expect(result.state).toBe(ClosureState.Partial);
   });
 
   it("preserves a CONFLICTING state without recomputing", () => {

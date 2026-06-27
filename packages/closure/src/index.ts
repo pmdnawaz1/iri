@@ -11,7 +11,7 @@
  */
 
 import { ClosureState, NodeKind, type CapabilityIR, type NodeIR, type RepositoryIR } from "@rir/ir";
-import { ExecutionStage, getCapability } from "@rir/ontology";
+import { ExecutionStage, type ExecutionTier, getCapability, tierOfStage } from "@rir/ontology";
 
 /** Canonical mapping from a Repository IR node kind onto an ontology execution stage.
  *  Node kinds without a stage (e.g. Variable, Test) do not participate in closure. */
@@ -25,6 +25,7 @@ const STAGE_OF_NODE_KIND: Partial<Record<NodeKind, ExecutionStage>> = {
   [NodeKind.ApiCall]: ExecutionStage.ApiCall,
   [NodeKind.SqlQuery]: ExecutionStage.Database,
   [NodeKind.Table]: ExecutionStage.Database,
+  [NodeKind.Response]: ExecutionStage.Response,
 };
 
 export function stageOfNodeKind(kind: NodeKind): ExecutionStage | undefined {
@@ -103,13 +104,19 @@ export function evaluateClosure(
     if (stage) presentStages.add(stage);
   }
 
+  // Tier-aware (ADR-0019): only require stages whose tier is actually present in the repo.
+  // A backend-only repo is judged on its BACKEND subchain, not the full-stack chain.
+  const presentTiers = new Set<ExecutionTier>();
+  for (const s of presentStages) presentTiers.add(tierOfStage(s));
+
+  const requiredStages = expected.filter((s) => presentTiers.has(tierOfStage(s)));
   const present = expected.filter((s) => presentStages.has(s));
-  const missing = expected.filter((s) => !presentStages.has(s));
+  const missing = requiredStages.filter((s) => !presentStages.has(s));
 
   let state: ClosureState;
   if (missing.length === 0) {
     state = ClosureState.Closed;
-  } else if (isChainInterrupted(expected, presentStages)) {
+  } else if (isChainInterrupted(requiredStages, presentStages)) {
     state = ClosureState.Broken;
   } else {
     state = ClosureState.Partial;

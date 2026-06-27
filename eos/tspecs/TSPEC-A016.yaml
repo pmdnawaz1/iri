@@ -3,7 +3,7 @@
 id: "TSPEC-A016"
 title: "Ontology expansion (commerce/profile/notification features)"
 owner: "ROLE_ARCHITECT"
-state: "DRAFT"
+state: "COMPLETE"
 package: "ontology"
 module: "expansion"
 repository_path: "packages/ontology"

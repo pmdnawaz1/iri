@@ -9,7 +9,7 @@
  * is only valid because it is listed in `aliases`).
  */
 
-export const ONTOLOGY_VERSION = "1.0.0" as const;
+export const ONTOLOGY_VERSION = "1.1.0" as const;
 
 /**
  * Canonical execution stages. A capability's `expectedChain` is an ordered list of
@@ -31,6 +31,38 @@ export const ExecutionStage = {
   RenderedUi: "RENDERED_UI",
 } as const;
 export type ExecutionStage = (typeof ExecutionStage)[keyof typeof ExecutionStage];
+
+/**
+ * Tier of each stage (ADR-0019). Closure only requires the stages whose tier is actually
+ * present in the compiled repository, so a backend-only repo can be honestly CLOSED on its
+ * tier instead of permanently BROKEN. FRONTEND = browser; EDGE = the client→server hop;
+ * BACKEND = server + persistence.
+ */
+export const ExecutionTier = {
+  Frontend: "FRONTEND",
+  Edge: "EDGE",
+  Backend: "BACKEND",
+} as const;
+export type ExecutionTier = (typeof ExecutionTier)[keyof typeof ExecutionTier];
+
+export const STAGE_TIER: Readonly<Record<ExecutionStage, ExecutionTier>> = {
+  FRONTEND_ROUTE: "FRONTEND",
+  COMPONENT: "FRONTEND",
+  HANDLER: "FRONTEND",
+  FRONTEND_STATE: "FRONTEND",
+  RENDERED_UI: "FRONTEND",
+  API_CALL: "EDGE",
+  BACKEND_ROUTE: "BACKEND",
+  CONTROLLER: "BACKEND",
+  SERVICE: "BACKEND",
+  REPOSITORY: "BACKEND",
+  DATABASE: "BACKEND",
+  RESPONSE: "BACKEND",
+};
+
+export function tierOfStage(stage: ExecutionStage): ExecutionTier {
+  return STAGE_TIER[stage];
+}
 
 /** The kind of value a constraint key accepts. */
 export const ConstraintType = {
@@ -224,8 +256,101 @@ const AUTH: FeatureDefinition = {
   ],
 };
 
+// ---------------------------------------------------------------------------
+// Expanded coverage (TSPEC-A016 / ADR-0018): commerce, profile, notification.
+// Backend-tier chains by default; closure is tier-aware (ADR-0019), so a backend
+// repo is judged on the BACKEND subchain.
+// ---------------------------------------------------------------------------
+
+const S = ExecutionStage;
+const BACKEND_CHAIN: readonly ExecutionStage[] = [
+  S.BackendRoute,
+  S.Controller,
+  S.Service,
+  S.Repository,
+  S.Database,
+  S.Response,
+];
+
+function cap(
+  id: string,
+  name: string,
+  aliases: readonly string[] = [],
+  chain: readonly ExecutionStage[] = BACKEND_CHAIN,
+): CapabilityDefinition {
+  return { id, name, expectedChain: chain, constraints: [], outputs: [], aliases };
+}
+
+const PAYMENT: FeatureDefinition = {
+  id: "PAYMENT",
+  name: "Payment",
+  capabilities: [
+    cap("PAYMENT.CREATE_PAYMENT", "CREATE_PAYMENT", ["pay", "payment", "charge"]),
+    cap("PAYMENT.CAPTURE", "CAPTURE", ["capture"]),
+    cap("PAYMENT.REFUND", "REFUND", ["refund"]),
+    cap("PAYMENT.CANCEL", "CANCEL", ["void"]),
+  ],
+};
+
+const ORDER: FeatureDefinition = {
+  id: "ORDER",
+  name: "Order",
+  capabilities: [
+    cap("ORDER.CREATE", "CREATE", ["order", "orders", "place_order"]),
+    cap("ORDER.UPDATE", "UPDATE", []),
+    cap("ORDER.CANCEL", "CANCEL", []),
+  ],
+};
+
+const CART: FeatureDefinition = {
+  id: "CART",
+  name: "Cart",
+  capabilities: [
+    cap("CART.ADD_ITEM", "ADD_ITEM", ["cart", "add_to_cart"]),
+    cap("CART.REMOVE_ITEM", "REMOVE_ITEM", ["remove_from_cart"]),
+    cap("CART.VIEW", "VIEW", []),
+  ],
+};
+
+const CHECKOUT: FeatureDefinition = {
+  id: "CHECKOUT",
+  name: "Checkout",
+  capabilities: [cap("CHECKOUT.START", "START", ["checkout"]), cap("CHECKOUT.COMPLETE", "COMPLETE", [])],
+};
+
+const INVENTORY: FeatureDefinition = {
+  id: "INVENTORY",
+  name: "Inventory",
+  capabilities: [
+    cap("INVENTORY.CHECK", "CHECK", ["inventory", "stock"]),
+    cap("INVENTORY.RESERVE", "RESERVE", ["reserve"]),
+    cap("INVENTORY.RELEASE", "RELEASE", ["release"]),
+  ],
+};
+
+const PROFILE: FeatureDefinition = {
+  id: "PROFILE",
+  name: "Profile",
+  capabilities: [cap("PROFILE.VIEW", "VIEW", ["profile", "me"]), cap("PROFILE.UPDATE", "UPDATE", [])],
+};
+
+const NOTIFICATION: FeatureDefinition = {
+  id: "NOTIFICATION",
+  name: "Notification",
+  capabilities: [cap("NOTIFICATION.SEND", "SEND", ["notify", "notification", "notifications"])],
+};
+
 /** The complete ontology, keyed by feature id. Extend additively, never in place. */
-export const ONTOLOGY: readonly FeatureDefinition[] = [AUTH];
+export const ONTOLOGY: readonly FeatureDefinition[] = [
+  AUTH,
+  PAYMENT,
+  ORDER,
+  CART,
+  CHECKOUT,
+  INVENTORY,
+  PROFILE,
+  NOTIFICATION,
+];
 
 // ---------------------------------------------------------------------------
 // Deterministic lookups (no inference)

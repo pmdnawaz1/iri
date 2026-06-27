@@ -49,6 +49,30 @@ export class RoutePass extends AbstractPass {
           ],
         });
 
+        // Response producer (ADR-0019): a handler that sends a response yields a RESPONSE
+        // node reachable from the route, so the backend tier can close.
+        if (/\b(res|reply|response|ctx)\.(json|send|status|code|end|render)\b/.test(route.handler)) {
+          const responseId = makeId("response", routeId);
+          draft.addNode({
+            id: responseId,
+            kind: "RESPONSE",
+            name: `response ${route.method} ${route.path}`,
+            language: pr.artifact.language,
+            artifactId: pr.artifact.id,
+            span: route.span,
+            hash: "0",
+            execution: { reachable: false, entryDistance: null, runtimeObserved: false, tested: false },
+            evidence: [{ source: "AST", locator: pr.artifact.path, confidence: 1 }],
+          });
+          draft.addEdge({
+            id: makeId("edge", "response", routeId, responseId),
+            kind: "CALLS",
+            from: routeId,
+            to: responseId,
+            evidence: [{ source: "AST", locator: pr.artifact.path, confidence: 1 }],
+          });
+        }
+
         // Resolve handler's controller: scan route.handler for <ident>.<method> patterns
         const identMethodPattern = /\b([a-z][a-zA-Z0-9_]*)\.([a-zA-Z_][a-zA-Z0-9_]*)/g;
         let match: RegExpExecArray | null;

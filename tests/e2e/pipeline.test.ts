@@ -23,14 +23,16 @@ describe("Repository Compiler — express-auth", () => {
     expect(result!.present).toContain("REPOSITORY");
   });
 
-  it("reports AUTH.LOGIN as BROKEN (backend wired, frontend + persistence missing)", async () => {
+  it("reports AUTH.LOGIN as CLOSED on the backend tier (route->controller->service->repo->db->response)", async () => {
     const { ir, closure } = await compileRepository("fixtures/express-auth", tsOnly());
     const login = ir.capabilities.find((c) => c.capability === "AUTH.LOGIN")!;
     const result = closure.find((r) => r.capabilityId === login.id)!;
 
-    expect(result.state).toBe("BROKEN");
-    expect(result.missing).toContain("FRONTEND_ROUTE");
-    expect(result.missing).toContain("DATABASE");
+    // Tier-aware closure (ADR-0019): a fully-wired backend closes on its tier.
+    expect(result.state).toBe("CLOSED");
+    expect(result.present).toContain("DATABASE");
+    expect(result.present).toContain("RESPONSE");
+    expect(result.missing).toHaveLength(0);
   });
 
   it("produces a deterministic IR (same nodes/edges across runs)", async () => {
