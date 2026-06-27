@@ -106,19 +106,49 @@ function extractExports(root: Parser.SyntaxNode): string[] {
 }
 function extractCalls(root: Parser.SyntaxNode): CallFact[] {
   const calls: CallFact[] = [];
-  const visit = (node: Parser.SyntaxNode): void => {
+  const visit = (node: Parser.SyntaxNode, enclosing?: string): void => {
+    let childEnclosing = enclosing;
+
+    if (node.type === "method_declaration") {
+      const receiverNode = node.childForFieldName("receiver");
+      if (receiverNode) {
+        const findTypeIdentifier = (n: Parser.SyntaxNode): Parser.SyntaxNode | null => {
+          if (n.type === "type_identifier") return n;
+          for (let j = 0; j < n.childCount; j++) {
+            const child = n.child(j);
+            if (child) {
+              const res = findTypeIdentifier(child);
+              if (res) return res;
+            }
+          }
+          return null;
+        };
+        const typeId = findTypeIdentifier(receiverNode);
+        if (typeId) childEnclosing = typeId.text;
+      }
+    } else if (node.type === "function_declaration" && enclosing === undefined) {
+      const nameNode = node.childForFieldName("name");
+      if (nameNode) childEnclosing = nameNode.text;
+    }
+
     if (node.type === "call_expression") {
       const funcNode = node.childForFieldName("function");
       if (funcNode) {
-        calls.push({ callee: funcNode.text, span: getSpan(node) });
+        calls.push({
+          callee: funcNode.text,
+          enclosing: childEnclosing,
+          span: getSpan(node),
+        });
       }
     }
+
     for (let i = 0; i < node.childCount; i++) {
       const child = node.child(i);
-      if (child) visit(child);
+      if (child) visit(child, childEnclosing);
     }
   };
-  visit(root);
+
+  visit(root, undefined);
   return calls;
 }
 const parser = new Parser();
