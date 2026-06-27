@@ -9,6 +9,8 @@
  */
 
 import { readFile } from "node:fs/promises";
+import { openSync, writeSync } from "node:fs";
+import { Buffer } from "node:buffer";
 import { ConsoleLogger } from "@rir/common";
 import { ClosureState, RIR_VERSION, type RepositoryIR } from "@rir/ir";
 import { ONTOLOGY_VERSION, allCapabilities } from "@rir/ontology";
@@ -33,6 +35,9 @@ Usage:
   rir query <capability>      (pipeline not yet assembled)
   rir graph                   (pipeline not yet assembled)
   rir snapshot                (pipeline not yet assembled)
+
+Global options:
+  --log <file>                Append all output (stdout + stderr) to <file> as well
 `;
 
 async function loadIR(path: string | undefined): Promise<RepositoryIR> {
@@ -41,7 +46,38 @@ async function loadIR(path: string | undefined): Promise<RepositoryIR> {
   return JSON.parse(raw) as RepositoryIR;
 }
 
-async function main(argv: readonly string[]): Promise<number> {
+/** Tee stdout + stderr to a file (append), so output is both shown and logged.
+ *  Uses synchronous writes so data is flushed before process.exit(). */
+function teeToFile(file: string): void {
+  const fd = openSync(file, "a");
+  for (const s of [process.stdout, process.stderr]) {
+    const original = s.write.bind(s) as (...args: unknown[]) => boolean;
+    s.write = ((chunk: Uint8Array | string, ...args: unknown[]) => {
+      try {
+        if (typeof chunk === "string") {
+          writeSync(fd, chunk);
+        } else {
+          writeSync(fd, Buffer.from(chunk));
+        }
+      } catch {
+        // best-effort logging; never let a log write break the command
+      }
+      return original(chunk, ...args);
+    }) as typeof s.write;
+  }
+}
+
+/** Extract `--log <file>` from argv (if present) and start file logging. */
+function applyLogOption(argv: readonly string[]): string[] {
+  const i = argv.indexOf("--log");
+  if (i === -1) return [...argv];
+  const file = argv[i + 1];
+  if (file) teeToFile(file);
+  return [...argv.slice(0, i), ...argv.slice(i + 2)];
+}
+
+async function main(rawArgv: readonly string[]): Promise<number> {
+  const argv = applyLogOption(rawArgv);
   const [command, ...rest] = argv;
 
   switch (command) {

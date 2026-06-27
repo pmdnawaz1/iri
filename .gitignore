@@ -15,3 +15,6 @@ coverage/
 .idea/
 .vscode/*
 !.vscode/extensions.json
+
+# local machine-specific launcher
+rir.cmd
