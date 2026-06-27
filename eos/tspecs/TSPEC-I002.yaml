@@ -56,4 +56,4 @@ critical_path: false
 parallel_group: "wave-2"
 spec_path: "eos/specs/TSPEC-I002.spec.md"
 spec_required: true
-spec_status: "MISSING"
+spec_status: "WRITTEN"

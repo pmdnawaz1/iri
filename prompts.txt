@@ -14,8 +14,18 @@ HOW TO USE
    work-order file. Give the model repo access.
 4. When it opens a PR, YOU (architect) review it. Do not auto-merge.
 
-Currently WRITTEN work orders: TSPEC-I004 (sqlite storage), TSPEC-AD01 (typescript adapter).
-Everything else still needs its work order written before handoff.
+Currently WRITTEN work orders (READY to hand off, deps already satisfied by the scaffold):
+  - TSPEC-I002  IR serializer & validator        (packages/ir)
+  - TSPEC-I007  Ontology validators              (packages/ontology)
+  - TSPEC-I004  SQLite storage repository         (packages/storage)
+  - TSPEC-AD01  TypeScript language adapter       (packages/code-compiler)
+  - TSPEC-AD02  JavaScript language adapter       (packages/code-compiler)
+These 5 can be implemented in parallel (no inter-dependencies between them).
+
+NOT yet ready (need architect decisions first — do NOT hand these off):
+  - TSPEC-P*  passes        — need the IRDraft read contract + node/discovery model (ADR-0006/0007)
+  - TSPEC-DF* doc frontends — need the requirement normalization ruleset (ADR-0009)
+  - engine-wiring / apps depend on the above.
 
 ================================================================================
 IMPLEMENTER PROMPT TEMPLATE  (paste this, substitute {SPEC})
@@ -59,6 +69,15 @@ READY-TO-PASTE: TSPEC-AD01 (TypeScript language adapter)
 Branch: feature/tspec-ad01-typescript-language-adapter
 Reference implementation already in repo: apps/cli/src/prove.ts
 Depends on: TSPEC-A007, TSPEC-I006 (both already satisfied by the scaffold).
+
+================================================================================
+READY-TO-PASTE: TSPEC-I002 / TSPEC-I007 / TSPEC-AD02
+================================================================================
+[Use the TEMPLATE above; for {SPEC} paste the matching file:
+   eos/specs/TSPEC-I002.spec.md   branch feature/tspec-i002-ir-serializer-and-validator
+   eos/specs/TSPEC-I007.spec.md   branch feature/tspec-i007-ontology-validators
+   eos/specs/TSPEC-AD02.spec.md   branch feature/tspec-ad02-javascript-language-adapter ]
+All deps satisfied by the scaffold; safe to start immediately.
 
 ================================================================================
 NOTES

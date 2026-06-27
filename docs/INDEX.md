@@ -73,8 +73,26 @@ OpenTelemetry, Tarjan SCC. Implementers never search — references are provided
 
 - [ADR-0001 — Repository IR](ADR-0001-repository-ir.md) — TSPEC-A001
 - [ADR-0002 — Execution Closure](ADR-0002-execution-closure.md) — TSPEC-A009
+- [ADR-0003 — Requirement IR](ADR-0003-requirement-ir.md) — TSPEC-A002
+- [ADR-0004 — Capability Ontology](ADR-0004-capability-ontology.md) — TSPEC-A003
+- [ADR-0005 — Graph Semantics](ADR-0005-graph-semantics.md) — TSPEC-A004
+- [ADR-0006 — Compiler Pipeline & Builder Contracts](ADR-0006-compiler-pipeline.md) — TSPEC-A005
+- [ADR-0007 — Pass Roster & Ordering](ADR-0007-pass-roster.md) — TSPEC-A006
+- [ADR-0008 — Language Adapter Contract](ADR-0008-language-adapter-contract.md) — TSPEC-A007
+- [ADR-0009 — Document Compiler Semantics](ADR-0009-document-compiler-semantics.md) — TSPEC-A008 (partial)
+- [ADR-0010 — Coverage Rules](ADR-0010-coverage-rules.md) — TSPEC-A010
+- [ADR-0011 — Consistency Rules](ADR-0011-consistency-rules.md) — TSPEC-A011
+- [ADR-0012 — Storage Schema](ADR-0012-storage-schema.md) — TSPEC-A012
+- [ADR-0013 — Query Language](ADR-0013-query-language.md) — TSPEC-A013
+- [ADR-0014 — Semantic Projection Contract](ADR-0014-semantic-projection.md) — TSPEC-A014
+- [ADR-0015 — Telemetry Evidence Model](ADR-0015-telemetry-evidence.md) — TSPEC-A015
 - New ADRs follow [eos/templates/adr-template.md](../eos/templates/adr-template.md) and
   reference their TSPEC.
+
+### Pending architect decisions (block the pass/frontend layer)
+- IRDraft read contract (`getNodes/getEdges`) — see ADR-0006 open item — blocks TSPEC-P*.
+- Symbol→node creation model + capability discovery rules — blocks CallPass/CapabilityPass.
+- Requirement normalization ruleset — see ADR-0009 — blocks TSPEC-DF*.
 
 ## Research Index
 

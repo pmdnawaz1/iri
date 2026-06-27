@@ -1128,7 +1128,7 @@
       "parallel_group": "wave-2",
       "spec_path": "eos/specs/TSPEC-I002.spec.md",
       "spec_required": true,
-      "spec_status": "MISSING"
+      "spec_status": "WRITTEN"
     },
     {
       "priority": "P1",
@@ -1266,7 +1266,7 @@
       "parallel_group": "wave-2",
       "spec_path": "eos/specs/TSPEC-I007.spec.md",
       "spec_required": true,
-      "spec_status": "MISSING"
+      "spec_status": "WRITTEN"
     },
     {
       "priority": "P3",
@@ -2498,7 +2498,7 @@
       "parallel_group": "wave-5",
       "spec_path": "eos/specs/TSPEC-AD02.spec.md",
       "spec_required": true,
-      "spec_status": "MISSING"
+      "spec_status": "WRITTEN"
     },
     {
       "priority": "P2",
