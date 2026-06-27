@@ -16,29 +16,29 @@ describe("Worker: CompileRepository", () => {
 
   it("dispatching CompileRepository on fixtures/express-auth saves exactly one snapshot", async () => {
     await worker.dispatch("CompileRepository");
-    
+
     // We expect 1 snapshot in storage
     const latest = await storage.latestSnapshot();
     expect(latest).toBeDefined();
-    
+
     // We can't directly check the size of InMemoryStorage's internal map, but we can verify latest is present.
     // If it saved exactly one, latestSnapshot should return it.
   });
 
   it("the saved snapshot's ir.capabilities includes AUTH.LOGIN", async () => {
     await worker.dispatch("CompileRepository");
-    
+
     const latest = await storage.latestSnapshot();
     expect(latest).toBeDefined();
-    
+
     const capabilities = latest!.ir.capabilities;
-    const authLogin = capabilities.find(c => c.capability === "AUTH.LOGIN");
+    const authLogin = capabilities.find((c) => c.capability === "AUTH.LOGIN");
     expect(authLogin).toBeDefined();
   });
 
   it("latestSnapshot() returns the saved snapshot", async () => {
     await worker.dispatch("CompileRepository");
-    
+
     const latest = await storage.latestSnapshot();
     expect(latest).toBeDefined();
     expect(latest!.id).toMatch(/^snap\|fixtures\/express-auth\|/);

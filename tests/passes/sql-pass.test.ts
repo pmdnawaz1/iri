@@ -74,7 +74,7 @@ describe("SQLPass", () => {
 
     const nodes = draft.getNodes();
     expect(nodes.some((n) => n.kind === "SQL_QUERY" && n.name === "query")).toBe(true);
-    
+
     const edges = draft.getEdges();
     expect(edges.some((e) => e.kind === "READS")).toBe(true);
   });
@@ -104,9 +104,7 @@ describe("SQLPass", () => {
     const ctx2: CompilationContext = {
       ...ctx,
       parseResults: [
-        makePrWithCalls("services/UserService.ts", [
-          { callee: "foo.bar", enclosing: "UserService", span },
-        ]),
+        makePrWithCalls("services/UserService.ts", [{ callee: "foo.bar", enclosing: "UserService", span }]),
       ],
     };
     await new SQLPass().run(ctx2, draft);

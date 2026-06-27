@@ -30,16 +30,16 @@ describe("GitPass", () => {
 
   it("skips if .git directory is missing", async () => {
     vi.mocked(fs.existsSync).mockReturnValue(false);
-    
+
     const draft = new DefaultIRDraft();
     await new GitPass().run(ctx, draft);
-    
+
     expect(cp.execSync).not.toHaveBeenCalled();
   });
 
   it("executes git log and enriches matching nodes with GIT_HISTORY evidence", async () => {
     vi.mocked(fs.existsSync).mockReturnValue(true);
-    
+
     const mockGitLog = `abcd123 initial commit
 src/app.ts
 src/utils.ts
@@ -47,7 +47,7 @@ src/utils.ts
     vi.mocked(cp.execSync).mockReturnValue(mockGitLog as any);
 
     const draft = new DefaultIRDraft();
-    
+
     // Seed a node that matches src/app.ts
     const appNode: NodeIR = {
       id: makeId("decl", "App"),
@@ -61,7 +61,7 @@ src/utils.ts
       evidence: [{ source: "AST", locator: "src/app.ts", confidence: 1 }],
     };
     draft.addNode(appNode);
-    
+
     // Seed a node that does NOT match
     const otherNode: NodeIR = {
       id: makeId("decl", "Other"),
@@ -79,14 +79,14 @@ src/utils.ts
     await new GitPass().run(ctx, draft);
 
     const nodes = draft.getNodes();
-    
-    const finalAppNode = nodes.find(n => n.name === "App")!;
+
+    const finalAppNode = nodes.find((n) => n.name === "App")!;
     expect(finalAppNode.evidence.length).toBe(2);
     expect(finalAppNode.evidence[1].source).toBe("GIT_HISTORY");
     expect(finalAppNode.evidence[1].confidence).toBe(0.8);
     expect(finalAppNode.evidence[1].locator).toBe("src/app.ts");
 
-    const finalOtherNode = nodes.find(n => n.name === "Other")!;
+    const finalOtherNode = nodes.find((n) => n.name === "Other")!;
     expect(finalOtherNode.evidence.length).toBe(1);
   });
 });

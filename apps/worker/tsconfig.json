@@ -8,6 +8,8 @@
   "references": [
     { "path": "../../packages/common" },
     { "path": "../../packages/core" },
-    { "path": "../../packages/storage" }
+    { "path": "../../packages/storage" },
+    { "path": "../../packages/compiler" },
+    { "path": "../../packages/ir" }
   ]
 }

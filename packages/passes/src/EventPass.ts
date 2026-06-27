@@ -13,7 +13,7 @@ export class EventPass extends AbstractPass {
       for (const call of pr.calls) {
         const segments = call.callee.split(".");
         const method = segments[segments.length - 1]?.toLowerCase();
-        
+
         if (!method) continue;
 
         if (EMIT_METHODS.has(method)) {
@@ -26,8 +26,8 @@ export class EventPass extends AbstractPass {
             artifactId: pr.artifact.id,
             span: call.span,
             hash: "0",
-            execution: "DEFAULT",
-            evidence: [{ source: "AST", locator: pr.artifact.path, confidence: 1 }]
+            execution: { reachable: false, entryDistance: null, runtimeObserved: false, tested: false },
+            evidence: [{ source: "AST", locator: pr.artifact.path, confidence: 1 }],
           });
 
           if (call.enclosing) {
@@ -38,7 +38,7 @@ export class EventPass extends AbstractPass {
                 kind: "EMITS",
                 from: fromId,
                 to: eventId,
-                evidence: [{ source: "AST", locator: pr.artifact.path, confidence: 1 }]
+                evidence: [{ source: "AST", locator: pr.artifact.path, confidence: 1 }],
               });
             }
           }
@@ -52,8 +52,8 @@ export class EventPass extends AbstractPass {
             artifactId: pr.artifact.id,
             span: call.span,
             hash: "0",
-            execution: "DEFAULT",
-            evidence: [{ source: "AST", locator: pr.artifact.path, confidence: 1 }]
+            execution: { reachable: false, entryDistance: null, runtimeObserved: false, tested: false },
+            evidence: [{ source: "AST", locator: pr.artifact.path, confidence: 1 }],
           });
 
           if (call.enclosing) {
@@ -64,7 +64,7 @@ export class EventPass extends AbstractPass {
                 kind: "CONSUMES",
                 from: fromId,
                 to: consumerId,
-                evidence: [{ source: "AST", locator: pr.artifact.path, confidence: 1 }]
+                evidence: [{ source: "AST", locator: pr.artifact.path, confidence: 1 }],
               });
             }
           }

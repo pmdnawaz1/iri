@@ -24,7 +24,7 @@ export class ComponentPass extends AbstractPass {
               artifactId: pr.artifact.id,
               span: sym.span,
               hash: "0",
-              execution: "DEFAULT",
+              execution: { reachable: false, entryDistance: null, runtimeObserved: false, tested: false },
               evidence: [{ source: "AST", locator: pr.artifact.path, confidence: 1 }],
             });
           }

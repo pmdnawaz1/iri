@@ -46,9 +46,7 @@ describe("ComponentPass", () => {
     const ctx2: CompilationContext = {
       ...ctx,
       parseResults: [
-        makePrWithSymbols("ui/login.tsx", [
-          { name: "LoginForm", kind: "function", exported: true, span },
-        ]),
+        makePrWithSymbols("ui/login.tsx", [{ name: "LoginForm", kind: "function", exported: true, span }]),
       ],
     };
     await new ComponentPass().run(ctx2, draft);
@@ -61,9 +59,7 @@ describe("ComponentPass", () => {
     const ctx2: CompilationContext = {
       ...ctx,
       parseResults: [
-        makePrWithSymbols("ui/login.tsx", [
-          { name: "helper", kind: "function", exported: false, span },
-        ]),
+        makePrWithSymbols("ui/login.tsx", [{ name: "helper", kind: "function", exported: false, span }]),
       ],
     };
     await new ComponentPass().run(ctx2, draft);
@@ -87,9 +83,7 @@ describe("ComponentPass", () => {
   });
 
   it("determinism: two runs yield equal sealed IR", async () => {
-    const pr = makePrWithSymbols("ui/app.tsx", [
-      { name: "App", kind: "function", exported: true, span },
-    ]);
+    const pr = makePrWithSymbols("ui/app.tsx", [{ name: "App", kind: "function", exported: true, span }]);
     const ctx2: CompilationContext = { ...ctx, parseResults: [pr] };
 
     const d1 = new DefaultIRDraft();

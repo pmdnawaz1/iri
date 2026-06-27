@@ -65,16 +65,14 @@ describe("EventPass", () => {
     const ctx2: CompilationContext = {
       ...ctx,
       parseResults: [
-        makePrWithCalls("services/UserService.ts", [
-          { callee: "bus.emit", enclosing: "UserService", span },
-        ]),
+        makePrWithCalls("services/UserService.ts", [{ callee: "bus.emit", enclosing: "UserService", span }]),
       ],
     };
     await new EventPass().run(ctx2, draft);
 
     const nodes = draft.getNodes();
     expect(nodes.some((n) => n.kind === "EVENT" && n.name === "emit")).toBe(true);
-    
+
     const edges = draft.getEdges();
     expect(edges.some((e) => e.kind === "EMITS")).toBe(true);
   });
@@ -86,16 +84,14 @@ describe("EventPass", () => {
     const ctx2: CompilationContext = {
       ...ctx,
       parseResults: [
-        makePrWithCalls("services/UserService.ts", [
-          { callee: "bus.on", enclosing: "UserService", span },
-        ]),
+        makePrWithCalls("services/UserService.ts", [{ callee: "bus.on", enclosing: "UserService", span }]),
       ],
     };
     await new EventPass().run(ctx2, draft);
 
     const nodes = draft.getNodes();
     expect(nodes.some((n) => n.kind === "EVENT_CONSUMER" && n.name === "on")).toBe(true);
-    
+
     const edges = draft.getEdges();
     expect(edges.some((e) => e.kind === "CONSUMES")).toBe(true);
   });
@@ -107,9 +103,7 @@ describe("EventPass", () => {
     const ctx2: CompilationContext = {
       ...ctx,
       parseResults: [
-        makePrWithCalls("services/UserService.ts", [
-          { callee: "foo.bar", enclosing: "UserService", span },
-        ]),
+        makePrWithCalls("services/UserService.ts", [{ callee: "foo.bar", enclosing: "UserService", span }]),
       ],
     };
     await new EventPass().run(ctx2, draft);

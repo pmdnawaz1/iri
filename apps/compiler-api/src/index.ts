@@ -13,8 +13,7 @@ import { DefaultCoverageEngine } from "@rir/coverage";
 import { DefaultConsistencyEngine } from "@rir/consistency";
 import { QueryEngine } from "@rir/query-engine";
 import { emptyRequirementSet, type RepositoryIR } from "@rir/ir";
-import { Worker } from "@rir/worker";
-import { CompileRepository } from "../../worker/src/jobs/compile-repository.js";
+import { Worker, CompileRepository } from "@rir/worker";
 import * as fs from "fs";
 
 const irBody = z.object({ ir: z.unknown() });
@@ -73,13 +72,7 @@ export function buildServer() {
     return { status: "queued", dir };
   });
 
-  for (const route of [
-    "/compile/code",
-    "/compile/document",
-    "/diff",
-    "/graph",
-    "/snapshot",
-  ]) {
+  for (const route of ["/compile/code", "/compile/document", "/diff", "/graph", "/snapshot"]) {
     app.post(route, async (_req, reply) => {
       reply.code(501);
       return { error: "builder pipeline not yet assembled", route };

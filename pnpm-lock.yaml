@@ -98,6 +98,9 @@ importers:
       '@rir/storage':
         specifier: workspace:*
         version: link:../../packages/storage
+      '@rir/worker':
+        specifier: workspace:^
+        version: link:../worker
       fastify:
         specifier: ^5.2.0
         version: 5.8.5
@@ -110,9 +113,15 @@ importers:
       '@rir/common':
         specifier: workspace:*
         version: link:../../packages/common
+      '@rir/compiler':
+        specifier: workspace:^
+        version: link:../../packages/compiler
       '@rir/core':
         specifier: workspace:*
         version: link:../../packages/core
+      '@rir/ir':
+        specifier: workspace:^
+        version: link:../../packages/ir
       '@rir/storage':
         specifier: workspace:*
         version: link:../../packages/storage

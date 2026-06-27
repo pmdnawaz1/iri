@@ -6,6 +6,7 @@ vi.mock("@rir/worker", async (importOriginal) => {
   const actual = await importOriginal<typeof import("@rir/worker")>();
   return {
     ...actual,
+    CompileRepository: vi.fn().mockImplementation(() => ({})),
     Worker: vi.fn().mockImplementation(() => {
       return {
         register: vi.fn().mockReturnThis(),
@@ -57,7 +58,7 @@ describe("POST /compile/repository", () => {
 
     expect(response.statusCode).toBe(202);
     expect(response.json()).toEqual({ status: "queued", dir: process.cwd() });
-    
+
     // We mocked the Worker, so the dispatch should have been called (though it's fire-and-forget).
     // The test just asserts the 202 status code and the body as requested.
   });
