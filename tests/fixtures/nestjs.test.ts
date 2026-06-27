@@ -20,55 +20,33 @@ const ctx: CompilationContext = {
 
 const fixtureDir = join(import.meta.dirname, "../../fixtures/nestjs");
 
-const controllerSource = readFileSync(
-  join(fixtureDir, "auth.controller.ts"),
-  "utf-8",
-);
-const serviceSource = readFileSync(
-  join(fixtureDir, "auth.service.ts"),
-  "utf-8",
-);
+const controllerSource = readFileSync(join(fixtureDir, "auth.controller.ts"), "utf-8");
+const serviceSource = readFileSync(join(fixtureDir, "auth.service.ts"), "utf-8");
 
 describe("TSPEC-FX02: NestJS fixture", () => {
   it("TypeScriptAdapter extracts class AuthController from auth.controller.ts", () => {
     const adapter = new TypeScriptAdapter();
     const result = adapter.parse("auth.controller.ts", controllerSource, ctx);
-    expect(
-      result.symbols.some(
-        (s) => s.name === "AuthController" && s.kind === "class",
-      ),
-    ).toBe(true);
+    expect(result.symbols.some((s) => s.name === "AuthController" && s.kind === "class")).toBe(true);
   });
 
   it("extracts the login method from auth.controller.ts", () => {
     const adapter = new TypeScriptAdapter();
     const result = adapter.parse("auth.controller.ts", controllerSource, ctx);
-    expect(
-      result.symbols.some((s) => s.name === "login" && s.kind === "method"),
-    ).toBe(true);
+    expect(result.symbols.some((s) => s.name === "login" && s.kind === "method")).toBe(true);
   });
 
   it("calls from the controller include this.authService.login", () => {
     const adapter = new TypeScriptAdapter();
     const result = adapter.parse("auth.controller.ts", controllerSource, ctx);
-    expect(
-      result.calls.some((c) => c.callee.includes("this.authService.login")),
-    ).toBe(true);
+    expect(result.calls.some((c) => c.callee.includes("this.authService.login"))).toBe(true);
   });
 
   it("AuthService is extracted from auth.service.ts and its call to the repository appears", () => {
     const adapter = new TypeScriptAdapter();
     const result = adapter.parse("auth.service.ts", serviceSource, ctx);
-    expect(
-      result.symbols.some(
-        (s) => s.name === "AuthService" && s.kind === "class",
-      ),
-    ).toBe(true);
-    expect(
-      result.calls.some((c) =>
-        c.callee.includes("this.userRepository.findByEmail"),
-      ),
-    ).toBe(true);
+    expect(result.symbols.some((s) => s.name === "AuthService" && s.kind === "class")).toBe(true);
+    expect(result.calls.some((c) => c.callee.includes("this.userRepository.findByEmail"))).toBe(true);
   });
 
   it("determinism: two parses of auth.controller.ts are deep-equal", () => {
