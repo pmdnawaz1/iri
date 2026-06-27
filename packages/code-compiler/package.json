@@ -12,6 +12,8 @@
     "@rir/ir": "workspace:*",
     "@rir/core": "workspace:*",
     "@rir/common": "workspace:*",
-    "typescript": "^5.7.2"
+    "typescript": "^5.7.2",
+    "tree-sitter": "^0.22.4",
+    "tree-sitter-python": "0.21.0"
   }
 }
