@@ -71,3 +71,5 @@ export class AdapterRegistry {
     return this.adapters.find((a) => a.supports(path));
   }
 }
+
+export { JavaScriptAdapter } from "./language/javascript.js";
