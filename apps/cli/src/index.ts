@@ -10,11 +10,12 @@
 
 import { readFile } from "node:fs/promises";
 import { ConsoleLogger } from "@rir/common";
-import { RIR_VERSION, type RepositoryIR } from "@rir/ir";
+import { ClosureState, RIR_VERSION, type RepositoryIR } from "@rir/ir";
 import { ONTOLOGY_VERSION, allCapabilities } from "@rir/ontology";
 import { DefaultClosureEngine } from "@rir/closure";
 import { DefaultCoverageEngine } from "@rir/coverage";
 import { emptyRequirementSet } from "@rir/ir";
+import { prove } from "./prove.js";
 
 const log = new ConsoleLogger("info");
 
@@ -25,6 +26,7 @@ Usage:
   rir ontology                List canonical ontology capabilities
   rir validate <ir.json>      Run closure over a Repository IR (JSON)
   rir coverage <ir.json>      Run coverage over a Repository IR (JSON)
+  rir prove <dir>             Parse a TS backend dir and report AUTH.LOGIN closure
   rir compile <path>          (pipeline not yet assembled)
   rir diff <a> <b>            (pipeline not yet assembled)
   rir query <capability>      (pipeline not yet assembled)
@@ -68,6 +70,21 @@ async function main(argv: readonly string[]): Promise<number> {
         process.stdout.write(`${dim}\t${(ratio.ratio * 100).toFixed(1)}%\t(${ratio.covered}/${ratio.total})\n`);
       }
       return 0;
+    }
+    case "prove": {
+      const dir = rest[0];
+      if (!dir) {
+        process.stderr.write("usage: rir prove <dir>\n");
+        return 64;
+      }
+      const { directory, fileCount, ir, result, reachableChain } = prove(dir);
+      process.stdout.write(`Repository: ${directory}\n`);
+      process.stdout.write(`Parsed ${fileCount} file(s) -> ${ir.nodes.length} nodes, ${ir.edges.length} edges\n`);
+      process.stdout.write(`\nAUTH.LOGIN: ${result.state}\n`);
+      process.stdout.write(`  reachable chain: ${reachableChain.join(" -> ") || "(none)"}\n`);
+      process.stdout.write(`  present stages:  ${result.present.join(", ") || "(none)"}\n`);
+      process.stdout.write(`  missing stages:  ${result.missing.join(", ") || "(none)"}\n`);
+      return result.state === ClosureState.Closed ? 0 : 1;
     }
     case "compile":
     case "diff":

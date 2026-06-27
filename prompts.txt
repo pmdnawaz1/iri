@@ -1,0 +1,73 @@
+================================================================================
+RIR — MANUAL IMPLEMENTER HANDOFF PROMPTS
+================================================================================
+
+HOW TO USE
+----------
+1. Open a FRESH session with your implementer model (the cheaper one).
+2. Only hand off a TSPEC that is READY:
+     - all its `depends_on` are COMPLETE (see eos/state/project.state.yaml), AND
+     - its work order exists (eos/specs/<id>.spec.md, spec_status: WRITTEN).
+   Check readiness: `pnpm eos:compile` then read eos/state/project.health.yaml
+   (work_order_coverage_pct) and eos/state/project.waves.yaml (order).
+3. Paste the TEMPLATE below, with {SPEC} replaced by the full contents of the
+   work-order file. Give the model repo access.
+4. When it opens a PR, YOU (architect) review it. Do not auto-merge.
+
+Currently WRITTEN work orders: TSPEC-I004 (sqlite storage), TSPEC-AD01 (typescript adapter).
+Everything else still needs its work order written before handoff.
+
+================================================================================
+IMPLEMENTER PROMPT TEMPLATE  (paste this, substitute {SPEC})
+================================================================================
+You are ROLE_IMPLEMENTER for the RIR repository. You implement exactly one TSPEC.
+
+Hard rules (from decision1.md):
+- Implement ONLY what the work order specifies. Make NO architectural decisions.
+- Do NOT change Repository IR, Requirement IR, ontology, the compiler pipeline,
+  builder order, or any item in the work order's "Forbidden changes".
+- No TODOs, no placeholder code, no dead code. Deterministic output only.
+- If anything is ambiguous or the work order seems wrong, STOP and report — do not guess.
+
+Workflow:
+1. Create the branch named in the work order header (from `main`).
+2. Implement the deliverables in the listed files only.
+3. Write the tests from section 7 (acceptance criteria); make them pass.
+4. Run: pnpm build && pnpm typecheck && pnpm test  — all must be green.
+5. Open a PR using .github/pull_request_template.md. Commit message:
+   `<type>(<tspec-id>): <summary>` (e.g. feat(tspec-i004): sqlite storage).
+
+Definition of done: build + typecheck + lint + the section-7 tests + coverage >= 95%.
+
+----- WORK ORDER -----
+{SPEC}
+----------------------
+
+================================================================================
+READY-TO-PASTE: TSPEC-I004 (SQLite storage)
+================================================================================
+[Use the TEMPLATE above, and for {SPEC} paste the full contents of:
+   eos/specs/TSPEC-I004.spec.md ]
+Branch: feature/tspec-i004-sqlite-storage-repository
+Depends on: TSPEC-A012, TSPEC-I001 (both already satisfied by the scaffold).
+
+================================================================================
+READY-TO-PASTE: TSPEC-AD01 (TypeScript language adapter)
+================================================================================
+[Use the TEMPLATE above, and for {SPEC} paste the full contents of:
+   eos/specs/TSPEC-AD01.spec.md ]
+Branch: feature/tspec-ad01-typescript-language-adapter
+Reference implementation already in repo: apps/cli/src/prove.ts
+Depends on: TSPEC-A007, TSPEC-I006 (both already satisfied by the scaffold).
+
+================================================================================
+NOTES
+================================================================================
+- The proving slice (`rir prove <dir>`) already demonstrates the full pipeline
+  source -> IR -> closure verdict on fixtures/express-auth (wired) and
+  fixtures/express-auth-broken (broken). AD01 turns that ad-hoc extractor into the
+  real, contract-satisfying adapter; later passes (TSPEC-P*) consume its facts.
+- To unlock more TSPECs for handoff, the architect writes their work orders next
+  (one eos/specs/<id>.spec.md each). Recommended next batch: the passes that turn
+  adapter facts into IR — RoutePass (P03), CallPass (P02), CapabilityPass (P09),
+  ReachabilityPass (P12) — then the closure path runs on real parsed repos.

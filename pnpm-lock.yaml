@@ -38,6 +38,9 @@ importers:
       '@rir/coverage':
         specifier: workspace:*
         version: link:../../packages/coverage
+      '@rir/graph':
+        specifier: workspace:*
+        version: link:../../packages/graph
       '@rir/ir':
         specifier: workspace:*
         version: link:../../packages/ir
@@ -50,6 +53,9 @@ importers:
       '@rir/storage':
         specifier: workspace:*
         version: link:../../packages/storage
+      typescript:
+        specifier: ^5.7.2
+        version: 5.9.3
 
   apps/compiler-api:
     dependencies:

@@ -13,6 +13,7 @@
     { "path": "../../packages/storage" },
     { "path": "../../packages/closure" },
     { "path": "../../packages/coverage" },
-    { "path": "../../packages/query-engine" }
+    { "path": "../../packages/query-engine" },
+    { "path": "../../packages/graph" }
   ]
 }

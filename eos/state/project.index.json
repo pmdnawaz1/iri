@@ -2430,7 +2430,7 @@
       "parallel_group": "wave-5",
       "spec_path": "eos/specs/TSPEC-AD01.spec.md",
       "spec_required": true,
-      "spec_status": "MISSING"
+      "spec_status": "WRITTEN"
     },
     {
       "priority": "P2",

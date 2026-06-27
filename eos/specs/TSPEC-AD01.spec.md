@@ -1,0 +1,119 @@
+# TSPEC-AD01 — TypeScript language adapter (Work Order)
+
+> Authored by ROLE_ARCHITECT during `ARCHITECTURE_REVIEW`. Implement using ONLY this
+> document. Make no architectural decisions; if anything is ambiguous, STOP and escalate.
+
+- **TSPEC:** TSPEC-AD01 · **Owner:** ROLE_IMPLEMENTER · **Header:** `eos/tspecs/TSPEC-AD01.yaml`
+- **Depends on:** TSPEC-A007 (adapter contract), TSPEC-I006 (builder engine) — COMPLETE · **Wave:** 5
+
+## 1. Objective
+
+Parse a single TypeScript source file and emit **syntactic, non-semantic** facts
+(symbols, imports, exports, calls, routes) as a `ParseResult`. The adapter does NOT
+resolve call targets, build IR, or bind capabilities — those are downstream passes.
+
+## 2. Contract (fixed — do not change)
+
+Implement `LanguageAdapter` from `packages/code-compiler/src/index.ts`:
+
+```ts
+export interface LanguageAdapter {
+  readonly language: string;          // "typescript"
+  readonly extensions: readonly string[]; // [".ts", ".tsx"]
+  supports(path: string): boolean;
+  parse(path: string, source: string, ctx: CompilationContext): ParseResult;
+}
+// ParseResult { artifact, symbols, imports, exports, calls, routes }
+// SymbolFact  { name, kind: "function"|"class"|"method"|"variable"|"type"|"interface", exported, span }
+// ImportFact  { specifier, imported: string[], span }
+// CallFact    { callee, span }       // callee text AS WRITTEN, e.g. "this.authService.login"
+// RouteFact   { method, path, handler, span }
+```
+
+### Architect decision (recorded)
+
+The TypeScript adapter uses the **TypeScript Compiler API** (`typescript` package,
+`ts.createSourceFile`), not Tree-sitter. Rationale: first-class fidelity for TS/TSX,
+no native build on Windows. Other-language adapters still use Tree-sitter per
+TSPEC-A007. This does not change the `LanguageAdapter` contract. The proving slice
+(`apps/cli/src/prove.ts`) demonstrates the extraction approach and is the reference.
+
+## 3. Files
+
+| Action | Path | Purpose |
+| --- | --- | --- |
+| create | `packages/code-compiler/src/language/typescript.ts` | `TypeScriptAdapter` |
+| modify | `packages/code-compiler/src/index.ts` | export `TypeScriptAdapter` |
+| modify | `packages/code-compiler/package.json` | add dependency `typescript` |
+| create | `tests/compiler/typescript-adapter.test.ts` | tests from §7 |
+
+## 4. Behavior / Algorithm
+
+1. `supports(path)` → `true` iff `extname(path)` ∈ `[".ts", ".tsx"]`.
+2. `parse(path, source, ctx)`:
+   - `const sf = ts.createSourceFile(path, source, ts.ScriptTarget.Latest, true)`.
+   - Build the `ArtifactIR`: `{ id: makeId("art", path), kind: "CODE", path, language: "typescript", hash: hash64(source) }`.
+   - Walk the AST once (`ts.forEachChild` recursion), collecting:
+     - **symbols**: `ClassDeclaration` → `class`; top-level `FunctionDeclaration` → `function`;
+       class `MethodDeclaration` → `method`; `InterfaceDeclaration` → `interface`;
+       `TypeAliasDeclaration` → `type`; top-level `VariableDeclaration` → `variable`.
+       `exported` = node has an `export` modifier. `span` from `getLineAndCharacterOfPosition`.
+     - **imports**: `ImportDeclaration` → `{ specifier: moduleText, imported: [named/default/namespace names], span }`.
+     - **exports**: names of exported symbols + `ExportDeclaration` specifiers.
+     - **calls**: every `CallExpression` → `callee` = source text of `node.expression`
+       (use `node.expression.getText(sf)`), with `span`.
+     - **routes**: `CallExpression` where `expression` is `PropertyAccessExpression` whose
+       name ∈ `{get,post,put,delete,patch}` and `arguments[0]` is a string literal →
+       `{ method: NAME.toUpperCase(), path: literal.text, handler: arguments[1].getText(sf), span }`.
+3. Return the `ParseResult`. Deterministic: facts in source order.
+
+> Out of scope: resolving `callee` to a node, reachability, capability binding, IR
+> construction. Those are CallPass / ReachabilityPass / CapabilityPass.
+
+## 5. Input → Output examples (golden)
+
+For `fixtures/express-auth/routes.ts`:
+- `routes` contains `{ method: "POST", path: "/login", handler: "(req: any, res: any) => { ... }" }`.
+- `imports` contains `{ specifier: "./app", imported: ["AuthController"] }`.
+
+For `fixtures/express-auth/app.ts`:
+- `symbols` contains classes `UserRepository`, `AuthService`, `AuthController` (all `exported: true`),
+  and methods `findByEmail`, `login`, `login`.
+- `calls` contains `this.userRepository.findByEmail` and `this.authService.login`.
+
+## 6. Edge cases
+
+- `.tsx` supported; `.js`/`.d.ts` not claimed by this adapter.
+- Empty file → `ParseResult` with empty arrays (still a valid artifact).
+- A route call with a non-literal path (e.g. a variable) → NOT emitted as a route
+  (only string-literal paths; do not guess).
+- Re-parsing identical source yields an identical `ParseResult` (determinism).
+
+## 7. Acceptance criteria (concrete — each is a test)
+
+1. `TypeScriptAdapter` is assignable to `LanguageAdapter`.
+2. `supports("x.ts")` and `supports("x.tsx")` true; `supports("x.js")` false.
+3. parsing `fixtures/express-auth/app.ts` yields the 3 classes with `exported: true`.
+4. parsing `fixtures/express-auth/routes.ts` yields one route `POST /login`.
+5. `calls` include `this.authService.login` for `app.ts`.
+6. empty source → all fact arrays empty, artifact present with a stable hash.
+7. determinism: two parses of the same source are deep-equal.
+8. coverage for `typescript.ts` ≥ 95%.
+
+## 8. Forbidden changes
+
+- Do NOT change `LanguageAdapter`, `ParseResult`, or any fact interface (TSPEC-A007).
+- Do NOT resolve calls, build IR, or compute reachability here.
+- Do NOT touch other packages (except `code-compiler/package.json`).
+- Do NOT delete or alter `apps/cli/src/prove.ts` (the proving slice stays as the reference).
+
+## 9. References
+
+- TypeScript Compiler API: https://github.com/microsoft/TypeScript/wiki/Using-the-Compiler-API
+- `ts.forEachChild`, `SyntaxKind`: https://github.com/microsoft/TypeScript/blob/main/src/compiler/types.ts
+- Reference implementation (extraction shape): `apps/cli/src/prove.ts` in this repo.
+
+## 10. Definition of done
+
+`pnpm build` · `pnpm typecheck` · `pnpm lint` · the 8 tests in §7 green · coverage ≥ 95%
+· all CI gates green · PR `feat(tspec-ad01): typescript language adapter`.
