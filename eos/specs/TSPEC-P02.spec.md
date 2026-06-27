@@ -1,0 +1,104 @@
+# TSPEC-P02 — CallPass (Work Order)
+
+> Authored by ROLE_ARCHITECT. Implement using ONLY this document + ADR-0016. This is the
+> REFERENCE pass work order; P01/P03/P12 share its harness and conventions. COLLISION-FREE:
+> create only your pass file + your test file. Do NOT edit `packages/passes/src/index.ts`
+> or any shared file — the architect wires registration after merge.
+
+- **TSPEC:** TSPEC-P02 · **Owner:** ROLE_IMPLEMENTER · **Header:** `eos/tspecs/TSPEC-P02.yaml`
+- **Depends on:** TSPEC-A006, TSPEC-I006, ADR-0016 — COMPLETE · **Wave:** 5
+
+## 1. Objective
+
+Lift `ParseResult` symbols into IR declaration nodes (classified) and `CallFact`s into
+`CALLS` edges, per ADR-0016. Deterministic, non-semantic beyond the fixed classification rule.
+
+## 2. Contract (fixed — do not change)
+
+Implement the `Pass` interface from `@rir/core` (or extend `AbstractPass` from `@rir/passes`).
+Read `ctx.parseResults ?? []` and write to the `IRDraft`. Types: `NodeIR`, `EdgeIR`,
+`NodeKind` from `@rir/ir`; `ParseResult`, `SymbolFact`, `CallFact`, `IRDraft`,
+`CompilationContext`, `Pass` from `@rir/core`; `makeId` from `@rir/common`.
+
+> Import everything via package names (`@rir/core`, `@rir/ir`, `@rir/common`,
+> `@rir/passes`) — never relative `./*.js` — so both tsc and vitest resolve cleanly.
+
+## 3. Files (ADDITIVE ONLY)
+
+| Action | Path | Purpose |
+| --- | --- | --- |
+| create | `packages/passes/src/CallPass.ts` | the pass |
+| create | `tests/passes/call-pass.test.ts` | the tests from §7 |
+
+## 4. Behavior / Algorithm
+
+`name = "CallPass"`, `priority = PASS_PRIORITY.CallPass` (from `@rir/passes`), `supports()`
+returns true. `run(ctx, draft)`:
+
+**Phase 1 — declaration nodes (all files first, so cross-file calls resolve):**
+For each `pr` in `ctx.parseResults ?? []`, `draft.addArtifact(pr.artifact)`, and for each
+`sym` in `pr.symbols` add a node:
+- id = `makeId("decl", sym.name)`
+- kind = `classify(sym)`:
+  - `class`: name ends with `Controller` → `CONTROLLER`; `Service` → `SERVICE`;
+    `Repository` → `REPOSITORY`; else `CLASS`.
+  - `function`→`FUNCTION`, `method`→`METHOD`, `interface`→`INTERFACE`, `type`→`TYPE`,
+    `variable`→`VARIABLE`.
+- name = `sym.name`, language = `pr.artifact.language`, artifactId = `pr.artifact.id`,
+  span = `sym.span`, hash = `"0"`,
+  execution = `{ reachable: false, entryDistance: null, runtimeObserved: false, tested: false }`,
+  evidence = `[{ source: "AST", locator: pr.artifact.path, confidence: 1 }]`.
+
+**Phase 2 — CALLS edges:**
+For each `pr`, for each `call` in `pr.calls` with a defined `call.enclosing`:
+- from = `makeId("decl", call.enclosing)`.
+- resolve target: split `call.callee` on `"."`; `receiver` = second-to-last segment
+  (skip if it is `this` and there is no further segment); `targetClass` = receiver with
+  its first letter upper-cased (e.g. `authService` → `AuthService`); to = `makeId("decl", targetClass)`.
+- add the edge ONLY if both `draft.getNode(from)` and `draft.getNode(to)` exist:
+  `{ id: makeId("edge", "calls", from, to), kind: "CALLS", from, to, evidence: [AST] }`.
+- otherwise produce no edge (never guess).
+
+Idempotent: re-adding the same node/edge id is a no-op-equivalent (the draft replaces by id).
+
+## 5. Input → Output examples (golden)
+
+Synthetic `ParseResult`s: one with class `AuthController` + a `CallFact { enclosing:
+"AuthController", callee: "this.authService.login" }`, another with class `AuthService`:
+- nodes include `CONTROLLER` `AuthController` and `SERVICE` `AuthService`.
+- edges include a `CALLS` edge `decl|AuthController → decl|AuthService`.
+
+## 6. Edge cases
+
+- `call.enclosing` undefined → no edge.
+- target class not present as a node → no edge.
+- a `class` named `UserRepository` → kind `REPOSITORY`; a plain `Helper` → kind `CLASS`.
+
+## 7. Acceptance criteria (each a test in tests/passes/call-pass.test.ts)
+
+Build a `CompilationContext` (logger stub like existing tests) with `parseResults`, a
+`DefaultIRDraft` from `@rir/builder-engine`, run the pass, then assert on
+`draft.getNodes()` / `draft.getEdges()`:
+1. a `class` `AuthController` becomes a `CONTROLLER` node; `AuthService` a `SERVICE`; `UserRepository` a `REPOSITORY`.
+2. a `function` symbol becomes a `FUNCTION` node.
+3. a call with `enclosing: "AuthController"`, `callee: "this.authService.login"` yields a `CALLS` edge to `AuthService`.
+4. a call whose target class is absent yields no edge.
+5. a call with no `enclosing` yields no edge.
+6. determinism: running twice on the same input yields equal sealed IR.
+7. coverage for `CallPass.ts` ≥ 95%.
+
+## 8. Forbidden changes
+
+- Do NOT edit `packages/passes/src/index.ts`, the roster, `@rir/core`, `@rir/ir`, or any adapter.
+- Do NOT change the classification rule or node-id conventions (ADR-0016).
+- Do NOT resolve calls beyond the §4 rule; never guess.
+
+## 9. References
+
+- ADR-0016 (`docs/ADR-0016-pass-pipeline.md`) — the governing design.
+- Reference behaviour: `apps/cli/src/prove.ts`.
+- Draft + read API: `packages/builder-engine/src/index.ts` (`DefaultIRDraft`).
+
+## 10. Definition of done
+
+format:check · build · typecheck · the §7 tests · coverage ≥ 95% · PR `feat(tspec-p02): call pass`.

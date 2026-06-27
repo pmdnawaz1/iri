@@ -4,11 +4,15 @@ completion_pct: 46.7
 completed_tspecs: 35
 total_tspecs: 75
 coverage_target_pct: 95
-work_orders_written: 20
+work_orders_written: 24
 work_orders_required: 60
-work_order_coverage_pct: 33.3
-ready_to_implement: 10
+work_order_coverage_pct: 40
+ready_to_implement: 14
 ready_ids:
+  - "TSPEC-P01"
+  - "TSPEC-P02"
+  - "TSPEC-P03"
+  - "TSPEC-P12"
   - "TSPEC-FX02"
   - "TSPEC-FX03"
   - "TSPEC-FX04"

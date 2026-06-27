@@ -1,6 +1,6 @@
 ================================================================================
-RIR IMPLEMENTER PROMPT 6 — TSPEC-FX07: Fixture: go
-Branch: feature/tspec-fx07-fixture-go
+RIR IMPLEMENTER PROMPT 6 — TSPEC-FX03: Fixture: react
+Branch: feature/tspec-fx03-fixture-react
 Depends on: TSPEC-AD01 (already satisfied by the scaffold)
 Paste this ENTIRE file into a fresh session with your implementer model.
 ================================================================================
@@ -30,41 +30,40 @@ Definition of done: build + typecheck + lint + the section-7 tests + coverage >=
 
 ----- WORK ORDER -----------------------------------------------------------------
 
-# TSPEC-FX07 — Go fixture + adapter validation (Work Order)
+# TSPEC-FX03 — React fixture + adapter validation (Work Order)
 
 > Same shape as **TSPEC-FX02 (read it first)**. COLLISION-FREE: only new files in your
-> fixture folder + one new test.
+> fixture folder + one new test. Touch nothing shared.
 
-- **TSPEC:** TSPEC-FX07 · **Owner:** ROLE_IMPLEMENTER · **Depends on:** TSPEC-AD05 (Go adapter, COMPLETE) · **Wave:** 6
+- **TSPEC:** TSPEC-FX03 · **Owner:** ROLE_IMPLEMENTER · **Depends on:** TSPEC-AD01 (COMPLETE) · **Wave:** 6
 
 ## Objective
-A small Go auth module fixture + a test that `GoAdapter` extracts its facts.
+A small React + TypeScript auth UI fixture, plus a test that `TypeScriptAdapter` extracts
+its facts. No closure/IR — adapter validation only.
 
 ## Files (ADDITIVE ONLY)
-- create `fixtures/go/repository.go` (a `UserRepository` struct + method)
-- create `fixtures/go/service.go` (an `AuthService` struct calling the repository)
-- create `tests/fixtures/go.test.ts` (the tests below)
+- create `fixtures/react/LoginForm.tsx` (a function component that calls an api helper)
+- create `fixtures/react/api.ts` (a `login(email)` function doing a `fetch`)
+- create `tests/fixtures/react.test.ts` (the tests below)
 
 ## Behavior
-Realistic, multi-line, formatted Go. **CRITICAL: Go is newline-sensitive — write real
-newlines; a single-line Go file does NOT parse.** Use exported (capitalized) identifiers.
-Test reads the files and runs `new GoAdapter().parse(...)` (CompilationContext stub as in
-`tests/compiler/go-adapter.test.ts`).
+Realistic, multi-line, formatted TSX. `LoginForm` imports and calls `login` from `./api`.
+Test reads the files and runs `new TypeScriptAdapter().parse(...)` (CompilationContext
+stub as in `tests/compiler/typescript-adapter.test.ts`).
 
 ## Acceptance (each a test)
-1. `symbols` include struct `UserRepository` (kind `class`) and a method (kind `method`).
-2. `imports` include at least one import specifier (e.g. `fmt`).
-3. `calls` include a `call_expression` callee.
-4. `AuthService` extracted from its file.
-5. determinism: two parses deep-equal.
+1. `symbols` from `LoginForm.tsx` include a `function`/`variable` named `LoginForm`.
+2. `imports` include the `./api` specifier with `login` imported.
+3. `calls` include the `login` call (and/or `fetch`).
+4. determinism: two parses deep-equal.
 
 ## Forbidden
-Modify no adapter/package/`index.ts`/`package.json`. Never minify (especially Go).
+Modify no adapter/package/`index.ts`/`package.json`. Never minify fixtures.
 
 ## References
-`tests/compiler/go-adapter.test.ts`; adapter `packages/code-compiler/src/language/go.ts`.
+`tests/compiler/typescript-adapter.test.ts`; adapter `packages/code-compiler/src/language/typescript.ts`.
 
 ## Done
-format:check · build · typecheck · the tests · PR `feat(tspec-fx07): go fixture`.
+format:check · build · typecheck · the tests · PR `feat(tspec-fx03): react fixture`.
 
 ----------------------------------------------------------------------------------

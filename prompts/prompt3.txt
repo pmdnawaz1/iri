@@ -1,7 +1,7 @@
 ================================================================================
-RIR IMPLEMENTER PROMPT 3 — TSPEC-FX04: Fixture: next
-Branch: feature/tspec-fx04-fixture-next
-Depends on: TSPEC-AD01 (already satisfied by the scaffold)
+RIR IMPLEMENTER PROMPT 3 — TSPEC-P03: RoutePass
+Branch: feature/tspec-p03-routepass
+Depends on: TSPEC-A006, TSPEC-I006 (already satisfied by the scaffold)
 Paste this ENTIRE file into a fresh session with your implementer model.
 ================================================================================
 
@@ -30,40 +30,49 @@ Definition of done: build + typecheck + lint + the section-7 tests + coverage >=
 
 ----- WORK ORDER -----------------------------------------------------------------
 
-# TSPEC-FX04 — Next.js fixture + adapter validation (Work Order)
+# TSPEC-P03 — RoutePass (Work Order)
 
-> Same shape as **TSPEC-FX02 (read it first)**. COLLISION-FREE: only new files in your
-> fixture folder + one new test.
+> Same harness/conventions as **TSPEC-P02 (read it first)** + ADR-0016. COLLISION-FREE:
+> only your pass file + test. Do NOT edit `packages/passes/src/index.ts`.
 
-- **TSPEC:** TSPEC-FX04 · **Owner:** ROLE_IMPLEMENTER · **Depends on:** TSPEC-AD01 (COMPLETE) · **Wave:** 6
+- **TSPEC:** TSPEC-P03 · **Owner:** ROLE_IMPLEMENTER · **Depends on:** TSPEC-A006, TSPEC-I006, ADR-0016 (COMPLETE) · **Wave:** 5
 
 ## Objective
-A small Next.js TypeScript auth fixture (a page + an API route handler) + a test that
-`TypeScriptAdapter` extracts its facts.
+Lift each `RouteFact` into a `ROUTE` node and a `ROUTES_TO` edge to the controller invoked
+by its handler. RoutePass runs after CallPass, so controller nodes already exist; in unit
+tests, pre-seed the controller node on the draft.
 
 ## Files (ADDITIVE ONLY)
-- create `fixtures/next/login-page.tsx` (a function component calling an api helper)
-- create `fixtures/next/api-login.ts` (a route handler `export function POST(...)` calling a service)
-- create `tests/fixtures/next.test.ts` (the tests below)
+- create `packages/passes/src/RoutePass.ts`
+- create `tests/passes/route-pass.test.ts`
 
 ## Behavior
-Realistic, multi-line, formatted TS/TSX. Test reads files and runs
-`new TypeScriptAdapter().parse(...)` (CompilationContext stub as in `tests/compiler/typescript-adapter.test.ts`).
+`name = "RoutePass"`, `priority = PASS_PRIORITY.RoutePass`, `supports()` true.
+`run(ctx, draft)`: for each `pr` in `ctx.parseResults ?? []`, for each `route` in `pr.routes`:
+- add a `ROUTE` node: id = `makeId("route", `${route.method} ${route.path}`)`, name =
+  `${route.method} ${route.path}`, artifactId = `pr.artifact.id`, span = `route.span`,
+  hash = "0", default execution, evidence `[AST]`.
+- resolve the handler's controller: scan `route.handler` for `<ident>.<method>` patterns;
+  for each `<ident>`, upper-case its first letter (`authController` → `AuthController`) and
+  if `draft.getNode(makeId("decl", that))` exists, add a `ROUTES_TO` edge
+  `{ id: makeId("edge","routesTo", routeId, controllerId), kind:"ROUTES_TO", from: routeId,
+  to: controllerId, evidence:[AST] }`. No match ⇒ no edge.
 
-## Acceptance (each a test)
-1. `symbols` from `login-page.tsx` include the page component.
-2. `exports` from `api-login.ts` include the `POST` handler.
-3. `calls` include the service/api call.
-4. `imports` are extracted.
-5. determinism: two parses deep-equal.
+## Acceptance (each a test; DefaultIRDraft + CompilationContext stub)
+1. a `RouteFact { method:"POST", path:"/login" }` → a `ROUTE` node `POST /login`.
+2. with a pre-seeded `CONTROLLER` node `AuthController` and handler text
+   `"authController.login"` → a `ROUTES_TO` edge route→AuthController.
+3. handler that resolves to no existing node → ROUTE node but no edge.
+4. determinism: two runs yield equal sealed IR.
+5. coverage ≥ 95%.
 
 ## Forbidden
-Modify no adapter/package/`index.ts`/`package.json`. Never minify.
+Edit no shared file/roster/`@rir/core`/adapter. Import via package names only.
 
 ## References
-`tests/compiler/typescript-adapter.test.ts`; adapter `packages/code-compiler/src/language/typescript.ts`.
+ADR-0016; `apps/cli/src/prove.ts` (route→controller resolution); DefaultIRDraft.
 
 ## Done
-format:check · build · typecheck · the tests · PR `feat(tspec-fx04): next fixture`.
+format:check · build · typecheck · the tests · PR `feat(tspec-p03): route pass`.
 
 ----------------------------------------------------------------------------------

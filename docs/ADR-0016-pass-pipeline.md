@@ -59,9 +59,16 @@ heuristic the proving slice (`apps/cli/src/prove.ts`) validated, and it is what 
 closure stage mapping (`STAGE_OF_NODE_KIND`) recognise backend layers. Implementers apply
 the rule exactly; they do not invent classifications.
 
-Call resolution: a `CallFact.callee` of the form `<obj>.<method>` or `this.<field>.<method>`
-resolves to a class node by mapping the binding to a declared class (best-effort, by name).
-Unresolved callees produce no edge (never guess).
+Call resolution: a `CallFact` carries `enclosing` (the nearest enclosing class/function
+name) as the edge SOURCE, and `callee` (e.g. `this.authService.login`) as the target.
+The target resolves by taking the receiver segment (`authService`), PascalCasing it
+(`AuthService`), and matching a declared class node by name. Unresolved targets or an
+absent `enclosing` produce no edge (never guess). `enclosing` is optional on the contract
+for backward compatibility; the language adapters populate it in a follow-up enhancement,
+so CallPass is unit-testable against synthetic parse results today.
+
+Node id conventions: module = `makeId("module", artifact.path)`, declaration =
+`makeId("decl", name)`, route = `makeId("route", "<METHOD> <path>")`.
 
 ### 4. Capability discovery (CapabilityPass)
 

@@ -28,5 +28,5 @@ critical_path_length: 9
 coverage_target: 0.95
 work_orders:
   required: 60
-  written: 20
-  spec_coverage_pct: 33.3
+  written: 24
+  spec_coverage_pct: 40

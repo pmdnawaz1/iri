@@ -1,6 +1,6 @@
 ================================================================================
-RIR IMPLEMENTER PROMPT 7 — TSPEC-FX09: Fixture: broken-repository
-Branch: feature/tspec-fx09-fixture-broken-repository
+RIR IMPLEMENTER PROMPT 7 — TSPEC-FX04: Fixture: next
+Branch: feature/tspec-fx04-fixture-next
 Depends on: TSPEC-AD01 (already satisfied by the scaffold)
 Paste this ENTIRE file into a fresh session with your implementer model.
 ================================================================================
@@ -30,43 +30,40 @@ Definition of done: build + typecheck + lint + the section-7 tests + coverage >=
 
 ----- WORK ORDER -----------------------------------------------------------------
 
-# TSPEC-FX09 — Broken-repository fixture + adapter validation (Work Order)
+# TSPEC-FX04 — Next.js fixture + adapter validation (Work Order)
 
 > Same shape as **TSPEC-FX02 (read it first)**. COLLISION-FREE: only new files in your
-> fixture folder + one new test. Note: `fixtures/broken-repository/` already contains
-> `repository-ir.json` — leave it; only ADD source files.
+> fixture folder + one new test.
 
-- **TSPEC:** TSPEC-FX09 · **Owner:** ROLE_IMPLEMENTER · **Depends on:** TSPEC-AD01 (COMPLETE) · **Wave:** 6
+- **TSPEC:** TSPEC-FX04 · **Owner:** ROLE_IMPLEMENTER · **Depends on:** TSPEC-AD01 (COMPLETE) · **Wave:** 6
 
 ## Objective
-A small Express-style TypeScript repo whose login chain is deliberately BROKEN (the route
-handler never calls the service), plus a test that `TypeScriptAdapter` extracts the route
-and shows the service is not called from it. Closure verdict is OUT OF SCOPE here.
+A small Next.js TypeScript auth fixture (a page + an API route handler) + a test that
+`TypeScriptAdapter` extracts its facts.
 
 ## Files (ADDITIVE ONLY)
-- create `fixtures/broken-repository/routes.ts` (a `router.post("/login", ...)` whose handler does NOT call the controller/service)
-- create `fixtures/broken-repository/auth.service.ts` (an `AuthService` that exists but is never reached)
-- create `tests/fixtures/broken-repository.test.ts` (the tests below)
-- do NOT modify the existing `fixtures/broken-repository/repository-ir.json`
+- create `fixtures/next/login-page.tsx` (a function component calling an api helper)
+- create `fixtures/next/api-login.ts` (a route handler `export function POST(...)` calling a service)
+- create `tests/fixtures/next.test.ts` (the tests below)
 
 ## Behavior
-Realistic, multi-line, formatted TS. Test reads the files and runs
-`new TypeScriptAdapter().parse(...)` (CompilationContext stub).
+Realistic, multi-line, formatted TS/TSX. Test reads files and runs
+`new TypeScriptAdapter().parse(...)` (CompilationContext stub as in `tests/compiler/typescript-adapter.test.ts`).
 
 ## Acceptance (each a test)
-1. `routes` from `routes.ts` include `POST /login`.
-2. the handler's `calls` do NOT include any `AuthService` method (the chain is broken).
-3. `AuthService` is still extracted as a symbol from `auth.service.ts`.
-4. determinism: two parses deep-equal.
+1. `symbols` from `login-page.tsx` include the page component.
+2. `exports` from `api-login.ts` include the `POST` handler.
+3. `calls` include the service/api call.
+4. `imports` are extracted.
+5. determinism: two parses deep-equal.
 
 ## Forbidden
-Modify no adapter/package/`index.ts`/`package.json`/the existing `repository-ir.json`. Never minify.
+Modify no adapter/package/`index.ts`/`package.json`. Never minify.
 
 ## References
-`tests/compiler/typescript-adapter.test.ts`; adapter `packages/code-compiler/src/language/typescript.ts`;
-the proving slice `apps/cli/src/prove.ts`.
+`tests/compiler/typescript-adapter.test.ts`; adapter `packages/code-compiler/src/language/typescript.ts`.
 
 ## Done
-format:check · build · typecheck · the tests · PR `feat(tspec-fx09): broken-repository fixture`.
+format:check · build · typecheck · the tests · PR `feat(tspec-fx04): next fixture`.
 
 ----------------------------------------------------------------------------------

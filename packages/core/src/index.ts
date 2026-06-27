@@ -35,6 +35,12 @@ export interface ImportFact {
 /** A raw call site (callee text as written, unresolved). */
 export interface CallFact {
   readonly callee: string;
+  /**
+   * Name of the nearest enclosing named declaration (class or function) that contains
+   * this call — the SOURCE of the resulting CALLS edge. Optional for backward
+   * compatibility; adapters populate it in a later enhancement. Absent ⇒ no edge.
+   */
+  readonly enclosing?: string;
   readonly span: Span;
 }
 
