@@ -35,9 +35,7 @@ export class ReachabilityPass extends AbstractPass {
     }
 
     // Entrypoints: nodes whose kind is ROUTE or ENTRYPOINT
-    const entrypointIds = nodes
-      .filter((n) => n.kind === "ROUTE" || n.kind === "ENTRYPOINT")
-      .map((n) => n.id);
+    const entrypointIds = nodes.filter((n) => n.kind === "ROUTE" || n.kind === "ENTRYPOINT").map((n) => n.id);
 
     // BFS distances from all entrypoints
     const dist = distancesFrom(graph, entrypointIds);
