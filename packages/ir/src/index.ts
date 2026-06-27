@@ -268,3 +268,6 @@ export function emptyRepositoryIR(): RepositoryIR {
 export function emptyRequirementSet(): RequirementSet {
   return { version: REQUIREMENT_IR_VERSION, requirements: [] };
 }
+
+export { serializeRepositoryIR, parseRepositoryIR } from "./serializer.js";
+export { validateRepositoryIR } from "./validator.js";
