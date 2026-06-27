@@ -3,7 +3,7 @@
 id: "TSPEC-A004"
 title: "Graph Semantics"
 owner: "ROLE_ARCHITECT"
-state: "DRAFT"
+state: "COMPLETE"
 package: "graph"
 module: "semantics"
 repository_path: "packages/graph"

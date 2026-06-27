@@ -3,7 +3,7 @@
 id: "TSPEC-E01"
 title: "Closure engine impl"
 owner: "ROLE_IMPLEMENTER"
-state: "DRAFT"
+state: "COMPLETE"
 package: "closure"
 module: "engine"
 repository_path: "packages/closure"

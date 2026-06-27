@@ -3,7 +3,7 @@
 id: "TSPEC-I002"
 title: "IR serializer & validator"
 owner: "ROLE_IMPLEMENTER"
-state: "DRAFT"
+state: "COMPLETE"
 package: "ir"
 module: "validator"
 repository_path: "packages/ir"

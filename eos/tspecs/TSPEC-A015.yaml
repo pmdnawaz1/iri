@@ -3,7 +3,7 @@
 id: "TSPEC-A015"
 title: "Telemetry Evidence Model"
 owner: "ROLE_ARCHITECT"
-state: "DRAFT"
+state: "COMPLETE"
 package: "telemetry"
 module: "model"
 repository_path: "packages/telemetry"

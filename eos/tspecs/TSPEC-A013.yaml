@@ -3,7 +3,7 @@
 id: "TSPEC-A013"
 title: "Query Language"
 owner: "ROLE_ARCHITECT"
-state: "DRAFT"
+state: "COMPLETE"
 package: "query-engine"
 module: "querylang"
 repository_path: "packages/query-engine"

@@ -22,6 +22,7 @@ interface IndexedTspec {
   id: string;
   title: string;
   owner: string;
+  state: string;
   branch: string;
   spec_path: string;
   spec_required: boolean;
@@ -52,7 +53,13 @@ Definition of done: build + typecheck + lint + the section-7 tests + coverage >=
 
 const index = JSON.parse(readFileSync(INDEX, "utf8")) as { tspecs: IndexedTspec[] };
 const ready = index.tspecs
-  .filter((t) => t.owner === "ROLE_IMPLEMENTER" && t.spec_required && t.spec_status === "WRITTEN")
+  .filter(
+    (t) =>
+      t.owner === "ROLE_IMPLEMENTER" &&
+      t.spec_required &&
+      t.spec_status === "WRITTEN" &&
+      t.state !== "COMPLETE",
+  )
   .sort((a, b) => a.wave - b.wave || a.id.localeCompare(b.id));
 
 rmSync(OUT, { recursive: true, force: true });

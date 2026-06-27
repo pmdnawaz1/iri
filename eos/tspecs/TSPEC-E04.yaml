@@ -3,7 +3,7 @@
 id: "TSPEC-E04"
 title: "Query engine impl"
 owner: "ROLE_IMPLEMENTER"
-state: "DRAFT"
+state: "COMPLETE"
 package: "query-engine"
 module: "engine"
 repository_path: "packages/query-engine"

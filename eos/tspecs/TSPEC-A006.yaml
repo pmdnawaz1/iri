@@ -3,7 +3,7 @@
 id: "TSPEC-A006"
 title: "Pass Roster & Ordering"
 owner: "ROLE_ARCHITECT"
-state: "DRAFT"
+state: "COMPLETE"
 package: "passes"
 module: "roster"
 repository_path: "packages/passes"

@@ -11,7 +11,7 @@
  * Run: pnpm eos:compile   (tsx eos/compiler/compile.ts)
  */
 
-import { existsSync, mkdirSync, writeFileSync, rmSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, writeFileSync, rmSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { DATASET } from "./dataset.js";
@@ -22,6 +22,14 @@ const HERE = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(HERE, "..", "..");
 const TSPEC_DIR = resolve(ROOT, "eos", "tspecs");
 const STATE_DIR = resolve(ROOT, "eos", "state");
+const COMPLETED_FILE = resolve(ROOT, "eos", "completed.json");
+
+/** TSPEC ids merged/done on main (eos/completed.json). Synced on every merge. */
+function loadCompleted(): Set<string> {
+  if (!existsSync(COMPLETED_FILE)) return new Set();
+  const parsed = JSON.parse(readFileSync(COMPLETED_FILE, "utf8")) as { completed?: string[] };
+  return new Set(parsed.completed ?? []);
+}
 
 // --- minimal deterministic YAML emitter ------------------------------------
 function yamlScalar(v: unknown): string {
@@ -176,6 +184,7 @@ function compile(dataset: readonly TspecSource[]): Compiled {
   }
 
   // Derive full TSPECs.
+  const completed = loadCompleted();
   const tspecs: Tspec[] = dataset.map((s) => {
     const w = wave.get(s.id) ?? 0;
     const spec_path = `eos/specs/${s.id}.spec.md`;
@@ -183,7 +192,7 @@ function compile(dataset: readonly TspecSource[]): Compiled {
     const spec_status: Tspec["spec_status"] = existsSync(resolve(ROOT, spec_path)) ? "WRITTEN" : "MISSING";
     return {
       ...s,
-      state: State.Draft,
+      state: completed.has(s.id) ? State.Complete : State.Draft,
       repository_path: repositoryPath(s),
       branch: `feature/${s.id.toLowerCase()}-${slug(s.title)}`,
       parent_branch: EOS.parentBranch,
@@ -235,6 +244,19 @@ function emit(c: Compiled): void {
   const specCoveragePct = specRequired.length
     ? Number(((specWritten.length / specRequired.length) * 100).toFixed(1))
     : 100;
+
+  // Completion + readiness, computed from synced state (eos/completed.json).
+  const completeSet = new Set(c.tspecs.filter((t) => t.state === State.Complete).map((t) => t.id));
+  const ready = c.tspecs.filter(
+    (t) =>
+      !completeSet.has(t.id) &&
+      t.spec_required &&
+      t.spec_status === "WRITTEN" &&
+      t.depends_on.every((d) => completeSet.has(d)),
+  );
+  const blocked = c.tspecs.filter(
+    (t) => !completeSet.has(t.id) && t.spec_required && !t.depends_on.every((d) => completeSet.has(d)),
+  );
 
   // project.index.json — full canonical record.
   writeFileSync(
@@ -334,17 +356,21 @@ function emit(c: Compiled): void {
     owning_tspecs: architects.map((t) => ({ id: t.id, protects: t.title })),
   });
 
-  // project.health.yaml — computed from current states (all DRAFT at init -> 0%).
-  const complete = c.tspecs.filter((t) => t.state === State.Complete).length;
+  // project.health.yaml — computed from synced state (eos/completed.json).
+  const complete = completeSet.size;
+  const criticalDone = c.tspecs.filter((t) => t.critical_path && completeSet.has(t.id)).length;
   writeYaml(resolve(STATE_DIR, "project.health.yaml"), "Repository health", {
     completion_pct: Number(((complete / c.tspecs.length) * 100).toFixed(1)),
+    completed_tspecs: complete,
+    total_tspecs: c.tspecs.length,
     coverage_target_pct: EOS.coverageTarget * 100,
     work_orders_written: specWritten.length,
     work_orders_required: specRequired.length,
     work_order_coverage_pct: specCoveragePct,
-    ready_to_implement: specWritten.length,
-    blocked_tspecs: 0,
-    critical_path_progress_pct: 0,
+    ready_to_implement: ready.length,
+    ready_ids: ready.map((t) => t.id),
+    blocked_tspecs: blocked.length,
+    critical_path_progress_pct: Number(((criticalDone / Math.max(1, criticalIds.length)) * 100).toFixed(1)),
     architecture_stability: c.errors.length === 0 ? "STABLE" : "DRIFT",
     compiler_health: c.errors.length === 0 ? "GREEN" : "RED",
     risk_score: Number((high.length / Math.max(1, c.tspecs.length)).toFixed(3)),

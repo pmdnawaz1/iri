@@ -3,7 +3,7 @@
 id: "TSPEC-A003"
 title: "Capability Ontology"
 owner: "ROLE_ARCHITECT"
-state: "DRAFT"
+state: "COMPLETE"
 package: "ontology"
 module: "ontology"
 repository_path: "packages/ontology"

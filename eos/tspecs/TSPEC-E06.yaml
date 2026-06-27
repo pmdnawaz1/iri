@@ -3,7 +3,7 @@
 id: "TSPEC-E06"
 title: "Telemetry ingestor impl"
 owner: "ROLE_IMPLEMENTER"
-state: "DRAFT"
+state: "COMPLETE"
 package: "telemetry"
 module: "ingestor"
 repository_path: "packages/telemetry"

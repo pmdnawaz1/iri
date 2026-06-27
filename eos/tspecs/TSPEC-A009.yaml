@@ -3,7 +3,7 @@
 id: "TSPEC-A009"
 title: "Execution Closure Algorithm"
 owner: "ROLE_ARCHITECT"
-state: "DRAFT"
+state: "COMPLETE"
 package: "closure"
 module: "algorithm"
 repository_path: "packages/closure"

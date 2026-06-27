@@ -3,7 +3,7 @@
 id: "TSPEC-I001"
 title: "Common utilities"
 owner: "ROLE_IMPLEMENTER"
-state: "DRAFT"
+state: "COMPLETE"
 package: "common"
 module: "common"
 repository_path: "packages/common"

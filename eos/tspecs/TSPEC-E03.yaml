@@ -3,7 +3,7 @@
 id: "TSPEC-E03"
 title: "Consistency engine impl"
 owner: "ROLE_IMPLEMENTER"
-state: "DRAFT"
+state: "COMPLETE"
 package: "consistency"
 module: "engine"
 repository_path: "packages/consistency"

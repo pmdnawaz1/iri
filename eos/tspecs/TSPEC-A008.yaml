@@ -3,7 +3,7 @@
 id: "TSPEC-A008"
 title: "Document Compiler Semantics"
 owner: "ROLE_ARCHITECT"
-state: "DRAFT"
+state: "COMPLETE"
 package: "document-compiler"
 module: "semantics"
 repository_path: "packages/document-compiler"

@@ -3,7 +3,7 @@
 id: "TSPEC-I007"
 title: "Ontology validators"
 owner: "ROLE_IMPLEMENTER"
-state: "DRAFT"
+state: "COMPLETE"
 package: "ontology"
 module: "validators"
 repository_path: "packages/ontology"
