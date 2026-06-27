@@ -74,3 +74,4 @@ export class AdapterRegistry {
 
 export { TypeScriptAdapter, extractParseResult } from "./language/typescript.js";
 export { JavaScriptAdapter } from "./language/javascript.js";
+export { CSharpAdapter } from "./language/csharp.js";

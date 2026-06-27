@@ -12,6 +12,8 @@
     "@rir/ir": "workspace:*",
     "@rir/core": "workspace:*",
     "@rir/common": "workspace:*",
-    "typescript": "^5.7.2"
+    "typescript": "^5.7.2",
+    "web-tree-sitter": "^0.26.9",
+    "tree-sitter-c-sharp": "^0.23.5"
   }
 }
