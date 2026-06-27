@@ -3,7 +3,7 @@
 id: "TSPEC-CE07"
 title: "javascript adapter: emit CallFact.enclosing"
 owner: "ROLE_IMPLEMENTER"
-state: "DRAFT"
+state: "COMPLETE"
 package: "code-compiler"
 module: "language/javascript"
 repository_path: "packages/code-compiler"

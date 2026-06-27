@@ -5,8 +5,10 @@ Each promptN.txt is fully self-contained. Open a FRESH session with your
 implementer model and paste the ENTIRE file. One file = one TSPEC = one PR.
 These are independent; you can run them in parallel.
 
-prompt1.txt  ->  TSPEC-CE04  java adapter: emit CallFact.enclosing  [branch feature/tspec-ce04-java-adapter-emit-callfact-enclosing]
-prompt2.txt  ->  TSPEC-CE05  rust adapter: emit CallFact.enclosing  [branch feature/tspec-ce05-rust-adapter-emit-callfact-enclosing]
-prompt3.txt  ->  TSPEC-CE06  csharp adapter: emit CallFact.enclosing  [branch feature/tspec-ce06-csharp-adapter-emit-callfact-enclosing]
-prompt4.txt  ->  TSPEC-CE07  javascript adapter: emit CallFact.enclosing  [branch feature/tspec-ce07-javascript-adapter-emit-callfact-enclosing]
-prompt5.txt  ->  TSPEC-FX08  Fixture: microservices  [branch feature/tspec-fx08-fixture-microservices]
+prompt1.txt  ->  TSPEC-CI01  CI/CD gates workflow  [branch feature/tspec-ci01-ci-cd-gates-workflow]
+prompt2.txt  ->  TSPEC-APP3  Worker  [branch feature/tspec-app3-worker]
+prompt3.txt  ->  TSPEC-P04  ComponentPass  [branch feature/tspec-p04-componentpass]
+prompt4.txt  ->  TSPEC-P05  SQLPass  [branch feature/tspec-p05-sqlpass]
+prompt5.txt  ->  TSPEC-P06  EventPass  [branch feature/tspec-p06-eventpass]
+prompt6.txt  ->  TSPEC-P15  GitPass  [branch feature/tspec-p15-gitpass]
+prompt7.txt  ->  TSPEC-APP2  Compiler API  [branch feature/tspec-app2-compiler-api]

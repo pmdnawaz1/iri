@@ -1,7 +1,7 @@
 ================================================================================
-RIR IMPLEMENTER PROMPT 4 — TSPEC-CE07: javascript adapter: emit CallFact.enclosing
-Branch: feature/tspec-ce07-javascript-adapter-emit-callfact-enclosing
-Depends on: TSPEC-AD02 (already satisfied by the scaffold)
+RIR IMPLEMENTER PROMPT 4 — TSPEC-P05: SQLPass
+Branch: feature/tspec-p05-sqlpass
+Depends on: TSPEC-A006, TSPEC-I006 (already satisfied by the scaffold)
 Paste this ENTIRE file into a fresh session with your implementer model.
 ================================================================================
 
@@ -30,43 +30,48 @@ Definition of done: build + typecheck + lint + the section-7 tests + coverage >=
 
 ----- WORK ORDER -----------------------------------------------------------------
 
-# TSPEC-CE07 — JavaScript adapter: emit CallFact.enclosing (Work Order)
+# TSPEC-P05 — SQLPass (Work Order)
 
-> Same shape as **TSPEC-CE01 (read it first)**. COLLISION-FREE: touches ONLY `javascript.ts`
-> and its test. The JS adapter uses the TypeScript Compiler API, so the algorithm is
-> identical to CE01 (the TypeScript enclosing enhancement).
+> Same harness/conventions as **TSPEC-P02 (read it first)** + ADR-0016. COLLISION-FREE:
+> only your pass file + test. Do NOT edit `packages/passes/src/index.ts`. Package-name imports.
+> The detection heuristic below is the architect's decision (amends ADR-0016); apply it exactly.
 
-- **TSPEC:** TSPEC-CE07 · **Owner:** ROLE_IMPLEMENTER · **Depends on:** TSPEC-AD02 (COMPLETE) · **Wave:** 6
+- **TSPEC:** TSPEC-P05 · **Owner:** ROLE_IMPLEMENTER · **Depends on:** TSPEC-A006, TSPEC-I006, ADR-0016 (COMPLETE) · **Wave:** 5
 
 ## Objective
-Populate `CallFact.enclosing` in the JavaScript adapter (nearest enclosing class, else
-top-level function) so CallPass can build the call graph.
+Detect database access from call facts and add `SQL_QUERY` nodes + edges, so closure can
+see the `DATABASE` stage. Heuristic and deterministic.
 
-## Files (ADDITIVE-TO-ONE-FILE)
-- modify `packages/code-compiler/src/language/javascript.ts` (only `extractCalls`)
-- modify `tests/compiler/javascript-adapter.test.ts` (add the assertions)
+## Files (ADDITIVE ONLY)
+- create `packages/passes/src/SQLPass.ts`
+- create `tests/passes/sql-pass.test.ts`
 
 ## Behavior
-Apply CE01 §4 verbatim (the JS adapter parses with the TS Compiler API): walk
-`(node, enclosing)`; a `ClassDeclaration` with a name sets the child enclosing to the
-class name; a named `FunctionDeclaration` sets it when none is set; a `CallExpression`
-records the current enclosing. If CE01 exposed a shared `extractCalls` helper, reuse it;
-otherwise implement the same logic standalone.
+`name = "SQLPass"`, `priority = PASS_PRIORITY.SQLPass`, `supports()` true. `run(ctx, draft)`:
+for each `pr` in `ctx.parseResults ?? []`, for each `call` in `pr.calls`:
+- let `method` = the last `.`-segment of `call.callee`. If `method` (lower-cased) is in the
+  fixed set `{ query, execute, exec, raw, insert, update, delete, find, findone, save }`:
+  - create a `SQL_QUERY` node: id = `makeId("sql", pr.artifact.path, String(call.span.startLine))`,
+    name = `method`, language = `pr.artifact.language`, artifactId = `pr.artifact.id`,
+    span = `call.span`, hash = "0", default execution, evidence `[AST]`.
+  - if `call.enclosing` resolves to an existing node (`draft.getNode(makeId("decl", call.enclosing))`),
+    add an edge from it to the SQL node: kind `WRITES` if `method` ∈ `{ insert, update, delete, save, exec, execute }`, else `READS`. id = `makeId("edge","sql", from, sqlId)`, evidence `[AST]`.
+- otherwise no node/edge. (`SQL_QUERY` maps to the `DATABASE` execution stage in closure.)
 
-## Acceptance (added to the adapter test)
-1. a call inside a method of `class AuthService` reports `enclosing === "AuthService"`.
-2. a call inside a named top-level function reports that function's name.
-3. a module-top-level call reports `undefined`.
-4. existing call assertions still hold.
+## Acceptance (each a test; DefaultIRDraft + CompilationContext stub)
+1. a call `this.db.query(...)` (enclosing a known decl) yields a `SQL_QUERY` node and a `READS` edge.
+2. `this.db.insert(...)` yields a `WRITES` edge.
+3. a non-DB call (e.g. `foo.bar()`) yields no SQL node.
+4. determinism: two runs yield equal sealed IR.
 5. coverage ≥ 95%.
 
 ## Forbidden
-Change no contract/other adapter/`index.ts`/`package.json`. Never minify.
+Edit no shared file/roster/`@rir/core`/adapter. Do NOT change the method set. Package-name imports only.
 
 ## References
-TSPEC-CE01 (identical algorithm); `packages/code-compiler/src/language/javascript.ts`; ADR-0016.
+ADR-0016; `@rir/ir` (`NodeKind.SqlQuery`); `@rir/closure` (`STAGE_OF_NODE_KIND` maps SQL_QUERY→DATABASE); DefaultIRDraft.
 
 ## Done
-format:check · build · typecheck · the tests · PR `feat(tspec-ce07): javascript enclosing`.
+format:check · build · typecheck · the tests · PR `feat(tspec-p05): sql pass`.
 
 ----------------------------------------------------------------------------------

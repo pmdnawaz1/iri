@@ -18,3 +18,7 @@ coverage/
 
 # local machine-specific launcher
 rir.cmd
+
+# local throwaway scripts / logs
+create_prs*.ps1
+lint_output.txt

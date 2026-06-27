@@ -3,7 +3,7 @@
 id: "TSPEC-FX08"
 title: "Fixture: microservices"
 owner: "ROLE_IMPLEMENTER"
-state: "DRAFT"
+state: "COMPLETE"
 package: "fixtures"
 module: "microservices"
 repository_path: "fixtures/microservices"
