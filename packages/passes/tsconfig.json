@@ -6,6 +6,7 @@
     { "path": "../ir" },
     { "path": "../core" },
     { "path": "../graph" },
-    { "path": "../common" }
+    { "path": "../common" },
+    { "path": "../ontology" }
   ]
 }
