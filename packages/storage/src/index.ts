@@ -17,6 +17,12 @@ export interface Storage {
   listSnapshots(): Promise<readonly SnapshotIR[]>;
   saveRequirements(set: RequirementSet): Promise<void>;
   loadRequirements(): Promise<RequirementSet | undefined>;
+  /**
+   * Release underlying resources (e.g. close a database handle). Optional —
+   * in-memory backends need no teardown. Sanctioned by ADR-0012 as the
+   * TSPEC-I004 review follow-up so SqliteStorage may expose `close()`.
+   */
+  close?(): void;
 }
 
 /**

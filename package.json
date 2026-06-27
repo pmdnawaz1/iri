@@ -11,7 +11,7 @@
   "scripts": {
     "build": "tsc -b",
     "clean": "tsc -b --clean",
-    "typecheck": "tsc -b --noEmit && tsc -p eos/tsconfig.json",
+    "typecheck": "tsc -b && tsc -p eos/tsconfig.json",
     "test": "vitest run",
     "test:watch": "vitest",
     "lint": "eslint .",

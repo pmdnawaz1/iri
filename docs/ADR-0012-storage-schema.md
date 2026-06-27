@@ -19,3 +19,8 @@ for future query indexing. `InMemoryStorage` is the reference implementation.
 ## Consequences
 The SQLite implementation (TSPEC-I004) persists snapshot JSON; node/edge decomposition
 is a separate indexing TSPEC.
+
+## Amendment (TSPEC-I004 review)
+The `Storage` interface gains an optional `close?(): void` for backends that hold OS
+resources (SQLite file handles). In-memory backends omit it. This is additive and
+non-breaking; it sanctions `SqliteStorage.close()` surfaced during PR review.
