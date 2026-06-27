@@ -123,19 +123,35 @@ function extractExports(root: Parser.SyntaxNode): string[] {
 
 function extractCalls(root: Parser.SyntaxNode): CallFact[] {
   const calls: CallFact[] = [];
-  const visit = (node: Parser.SyntaxNode): void => {
+  const visit = (node: Parser.SyntaxNode, enclosing?: string): void => {
+    let childEnclosing = enclosing;
+
+    if (node.type === "class_definition") {
+      const nameNode = node.childForFieldName("name");
+      if (nameNode) childEnclosing = nameNode.text;
+    } else if (node.type === "function_definition" && enclosing === undefined) {
+      const nameNode = node.childForFieldName("name");
+      if (nameNode) childEnclosing = nameNode.text;
+    }
+
     if (node.type === "call") {
       const funcNode = node.childForFieldName("function");
       if (funcNode) {
-        calls.push({ callee: funcNode.text, span: getSpan(node) });
+        calls.push({
+          callee: funcNode.text,
+          enclosing: childEnclosing,
+          span: getSpan(node),
+        });
       }
     }
+
     for (let i = 0; i < node.childCount; i++) {
       const child = node.child(i);
-      if (child) visit(child);
+      if (child) visit(child, childEnclosing);
     }
   };
-  visit(root);
+
+  visit(root, undefined);
   return calls;
 }
 
