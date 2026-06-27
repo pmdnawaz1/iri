@@ -251,3 +251,5 @@ export function resolveAlias(alias: string): CapabilityDefinition | undefined {
 export function allCapabilities(): readonly CapabilityDefinition[] {
   return [...CAPABILITY_BY_ID.values()];
 }
+
+export { validateOntology, validateFeatures, type OntologyProblem } from "./validators.js";
