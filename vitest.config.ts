@@ -13,6 +13,7 @@ export default defineConfig({
       "@rir/ontology": pkg("ontology"),
       "@rir/storage": pkg("storage"),
       "@rir/code-compiler": pkg("code-compiler"),
+      "@rir/compiler": pkg("compiler"),
       "@rir/document-compiler": pkg("document-compiler"),
       "@rir/builder-engine": pkg("builder-engine"),
       "@rir/passes": pkg("passes"),

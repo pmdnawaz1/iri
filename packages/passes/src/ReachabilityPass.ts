@@ -8,7 +8,7 @@
 
 import type { CompilationContext, IRDraft } from "@rir/core";
 import { DirectedGraph, distancesFrom } from "@rir/graph";
-import { AbstractPass, PASS_PRIORITY } from "@rir/passes";
+import { AbstractPass, PASS_PRIORITY } from "./base.js";
 
 export class ReachabilityPass extends AbstractPass {
   readonly name = "ReachabilityPass" as const;

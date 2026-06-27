@@ -28,6 +28,7 @@
       "@rir/ontology": ["./packages/ontology/src/index.ts"],
       "@rir/storage": ["./packages/storage/src/index.ts"],
       "@rir/code-compiler": ["./packages/code-compiler/src/index.ts"],
+      "@rir/compiler": ["./packages/compiler/src/index.ts"],
       "@rir/document-compiler": ["./packages/document-compiler/src/index.ts"],
       "@rir/builder-engine": ["./packages/builder-engine/src/index.ts"],
       "@rir/passes": ["./packages/passes/src/index.ts"],

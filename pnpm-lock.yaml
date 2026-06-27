@@ -35,6 +35,9 @@ importers:
       '@rir/common':
         specifier: workspace:*
         version: link:../../packages/common
+      '@rir/compiler':
+        specifier: workspace:*
+        version: link:../../packages/compiler
       '@rir/core':
         specifier: workspace:*
         version: link:../../packages/core
@@ -170,6 +173,30 @@ importers:
 
   packages/common: {}
 
+  packages/compiler:
+    dependencies:
+      '@rir/builder-engine':
+        specifier: workspace:*
+        version: link:../builder-engine
+      '@rir/closure':
+        specifier: workspace:*
+        version: link:../closure
+      '@rir/code-compiler':
+        specifier: workspace:*
+        version: link:../code-compiler
+      '@rir/common':
+        specifier: workspace:*
+        version: link:../common
+      '@rir/core':
+        specifier: workspace:*
+        version: link:../core
+      '@rir/ir':
+        specifier: workspace:*
+        version: link:../ir
+      '@rir/passes':
+        specifier: workspace:*
+        version: link:../passes
+
   packages/consistency:
     dependencies:
       '@rir/common':
@@ -214,7 +241,11 @@ importers:
 
   packages/graph: {}
 
-  packages/ir: {}
+  packages/ir:
+    dependencies:
+      '@rir/common':
+        specifier: workspace:*
+        version: link:../common
 
   packages/ontology: {}
 
@@ -232,6 +263,9 @@ importers:
       '@rir/ir':
         specifier: workspace:*
         version: link:../ir
+      '@rir/ontology':
+        specifier: workspace:*
+        version: link:../ontology
 
   packages/query-engine:
     dependencies:

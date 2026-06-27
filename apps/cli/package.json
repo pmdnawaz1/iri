@@ -19,6 +19,7 @@
     "@rir/coverage": "workspace:*",
     "@rir/query-engine": "workspace:*",
     "@rir/graph": "workspace:*",
+    "@rir/compiler": "workspace:*",
     "@rir/common": "workspace:*",
     "typescript": "^5.7.2"
   }

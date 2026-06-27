@@ -1,0 +1,14 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": { "rootDir": "./src", "outDir": "./dist" },
+  "include": ["src/**/*"],
+  "references": [
+    { "path": "../ir" },
+    { "path": "../core" },
+    { "path": "../common" },
+    { "path": "../code-compiler" },
+    { "path": "../passes" },
+    { "path": "../builder-engine" },
+    { "path": "../closure" }
+  ]
+}

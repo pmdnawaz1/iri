@@ -12,6 +12,7 @@
     "@rir/ir": "workspace:*",
     "@rir/core": "workspace:*",
     "@rir/graph": "workspace:*",
+    "@rir/ontology": "workspace:*",
     "@rir/common": "workspace:*"
   }
 }

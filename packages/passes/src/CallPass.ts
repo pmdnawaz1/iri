@@ -9,7 +9,7 @@
 import type { CompilationContext, IRDraft, SymbolFact } from "@rir/core";
 import type { NodeKind } from "@rir/ir";
 import { makeId } from "@rir/common";
-import { AbstractPass, PASS_PRIORITY } from "@rir/passes";
+import { AbstractPass, PASS_PRIORITY } from "./base.js";
 
 function classify(sym: SymbolFact): NodeKind {
   if (sym.kind === "class") {

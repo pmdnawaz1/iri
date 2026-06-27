@@ -7,7 +7,7 @@
 
 import type { CompilationContext, IRDraft } from "@rir/core";
 import { makeId } from "@rir/common";
-import { AbstractPass, PASS_PRIORITY } from "@rir/passes";
+import { AbstractPass, PASS_PRIORITY } from "./base.js";
 
 export class ImportPass extends AbstractPass {
   readonly name = "ImportPass" as const;

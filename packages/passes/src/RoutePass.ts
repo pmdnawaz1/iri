@@ -8,7 +8,7 @@
 
 import type { CompilationContext, IRDraft } from "@rir/core";
 import { makeId } from "@rir/common";
-import { AbstractPass, PASS_PRIORITY } from "@rir/passes";
+import { AbstractPass, PASS_PRIORITY } from "./base.js";
 
 export class RoutePass extends AbstractPass {
   readonly name = "RoutePass" as const;

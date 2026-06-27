@@ -1,4 +1,4 @@
-import { AbstractPass, PASS_PRIORITY } from "@rir/passes";
+import { AbstractPass, PASS_PRIORITY } from "./base.js";
 import { makeId } from "@rir/common";
 import type { IRDraft, CompilationContext } from "@rir/core";
 import { ClosureState } from "@rir/ir";

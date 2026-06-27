@@ -15,6 +15,7 @@ import { ONTOLOGY_VERSION, allCapabilities } from "@rir/ontology";
 import { DefaultClosureEngine } from "@rir/closure";
 import { DefaultCoverageEngine } from "@rir/coverage";
 import { emptyRequirementSet } from "@rir/ir";
+import { compileRepository } from "@rir/compiler";
 import { prove } from "./prove.js";
 
 const log = new ConsoleLogger("info");
@@ -26,8 +27,8 @@ Usage:
   rir ontology                List canonical ontology capabilities
   rir validate <ir.json>      Run closure over a Repository IR (JSON)
   rir coverage <ir.json>      Run coverage over a Repository IR (JSON)
-  rir prove <dir>             Parse a TS backend dir and report AUTH.LOGIN closure
-  rir compile <path>          (pipeline not yet assembled)
+  rir prove <dir>             Parse a TS backend dir and report AUTH.LOGIN closure (legacy slice)
+  rir compile <dir>           Compile a repo (adapters -> passes -> IR -> closure)
   rir diff <a> <b>            (pipeline not yet assembled)
   rir query <capability>      (pipeline not yet assembled)
   rir graph                   (pipeline not yet assembled)
@@ -92,7 +93,22 @@ async function main(argv: readonly string[]): Promise<number> {
       process.stdout.write(`  missing stages:  ${result.missing.join(", ") || "(none)"}\n`);
       return result.state === ClosureState.Closed ? 0 : 1;
     }
-    case "compile":
+    case "compile": {
+      const dir = rest[0];
+      if (!dir) {
+        process.stderr.write("usage: rir compile <dir>\n");
+        return 64;
+      }
+      const { ir, closure } = await compileRepository(dir);
+      process.stdout.write(
+        `Compiled ${dir}: ${ir.nodes.length} nodes, ${ir.edges.length} edges, ${ir.capabilities.length} capabilities\n`,
+      );
+      for (const cap of ir.capabilities) {
+        const r = closure.find((c) => c.capabilityId === cap.id);
+        process.stdout.write(`  ${cap.capability}\t${r?.state ?? "?"}\n`);
+      }
+      return closure.every((c) => c.state === ClosureState.Closed) ? 0 : 1;
+    }
     case "diff":
     case "query":
     case "graph":
