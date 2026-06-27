@@ -580,6 +580,29 @@ const FIXTURES: TspecSource[] = FIXTURE_NAMES.map((name, i) =>
   }),
 );
 
+// Per-language adapter-validation fixtures (each depends on its language adapter).
+const LANG_FIXTURE_DEFS: Array<[string, string, string]> = [
+  ["FX10", "python", "TSPEC-AD03"],
+  ["FX11", "rust", "TSPEC-AD06"],
+  ["FX12", "csharp", "TSPEC-AD07"],
+];
+const LANG_FIXTURES: TspecSource[] = LANG_FIXTURE_DEFS.map(([id, name, adapter]) =>
+  T({
+    id: `TSPEC-${id}`,
+    title: `Fixture: ${name}`,
+    owner: Role.Implementer,
+    package: "fixtures",
+    module: name,
+    priority: Priority.P2,
+    complexity: Complexity.Low,
+    risk: Risk.Low,
+    estimated_effort: 1,
+    depends_on: [adapter],
+    deliverables: [`Tiny ${name} module + ${name} adapter validation`],
+    tests: ["golden"],
+  }),
+);
+
 const TOOLING: TspecSource[] = [
   T({
     id: "TSPEC-SC01",
@@ -640,5 +663,6 @@ export const DATASET: readonly TspecSource[] = [
   ...ENGINES,
   ...APPS,
   ...FIXTURES,
+  ...LANG_FIXTURES,
   ...TOOLING,
 ];

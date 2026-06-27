@@ -68,6 +68,9 @@ topological_order:
   - "TSPEC-FX07"
   - "TSPEC-FX08"
   - "TSPEC-FX09"
+  - "TSPEC-FX10"
+  - "TSPEC-FX11"
+  - "TSPEC-FX12"
   - "TSPEC-E01"
   - "TSPEC-APP1"
   - "TSPEC-APP2"
@@ -156,6 +159,9 @@ waves:
       - "TSPEC-FX07"
       - "TSPEC-FX08"
       - "TSPEC-FX09"
+      - "TSPEC-FX10"
+      - "TSPEC-FX11"
+      - "TSPEC-FX12"
   - wave: 7
     tspecs:
       - "TSPEC-APP1"

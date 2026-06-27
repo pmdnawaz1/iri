@@ -51,4 +51,4 @@ critical_path: false
 parallel_group: "wave-6"
 spec_path: "eos/specs/TSPEC-FX04.spec.md"
 spec_required: true
-spec_status: "MISSING"
+spec_status: "WRITTEN"

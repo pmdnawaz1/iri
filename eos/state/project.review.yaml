@@ -210,6 +210,15 @@ reviews:
   - id: "TSPEC-FX09"
     reviewers:
       - "ROLE_ARCHITECT"
+  - id: "TSPEC-FX10"
+    reviewers:
+      - "ROLE_ARCHITECT"
+  - id: "TSPEC-FX11"
+    reviewers:
+      - "ROLE_ARCHITECT"
+  - id: "TSPEC-FX12"
+    reviewers:
+      - "ROLE_ARCHITECT"
   - id: "TSPEC-APP1"
     reviewers:
       - "ROLE_ARCHITECT"

@@ -1,6 +1,6 @@
 ================================================================================
-RIR IMPLEMENTER PROMPT 3 — TSPEC-FX06: Fixture: java
-Branch: feature/tspec-fx06-fixture-java
+RIR IMPLEMENTER PROMPT 3 — TSPEC-FX04: Fixture: next
+Branch: feature/tspec-fx04-fixture-next
 Depends on: TSPEC-AD01 (already satisfied by the scaffold)
 Paste this ENTIRE file into a fresh session with your implementer model.
 ================================================================================
@@ -30,40 +30,40 @@ Definition of done: build + typecheck + lint + the section-7 tests + coverage >=
 
 ----- WORK ORDER -----------------------------------------------------------------
 
-# TSPEC-FX06 — Java fixture + adapter validation (Work Order)
+# TSPEC-FX04 — Next.js fixture + adapter validation (Work Order)
 
 > Same shape as **TSPEC-FX02 (read it first)**. COLLISION-FREE: only new files in your
 > fixture folder + one new test.
 
-- **TSPEC:** TSPEC-FX06 · **Owner:** ROLE_IMPLEMENTER · **Depends on:** TSPEC-AD04 (Java adapter, COMPLETE) · **Wave:** 6
+- **TSPEC:** TSPEC-FX04 · **Owner:** ROLE_IMPLEMENTER · **Depends on:** TSPEC-AD01 (COMPLETE) · **Wave:** 6
 
 ## Objective
-A small Spring-style Java auth module fixture + a test that `JavaAdapter` extracts its facts.
+A small Next.js TypeScript auth fixture (a page + an API route handler) + a test that
+`TypeScriptAdapter` extracts its facts.
 
 ## Files (ADDITIVE ONLY)
-- create `fixtures/java/AuthController.java` (`public class` with a `login` method calling a service)
-- create `fixtures/java/AuthService.java` (`public class` calling a repository)
-- create `fixtures/java/UserRepository.java` (`public class`)
-- create `tests/fixtures/java.test.ts` (the tests below)
+- create `fixtures/next/login-page.tsx` (a function component calling an api helper)
+- create `fixtures/next/api-login.ts` (a route handler `export function POST(...)` calling a service)
+- create `tests/fixtures/next.test.ts` (the tests below)
 
 ## Behavior
-Realistic, multi-line, formatted Java (real newlines). Test reads files and runs
-`new JavaAdapter().parse(...)` (CompilationContext stub as in `tests/compiler/java-adapter.test.ts`).
+Realistic, multi-line, formatted TS/TSX. Test reads files and runs
+`new TypeScriptAdapter().parse(...)` (CompilationContext stub as in `tests/compiler/typescript-adapter.test.ts`).
 
 ## Acceptance (each a test)
-1. `symbols` include `public class` `AuthController` (exported=true) and method `login`.
-2. `imports` include the package import(s).
-3. `calls` include the service invocation (e.g. `authService.login`).
-4. `AuthService` extracted from its file.
+1. `symbols` from `login-page.tsx` include the page component.
+2. `exports` from `api-login.ts` include the `POST` handler.
+3. `calls` include the service/api call.
+4. `imports` are extracted.
 5. determinism: two parses deep-equal.
 
 ## Forbidden
 Modify no adapter/package/`index.ts`/`package.json`. Never minify.
 
 ## References
-`tests/compiler/java-adapter.test.ts`; adapter `packages/code-compiler/src/language/java.ts`.
+`tests/compiler/typescript-adapter.test.ts`; adapter `packages/code-compiler/src/language/typescript.ts`.
 
 ## Done
-format:check · build · typecheck · the tests · PR `feat(tspec-fx06): java fixture`.
+format:check · build · typecheck · the tests · PR `feat(tspec-fx04): next fixture`.
 
 ----------------------------------------------------------------------------------

@@ -29,4 +29,4 @@ high_risk:
     title: "Closure engine impl"
     risk: "HIGH"
     critical_path: true
-risk_score: 0.097
+risk_score: 0.093

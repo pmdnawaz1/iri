@@ -1,7 +1,7 @@
 {
   "version": "1.0.0",
   "generated_at": "2026-06-27T00:00:00Z",
-  "count": 72,
+  "count": 75,
   "tspecs": [
     {
       "priority": "P0",
@@ -2554,7 +2554,9 @@
       "repository_path": "packages/code-compiler",
       "branch": "feature/tspec-ad03-python-language-adapter",
       "parent_branch": "main",
-      "blocks": [],
+      "blocks": [
+        "TSPEC-FX10"
+      ],
       "reviewers": [
         "ROLE_ARCHITECT"
       ],
@@ -2758,7 +2760,9 @@
       "repository_path": "packages/code-compiler",
       "branch": "feature/tspec-ad06-rust-language-adapter",
       "parent_branch": "main",
-      "blocks": [],
+      "blocks": [
+        "TSPEC-FX11"
+      ],
       "reviewers": [
         "ROLE_ARCHITECT"
       ],
@@ -2826,7 +2830,9 @@
       "repository_path": "packages/code-compiler",
       "branch": "feature/tspec-ad07-csharp-language-adapter",
       "parent_branch": "main",
-      "blocks": [],
+      "blocks": [
+        "TSPEC-FX12"
+      ],
       "reviewers": [
         "ROLE_ARCHITECT"
       ],
@@ -4230,7 +4236,7 @@
       "parallel_group": "wave-6",
       "spec_path": "eos/specs/TSPEC-FX04.spec.md",
       "spec_required": true,
-      "spec_status": "MISSING"
+      "spec_status": "WRITTEN"
     },
     {
       "priority": "P2",
@@ -4292,7 +4298,7 @@
       "parallel_group": "wave-6",
       "spec_path": "eos/specs/TSPEC-FX05.spec.md",
       "spec_required": true,
-      "spec_status": "MISSING"
+      "spec_status": "WRITTEN"
     },
     {
       "priority": "P2",
@@ -4539,6 +4545,192 @@
       "critical_path": false,
       "parallel_group": "wave-6",
       "spec_path": "eos/specs/TSPEC-FX09.spec.md",
+      "spec_required": true,
+      "spec_status": "WRITTEN"
+    },
+    {
+      "priority": "P2",
+      "complexity": "LOW",
+      "risk": "LOW",
+      "estimated_effort": 1,
+      "depends_on": [
+        "TSPEC-AD03"
+      ],
+      "references": [],
+      "architecture_documents": [
+        "repo_structure.md",
+        "requirement.md",
+        "decision1.md"
+      ],
+      "deliverables": [
+        "Tiny python module + python adapter validation"
+      ],
+      "outputs": [],
+      "tests": [
+        "golden"
+      ],
+      "acceptance_criteria": [
+        "Builds",
+        "Typechecks",
+        "Lint clean",
+        "Tests pass",
+        "Coverage >= 95%"
+      ],
+      "forbidden_changes": [
+        "Repository IR schema",
+        "Requirement IR schema",
+        "Ontology ids / properties",
+        "Compiler pipeline / builder order",
+        "Closure / coverage / consistency rules"
+      ],
+      "labels": [
+        "implementation",
+        "fixtures"
+      ],
+      "id": "TSPEC-FX10",
+      "title": "Fixture: python",
+      "owner": "ROLE_IMPLEMENTER",
+      "package": "fixtures",
+      "module": "python",
+      "state": "DRAFT",
+      "repository_path": "fixtures/python",
+      "branch": "feature/tspec-fx10-fixture-python",
+      "parent_branch": "main",
+      "blocks": [],
+      "reviewers": [
+        "ROLE_ARCHITECT"
+      ],
+      "version": "1.0.0",
+      "created_at": "2026-06-27T00:00:00Z",
+      "updated_at": "2026-06-27T00:00:00Z",
+      "wave": 6,
+      "critical_path": false,
+      "parallel_group": "wave-6",
+      "spec_path": "eos/specs/TSPEC-FX10.spec.md",
+      "spec_required": true,
+      "spec_status": "WRITTEN"
+    },
+    {
+      "priority": "P2",
+      "complexity": "LOW",
+      "risk": "LOW",
+      "estimated_effort": 1,
+      "depends_on": [
+        "TSPEC-AD06"
+      ],
+      "references": [],
+      "architecture_documents": [
+        "repo_structure.md",
+        "requirement.md",
+        "decision1.md"
+      ],
+      "deliverables": [
+        "Tiny rust module + rust adapter validation"
+      ],
+      "outputs": [],
+      "tests": [
+        "golden"
+      ],
+      "acceptance_criteria": [
+        "Builds",
+        "Typechecks",
+        "Lint clean",
+        "Tests pass",
+        "Coverage >= 95%"
+      ],
+      "forbidden_changes": [
+        "Repository IR schema",
+        "Requirement IR schema",
+        "Ontology ids / properties",
+        "Compiler pipeline / builder order",
+        "Closure / coverage / consistency rules"
+      ],
+      "labels": [
+        "implementation",
+        "fixtures"
+      ],
+      "id": "TSPEC-FX11",
+      "title": "Fixture: rust",
+      "owner": "ROLE_IMPLEMENTER",
+      "package": "fixtures",
+      "module": "rust",
+      "state": "DRAFT",
+      "repository_path": "fixtures/rust",
+      "branch": "feature/tspec-fx11-fixture-rust",
+      "parent_branch": "main",
+      "blocks": [],
+      "reviewers": [
+        "ROLE_ARCHITECT"
+      ],
+      "version": "1.0.0",
+      "created_at": "2026-06-27T00:00:00Z",
+      "updated_at": "2026-06-27T00:00:00Z",
+      "wave": 6,
+      "critical_path": false,
+      "parallel_group": "wave-6",
+      "spec_path": "eos/specs/TSPEC-FX11.spec.md",
+      "spec_required": true,
+      "spec_status": "WRITTEN"
+    },
+    {
+      "priority": "P2",
+      "complexity": "LOW",
+      "risk": "LOW",
+      "estimated_effort": 1,
+      "depends_on": [
+        "TSPEC-AD07"
+      ],
+      "references": [],
+      "architecture_documents": [
+        "repo_structure.md",
+        "requirement.md",
+        "decision1.md"
+      ],
+      "deliverables": [
+        "Tiny csharp module + csharp adapter validation"
+      ],
+      "outputs": [],
+      "tests": [
+        "golden"
+      ],
+      "acceptance_criteria": [
+        "Builds",
+        "Typechecks",
+        "Lint clean",
+        "Tests pass",
+        "Coverage >= 95%"
+      ],
+      "forbidden_changes": [
+        "Repository IR schema",
+        "Requirement IR schema",
+        "Ontology ids / properties",
+        "Compiler pipeline / builder order",
+        "Closure / coverage / consistency rules"
+      ],
+      "labels": [
+        "implementation",
+        "fixtures"
+      ],
+      "id": "TSPEC-FX12",
+      "title": "Fixture: csharp",
+      "owner": "ROLE_IMPLEMENTER",
+      "package": "fixtures",
+      "module": "csharp",
+      "state": "DRAFT",
+      "repository_path": "fixtures/csharp",
+      "branch": "feature/tspec-fx12-fixture-csharp",
+      "parent_branch": "main",
+      "blocks": [],
+      "reviewers": [
+        "ROLE_ARCHITECT"
+      ],
+      "version": "1.0.0",
+      "created_at": "2026-06-27T00:00:00Z",
+      "updated_at": "2026-06-27T00:00:00Z",
+      "wave": 6,
+      "critical_path": false,
+      "parallel_group": "wave-6",
+      "spec_path": "eos/specs/TSPEC-FX12.spec.md",
       "spec_required": true,
       "spec_status": "WRITTEN"
     },
