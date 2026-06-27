@@ -124,6 +124,35 @@ Rules for proposals:
 > notifications, files, comments, tags, search — the concepts the ontology must learn. Compile
 > several, diff `routes` against `mappedCapabilities`, and let the gaps drive the proposals.
 
+## Frontend repositories (for the full-stack DAG)
+
+Point `rir` at the **frontend app** dir (components, routers, `fetch`/`axios` calls). The
+frontend DAG produces FRONTEND_ROUTE / COMPONENT / HANDLER / API_CALL / FRONTEND_STATE /
+RENDERED_UI nodes. Compile the frontend **and** backend of the SAME product together (one
+`rir compile` over a dir that contains both, or merge their IRs) to let a capability reach
+`CLOSED` across all 12 stages.
+
+| Domain | Repo | Frontend | Suggested subdir |
+| --- | --- | --- | --- |
+| E-commerce storefront | https://github.com/vercel/commerce | Next/React | `components`, `app` |
+| Admin / internal tools | https://github.com/appsmithorg/appsmith | React (TS) | `app/client/src` |
+| Low-code framework | https://github.com/refinedev/refine | React (TS) | `packages/core/src` |
+| Docs e-sign | https://github.com/documenso/documenso | Next (TS) | `apps/web/src` |
+| Links/analytics | https://github.com/dub/dub | Next (TS) | `apps/web/app` |
+| CRM (web) | https://github.com/twentyhq/twenty | React (TS) | `packages/twenty-front/src` |
+| Project mgmt (web) | https://github.com/makeplane/plane | Next (TS) | `web/core` |
+| Vue admin | https://github.com/PanJiaChen/vue-element-admin | Vue (JS) | `src` |
+| Vue/TS data platform | https://github.com/nocodb/nocodb | Vue (TS) | `packages/nc-gui` |
+
+## Use the UNMAPPED records — never miss
+
+The compiler **never silently drops a route**. Any route that resolves to no ontology id is
+emitted as a capability with `feature: "UNMAPPED"` and `capability: "UNMAPPED.<METHOD>_<PATH>"`
+(closure `ORPHAN`). In `ir.json`, scan `ir.capabilities` for `feature === "UNMAPPED"`: that IS
+your candidate worklist. Cluster the UNMAPPED entries by concept and propose ontology for them.
+(If an UNMAPPED route is actually a concept the ontology already has, that's a *discovery* miss,
+not a new feature — note it so discovery signals can be improved, don't propose a duplicate.)
+
 ## Expected first-pass gaps (likely new features to propose)
 
 SUBSCRIPTION, WEBHOOK, TEAM / ORGANIZATION, MEMBERSHIP / INVITE, FILE / UPLOAD, COMMENT, TAG /

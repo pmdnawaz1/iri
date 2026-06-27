@@ -42,6 +42,9 @@ export const NodeKind = {
   Test: "TEST",
   Document: "DOCUMENT",
   Response: "RESPONSE",
+  FrontendRoute: "FRONTEND_ROUTE",
+  FrontendState: "FRONTEND_STATE",
+  RenderedUi: "RENDERED_UI",
 } as const;
 export type NodeKind = (typeof NodeKind)[keyof typeof NodeKind];
 

@@ -26,6 +26,9 @@ const STAGE_OF_NODE_KIND: Partial<Record<NodeKind, ExecutionStage>> = {
   [NodeKind.SqlQuery]: ExecutionStage.Database,
   [NodeKind.Table]: ExecutionStage.Database,
   [NodeKind.Response]: ExecutionStage.Response,
+  [NodeKind.FrontendRoute]: ExecutionStage.FrontendRoute,
+  [NodeKind.FrontendState]: ExecutionStage.FrontendState,
+  [NodeKind.RenderedUi]: ExecutionStage.RenderedUi,
 };
 
 export function stageOfNodeKind(kind: NodeKind): ExecutionStage | undefined {
@@ -62,6 +65,17 @@ export function evaluateClosure(
 ): ClosureResult {
   const def = getCapability(capability.capability);
   const expected: readonly ExecutionStage[] = def?.expectedChain ?? [];
+
+  // Unknown to the ontology (e.g. an UNMAPPED capability): cannot be evaluated — ORPHAN.
+  if (!def) {
+    return {
+      capabilityId: capability.id,
+      state: ClosureState.Orphan,
+      expected: [],
+      present: [],
+      missing: [],
+    };
+  }
 
   if (capability.closure === ClosureState.Conflicting) {
     return {

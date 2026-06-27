@@ -42,3 +42,27 @@ describe("Repository Compiler — express-auth", () => {
     expect(a.ir.edges.length).toBe(b.ir.edges.length);
   });
 });
+
+describe("Repository Compiler — full-stack (frontend + backend)", () => {
+  const tsOnly = () => new AdapterRegistry().register(new TypeScriptAdapter());
+
+  it("closes AUTH.LOGIN across all 12 stages (frontend DAG -> edge -> backend)", async () => {
+    const { ir, closure } = await compileRepository("fixtures/fullstack-auth", tsOnly());
+    const login = ir.capabilities.find((c) => c.capability === "AUTH.LOGIN")!;
+    const result = closure.find((r) => r.capabilityId === login.id)!;
+
+    expect(result.state).toBe("CLOSED");
+    for (const stage of [
+      "FRONTEND_ROUTE",
+      "COMPONENT",
+      "API_CALL",
+      "BACKEND_ROUTE",
+      "DATABASE",
+      "RESPONSE",
+      "RENDERED_UI",
+    ]) {
+      expect(result.present).toContain(stage);
+    }
+    expect(result.missing).toHaveLength(0);
+  });
+});

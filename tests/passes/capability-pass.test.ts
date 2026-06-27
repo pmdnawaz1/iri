@@ -35,13 +35,15 @@ describe("CapabilityPass", () => {
     expect(caps[0].closure).toBe(ClosureState.Partial);
   });
 
-  it("yields no capability for an unresolvable route", () => {
+  it("records an UNMAPPED capability for an unresolvable route (never miss)", () => {
     draft.addNode({ id: "route:1", kind: "ROUTE", name: "GET /healthz", evidence: [] });
 
     pass.run(ctx, draft);
 
     const caps = draft.getCapabilities();
-    expect(caps).toHaveLength(0);
+    expect(caps).toHaveLength(1);
+    expect(caps[0]!.feature).toBe("UNMAPPED");
+    expect(caps[0]!.capability).toContain("HEALTHZ");
   });
 
   it("resolves nested paths like POST /auth/login to login", () => {

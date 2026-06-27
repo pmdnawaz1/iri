@@ -61,7 +61,7 @@ states:
   - id: "TSPEC-A014"
     state: "COMPLETE"
   - id: "TSPEC-A017"
-    state: "DRAFT"
+    state: "COMPLETE"
   - id: "TSPEC-A019"
     state: "COMPLETE"
   - id: "TSPEC-A020"

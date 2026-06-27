@@ -3,7 +3,7 @@
 id: "TSPEC-A017"
 title: "Multi-signal capability discovery"
 owner: "ROLE_ARCHITECT"
-state: "DRAFT"
+state: "COMPLETE"
 package: "closure"
 module: "discovery"
 repository_path: "packages/closure"
