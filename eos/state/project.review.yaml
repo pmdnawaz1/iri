@@ -48,6 +48,9 @@ reviews:
   - id: "TSPEC-A013"
     reviewers:
       - "ROLE_ARCHITECT"
+  - id: "TSPEC-A016"
+    reviewers:
+      - "ROLE_ARCHITECT"
   - id: "TSPEC-E06"
     reviewers:
       - "ROLE_ARCHITECT"
@@ -67,6 +70,15 @@ reviews:
     reviewers:
       - "ROLE_ARCHITECT"
   - id: "TSPEC-A014"
+    reviewers:
+      - "ROLE_ARCHITECT"
+  - id: "TSPEC-A017"
+    reviewers:
+      - "ROLE_ARCHITECT"
+  - id: "TSPEC-A019"
+    reviewers:
+      - "ROLE_ARCHITECT"
+  - id: "TSPEC-A020"
     reviewers:
       - "ROLE_ARCHITECT"
   - id: "TSPEC-CI01"
@@ -105,7 +117,16 @@ reviews:
   - id: "TSPEC-I005"
     reviewers:
       - "ROLE_ARCHITECT"
+  - id: "TSPEC-A018"
+    reviewers:
+      - "ROLE_ARCHITECT"
+  - id: "TSPEC-DN01"
+    reviewers:
+      - "ROLE_ARCHITECT"
   - id: "TSPEC-E05"
+    reviewers:
+      - "ROLE_ARCHITECT"
+  - id: "TSPEC-E07"
     reviewers:
       - "ROLE_ARCHITECT"
   - id: "TSPEC-I006"

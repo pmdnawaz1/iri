@@ -15,7 +15,8 @@ risk: "MEDIUM"
 estimated_effort: 3
 depends_on:
   - "TSPEC-A008"
-blocks: []
+blocks:
+  - "TSPEC-DN01"
 references:
   - "https://github.com/remarkjs/remark"
 architecture_documents:

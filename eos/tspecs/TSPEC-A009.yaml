@@ -17,6 +17,8 @@ depends_on:
   - "TSPEC-A003"
   - "TSPEC-A004"
 blocks:
+  - "TSPEC-A017"
+  - "TSPEC-A019"
   - "TSPEC-E01"
 references: []
 architecture_documents:

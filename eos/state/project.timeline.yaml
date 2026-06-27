@@ -12,38 +12,38 @@ timeline:
     end_unit: 27
     tspecs: 6
   - wave: 2
-    effort: 37
+    effort: 41
     start_unit: 27
-    end_unit: 64
-    tspecs: 13
+    end_unit: 68
+    tspecs: 14
   - wave: 3
-    effort: 38
-    start_unit: 64
-    end_unit: 102
-    tspecs: 13
+    effort: 52
+    start_unit: 68
+    end_unit: 120
+    tspecs: 16
   - wave: 4
-    effort: 5
-    start_unit: 102
-    end_unit: 107
-    tspecs: 2
+    effort: 16
+    start_unit: 120
+    end_unit: 136
+    tspecs: 5
   - wave: 5
     effort: 69
-    start_unit: 107
-    end_unit: 176
+    start_unit: 136
+    end_unit: 205
     tspecs: 23
   - wave: 6
     effort: 30
-    start_unit: 176
-    end_unit: 206
+    start_unit: 205
+    end_unit: 235
     tspecs: 20
   - wave: 7
     effort: 6
-    start_unit: 206
-    end_unit: 212
+    start_unit: 235
+    end_unit: 241
     tspecs: 2
   - wave: 8
     effort: 4
-    start_unit: 212
-    end_unit: 216
+    start_unit: 241
+    end_unit: 245
     tspecs: 2
-total_effort: 216
+total_effort: 245

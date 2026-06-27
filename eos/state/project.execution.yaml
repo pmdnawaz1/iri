@@ -12,6 +12,7 @@ topological_order:
   - "TSPEC-A008"
   - "TSPEC-A010"
   - "TSPEC-A011"
+  - "TSPEC-A016"
   - "TSPEC-I007"
   - "TSPEC-SC02"
   - "TSPEC-A009"
@@ -28,12 +29,18 @@ topological_order:
   - "TSPEC-DF05"
   - "TSPEC-DF06"
   - "TSPEC-E02"
+  - "TSPEC-A020"
   - "TSPEC-E03"
+  - "TSPEC-A017"
+  - "TSPEC-A019"
   - "TSPEC-A014"
   - "TSPEC-E04"
   - "TSPEC-CI01"
   - "TSPEC-I004"
   - "TSPEC-I005"
+  - "TSPEC-DN01"
+  - "TSPEC-E07"
+  - "TSPEC-A018"
   - "TSPEC-E05"
   - "TSPEC-I006"
   - "TSPEC-AD01"
@@ -104,6 +111,7 @@ waves:
       - "TSPEC-A010"
       - "TSPEC-A011"
       - "TSPEC-A013"
+      - "TSPEC-A016"
       - "TSPEC-E06"
       - "TSPEC-I001"
       - "TSPEC-I002"
@@ -113,6 +121,9 @@ waves:
   - wave: 3
     tspecs:
       - "TSPEC-A014"
+      - "TSPEC-A017"
+      - "TSPEC-A019"
+      - "TSPEC-A020"
       - "TSPEC-CI01"
       - "TSPEC-DF01"
       - "TSPEC-DF02"
@@ -127,7 +138,10 @@ waves:
       - "TSPEC-I005"
   - wave: 4
     tspecs:
+      - "TSPEC-A018"
+      - "TSPEC-DN01"
       - "TSPEC-E05"
+      - "TSPEC-E07"
       - "TSPEC-I006"
   - wave: 5
     tspecs:

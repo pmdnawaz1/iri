@@ -1,7 +1,7 @@
 {
   "version": "1.0.0",
   "generated_at": "2026-06-27T00:00:00Z",
-  "count": 82,
+  "count": 89,
   "tspecs": [
     {
       "priority": "P0",
@@ -121,6 +121,7 @@
       "parent_branch": "main",
       "blocks": [
         "TSPEC-A008",
+        "TSPEC-A020",
         "TSPEC-I002"
       ],
       "reviewers": [
@@ -191,6 +192,8 @@
         "TSPEC-A009",
         "TSPEC-A010",
         "TSPEC-A011",
+        "TSPEC-A016",
+        "TSPEC-A017",
         "TSPEC-I007",
         "TSPEC-SC02"
       ],
@@ -664,7 +667,8 @@
         "TSPEC-DF03",
         "TSPEC-DF04",
         "TSPEC-DF05",
-        "TSPEC-DF06"
+        "TSPEC-DF06",
+        "TSPEC-DN01"
       ],
       "reviewers": [
         "ROLE_ARCHITECT"
@@ -725,6 +729,8 @@
       "branch": "feature/tspec-a009-execution-closure-algorithm",
       "parent_branch": "main",
       "blocks": [
+        "TSPEC-A017",
+        "TSPEC-A019",
         "TSPEC-E01"
       ],
       "reviewers": [
@@ -845,6 +851,7 @@
       "branch": "feature/tspec-a011-consistency-rules",
       "parent_branch": "main",
       "blocks": [
+        "TSPEC-A020",
         "TSPEC-E03"
       ],
       "reviewers": [
@@ -918,6 +925,66 @@
       "critical_path": false,
       "parallel_group": "wave-2",
       "spec_path": "eos/specs/TSPEC-A013.spec.md",
+      "spec_required": false,
+      "spec_status": "MISSING"
+    },
+    {
+      "priority": "P1",
+      "complexity": "MEDIUM",
+      "risk": "MEDIUM",
+      "estimated_effort": 4,
+      "depends_on": [
+        "TSPEC-A003"
+      ],
+      "references": [],
+      "architecture_documents": [
+        "docs/ADR-0018-ontology-evolution-and-discovery.md",
+        "docs/GAPS.md",
+        "requirement.md"
+      ],
+      "deliverables": [
+        "PAYMENT/ORDER/CART/CHECKOUT/INVENTORY/PROFILE/NOTIFICATION ontology features"
+      ],
+      "outputs": [
+        "@rir/ontology"
+      ],
+      "tests": [
+        "ADR review",
+        "schema golden test"
+      ],
+      "acceptance_criteria": [
+        "ADR accepted",
+        "No ambiguity remains",
+        "Versioned"
+      ],
+      "forbidden_changes": [
+        "Implementation code beyond reference snippets",
+        "CRUD / boilerplate"
+      ],
+      "labels": [
+        "architecture",
+        "ontology"
+      ],
+      "id": "TSPEC-A016",
+      "title": "Ontology expansion (commerce/profile/notification features)",
+      "owner": "ROLE_ARCHITECT",
+      "package": "ontology",
+      "module": "expansion",
+      "state": "DRAFT",
+      "repository_path": "packages/ontology",
+      "branch": "feature/tspec-a016-ontology-expansion-commerce-profile-notification-features",
+      "parent_branch": "main",
+      "blocks": [],
+      "reviewers": [
+        "ROLE_ARCHITECT"
+      ],
+      "version": "1.0.0",
+      "created_at": "2026-06-27T00:00:00Z",
+      "updated_at": "2026-06-27T00:00:00Z",
+      "wave": 2,
+      "critical_path": false,
+      "parallel_group": "wave-2",
+      "spec_path": "eos/specs/TSPEC-A016.spec.md",
       "spec_required": false,
       "spec_status": "MISSING"
     },
@@ -1377,6 +1444,7 @@
       "branch": "feature/tspec-a014-semantic-projection-contract",
       "parent_branch": "main",
       "blocks": [
+        "TSPEC-A018",
         "TSPEC-E05"
       ],
       "reviewers": [
@@ -1389,6 +1457,183 @@
       "critical_path": false,
       "parallel_group": "wave-3",
       "spec_path": "eos/specs/TSPEC-A014.spec.md",
+      "spec_required": false,
+      "spec_status": "MISSING"
+    },
+    {
+      "priority": "P1",
+      "complexity": "HIGH",
+      "risk": "HIGH",
+      "estimated_effort": 5,
+      "depends_on": [
+        "TSPEC-A003",
+        "TSPEC-A009"
+      ],
+      "references": [],
+      "architecture_documents": [
+        "docs/ADR-0018-ontology-evolution-and-discovery.md",
+        "docs/GAPS.md"
+      ],
+      "deliverables": [
+        "Deterministic verb+noun / handler / table discovery cascade"
+      ],
+      "outputs": [],
+      "tests": [
+        "ADR review",
+        "schema golden test"
+      ],
+      "acceptance_criteria": [
+        "ADR accepted",
+        "No ambiguity remains",
+        "Versioned"
+      ],
+      "forbidden_changes": [
+        "Implementation code beyond reference snippets",
+        "CRUD / boilerplate"
+      ],
+      "labels": [
+        "architecture",
+        "closure"
+      ],
+      "id": "TSPEC-A017",
+      "title": "Multi-signal capability discovery",
+      "owner": "ROLE_ARCHITECT",
+      "package": "closure",
+      "module": "discovery",
+      "state": "DRAFT",
+      "repository_path": "packages/closure",
+      "branch": "feature/tspec-a017-multi-signal-capability-discovery",
+      "parent_branch": "main",
+      "blocks": [
+        "TSPEC-A018"
+      ],
+      "reviewers": [
+        "ROLE_ARCHITECT"
+      ],
+      "version": "1.0.0",
+      "created_at": "2026-06-27T00:00:00Z",
+      "updated_at": "2026-06-27T00:00:00Z",
+      "wave": 3,
+      "critical_path": false,
+      "parallel_group": "wave-3",
+      "spec_path": "eos/specs/TSPEC-A017.spec.md",
+      "spec_required": false,
+      "spec_status": "MISSING"
+    },
+    {
+      "priority": "P1",
+      "complexity": "HIGH",
+      "risk": "HIGH",
+      "estimated_effort": 5,
+      "depends_on": [
+        "TSPEC-A009"
+      ],
+      "references": [],
+      "architecture_documents": [
+        "docs/ADR-0019-full-execution-closure.md",
+        "docs/GAPS.md"
+      ],
+      "deliverables": [
+        "Stage tier annotations; RESPONSE/API_CALL/HANDLER producers; honest CLOSED"
+      ],
+      "outputs": [],
+      "tests": [
+        "ADR review",
+        "schema golden test"
+      ],
+      "acceptance_criteria": [
+        "ADR accepted",
+        "No ambiguity remains",
+        "Versioned"
+      ],
+      "forbidden_changes": [
+        "Implementation code beyond reference snippets",
+        "CRUD / boilerplate"
+      ],
+      "labels": [
+        "architecture",
+        "closure"
+      ],
+      "id": "TSPEC-A019",
+      "title": "Full execution closure (stage producers + tiers)",
+      "owner": "ROLE_ARCHITECT",
+      "package": "closure",
+      "module": "tiers",
+      "state": "DRAFT",
+      "repository_path": "packages/closure",
+      "branch": "feature/tspec-a019-full-execution-closure-stage-producers-tiers",
+      "parent_branch": "main",
+      "blocks": [],
+      "reviewers": [
+        "ROLE_ARCHITECT"
+      ],
+      "version": "1.0.0",
+      "created_at": "2026-06-27T00:00:00Z",
+      "updated_at": "2026-06-27T00:00:00Z",
+      "wave": 3,
+      "critical_path": false,
+      "parallel_group": "wave-3",
+      "spec_path": "eos/specs/TSPEC-A019.spec.md",
+      "spec_required": false,
+      "spec_status": "MISSING"
+    },
+    {
+      "priority": "P1",
+      "complexity": "MEDIUM",
+      "risk": "HIGH",
+      "estimated_effort": 4,
+      "depends_on": [
+        "TSPEC-A002",
+        "TSPEC-A011"
+      ],
+      "references": [],
+      "architecture_documents": [
+        "docs/ADR-0020-requirement-repository-consistency.md",
+        "docs/GAPS.md"
+      ],
+      "deliverables": [
+        "UNDOCUMENTED/UNIMPLEMENTED/CONSTRAINT_MISMATCH/OVERIMPLEMENTED rules"
+      ],
+      "outputs": [],
+      "tests": [
+        "ADR review",
+        "schema golden test"
+      ],
+      "acceptance_criteria": [
+        "ADR accepted",
+        "No ambiguity remains",
+        "Versioned"
+      ],
+      "forbidden_changes": [
+        "Implementation code beyond reference snippets",
+        "CRUD / boilerplate"
+      ],
+      "labels": [
+        "architecture",
+        "consistency"
+      ],
+      "id": "TSPEC-A020",
+      "title": "Requirement <-> Repository consistency rules",
+      "owner": "ROLE_ARCHITECT",
+      "package": "consistency",
+      "module": "cross",
+      "state": "DRAFT",
+      "repository_path": "packages/consistency",
+      "branch": "feature/tspec-a020-requirement-repository-consistency-rules",
+      "parent_branch": "main",
+      "blocks": [
+        "TSPEC-E07"
+      ],
+      "reviewers": [
+        "ROLE_ARCHITECT"
+      ],
+      "version": "1.0.0",
+      "created_at": "2026-06-27T00:00:00Z",
+      "updated_at": "2026-06-27T00:00:00Z",
+      "wave": 3,
+      "critical_path": false,
+      "parallel_group": "wave-3",
+      "spec_path": "eos/specs/TSPEC-A020.spec.md",
       "spec_required": false,
       "spec_status": "MISSING"
     },
@@ -1510,7 +1755,9 @@
       "repository_path": "packages/document-compiler",
       "branch": "feature/tspec-df01-markdown-document-frontend",
       "parent_branch": "main",
-      "blocks": [],
+      "blocks": [
+        "TSPEC-DN01"
+      ],
       "reviewers": [
         "ROLE_ARCHITECT"
       ],
@@ -2199,6 +2446,129 @@
       "spec_status": "MISSING"
     },
     {
+      "priority": "P2",
+      "complexity": "MEDIUM",
+      "risk": "HIGH",
+      "estimated_effort": 4,
+      "depends_on": [
+        "TSPEC-A014",
+        "TSPEC-A017"
+      ],
+      "references": [],
+      "architecture_documents": [
+        "docs/ADR-0018-ontology-evolution-and-discovery.md",
+        "docs/GAPS.md"
+      ],
+      "deliverables": [
+        "ORPHAN_CAPABILITY records + semantic candidate proposals + review queue"
+      ],
+      "outputs": [],
+      "tests": [
+        "ADR review",
+        "schema golden test"
+      ],
+      "acceptance_criteria": [
+        "ADR accepted",
+        "No ambiguity remains",
+        "Versioned"
+      ],
+      "forbidden_changes": [
+        "Implementation code beyond reference snippets",
+        "CRUD / boilerplate"
+      ],
+      "labels": [
+        "architecture",
+        "semantic"
+      ],
+      "id": "TSPEC-A018",
+      "title": "Ontology self-evolution loop (AI proposes, architect accepts)",
+      "owner": "ROLE_ARCHITECT",
+      "package": "semantic",
+      "module": "evolution",
+      "state": "DRAFT",
+      "repository_path": "packages/semantic",
+      "branch": "feature/tspec-a018-ontology-self-evolution-loop-ai-proposes-architect-accepts",
+      "parent_branch": "main",
+      "blocks": [],
+      "reviewers": [
+        "ROLE_ARCHITECT"
+      ],
+      "version": "1.0.0",
+      "created_at": "2026-06-27T00:00:00Z",
+      "updated_at": "2026-06-27T00:00:00Z",
+      "wave": 4,
+      "critical_path": false,
+      "parallel_group": "wave-4",
+      "spec_path": "eos/specs/TSPEC-A018.spec.md",
+      "spec_required": false,
+      "spec_status": "MISSING"
+    },
+    {
+      "priority": "P2",
+      "complexity": "MEDIUM",
+      "risk": "MEDIUM",
+      "estimated_effort": 4,
+      "depends_on": [
+        "TSPEC-A008",
+        "TSPEC-DF01"
+      ],
+      "references": [
+        "https://github.com/remarkjs/remark"
+      ],
+      "architecture_documents": [
+        "docs/ADR-0017-document-compiler-and-requirement-ir.md"
+      ],
+      "deliverables": [
+        "Deterministic statement->RequirementIR normalization per ADR-0017"
+      ],
+      "outputs": [],
+      "tests": [
+        "unit",
+        "integration",
+        "golden"
+      ],
+      "acceptance_criteria": [
+        "Builds",
+        "Typechecks",
+        "Lint clean",
+        "Tests pass",
+        "Coverage >= 95%"
+      ],
+      "forbidden_changes": [
+        "Repository IR schema",
+        "Requirement IR schema",
+        "Ontology ids / properties",
+        "Compiler pipeline / builder order",
+        "Closure / coverage / consistency rules"
+      ],
+      "labels": [
+        "implementation",
+        "document-compiler"
+      ],
+      "id": "TSPEC-DN01",
+      "title": "RequirementNormalizer (statements -> Requirement IR)",
+      "owner": "ROLE_IMPLEMENTER",
+      "package": "document-compiler",
+      "module": "requirement-normalizer",
+      "state": "DRAFT",
+      "repository_path": "packages/document-compiler",
+      "branch": "feature/tspec-dn01-requirementnormalizer-statements-requirement-ir",
+      "parent_branch": "main",
+      "blocks": [],
+      "reviewers": [
+        "ROLE_ARCHITECT"
+      ],
+      "version": "1.0.0",
+      "created_at": "2026-06-27T00:00:00Z",
+      "updated_at": "2026-06-27T00:00:00Z",
+      "wave": 4,
+      "critical_path": false,
+      "parallel_group": "wave-4",
+      "spec_path": "eos/specs/TSPEC-DN01.spec.md",
+      "spec_required": true,
+      "spec_status": "MISSING"
+    },
+    {
       "priority": "P3",
       "complexity": "MEDIUM",
       "risk": "MEDIUM",
@@ -2260,6 +2630,68 @@
       "critical_path": false,
       "parallel_group": "wave-4",
       "spec_path": "eos/specs/TSPEC-E05.spec.md",
+      "spec_required": true,
+      "spec_status": "MISSING"
+    },
+    {
+      "priority": "P2",
+      "complexity": "MEDIUM",
+      "risk": "MEDIUM",
+      "estimated_effort": 3,
+      "depends_on": [
+        "TSPEC-A020"
+      ],
+      "references": [],
+      "architecture_documents": [
+        "docs/ADR-0020-requirement-repository-consistency.md"
+      ],
+      "deliverables": [
+        "CrossConsistencyEngine joining Requirement IR + Repository IR"
+      ],
+      "outputs": [],
+      "tests": [
+        "unit",
+        "integration",
+        "golden"
+      ],
+      "acceptance_criteria": [
+        "Builds",
+        "Typechecks",
+        "Lint clean",
+        "Tests pass",
+        "Coverage >= 95%"
+      ],
+      "forbidden_changes": [
+        "Repository IR schema",
+        "Requirement IR schema",
+        "Ontology ids / properties",
+        "Compiler pipeline / builder order",
+        "Closure / coverage / consistency rules"
+      ],
+      "labels": [
+        "implementation",
+        "consistency"
+      ],
+      "id": "TSPEC-E07",
+      "title": "CrossConsistencyEngine (doc vs code)",
+      "owner": "ROLE_IMPLEMENTER",
+      "package": "consistency",
+      "module": "cross-engine",
+      "state": "DRAFT",
+      "repository_path": "packages/consistency",
+      "branch": "feature/tspec-e07-crossconsistencyengine-doc-vs-code",
+      "parent_branch": "main",
+      "blocks": [],
+      "reviewers": [
+        "ROLE_ARCHITECT"
+      ],
+      "version": "1.0.0",
+      "created_at": "2026-06-27T00:00:00Z",
+      "updated_at": "2026-06-27T00:00:00Z",
+      "wave": 4,
+      "critical_path": false,
+      "parallel_group": "wave-4",
+      "spec_path": "eos/specs/TSPEC-E07.spec.md",
       "spec_required": true,
       "spec_status": "MISSING"
     },

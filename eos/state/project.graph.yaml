@@ -57,6 +57,10 @@ nodes:
     owner: "ROLE_ARCHITECT"
     wave: 2
     critical_path: false
+  - id: "TSPEC-A016"
+    owner: "ROLE_ARCHITECT"
+    wave: 2
+    critical_path: false
   - id: "TSPEC-E06"
     owner: "ROLE_IMPLEMENTER"
     wave: 2
@@ -82,6 +86,18 @@ nodes:
     wave: 2
     critical_path: false
   - id: "TSPEC-A014"
+    owner: "ROLE_ARCHITECT"
+    wave: 3
+    critical_path: false
+  - id: "TSPEC-A017"
+    owner: "ROLE_ARCHITECT"
+    wave: 3
+    critical_path: false
+  - id: "TSPEC-A019"
+    owner: "ROLE_ARCHITECT"
+    wave: 3
+    critical_path: false
+  - id: "TSPEC-A020"
     owner: "ROLE_ARCHITECT"
     wave: 3
     critical_path: false
@@ -133,7 +149,19 @@ nodes:
     owner: "ROLE_IMPLEMENTER"
     wave: 3
     critical_path: true
+  - id: "TSPEC-A018"
+    owner: "ROLE_ARCHITECT"
+    wave: 4
+    critical_path: false
+  - id: "TSPEC-DN01"
+    owner: "ROLE_IMPLEMENTER"
+    wave: 4
+    critical_path: false
   - id: "TSPEC-E05"
+    owner: "ROLE_IMPLEMENTER"
+    wave: 4
+    critical_path: false
+  - id: "TSPEC-E07"
     owner: "ROLE_IMPLEMENTER"
     wave: 4
     critical_path: false
@@ -360,6 +388,8 @@ edges:
     to: "TSPEC-A011"
   - from: "TSPEC-A004"
     to: "TSPEC-A013"
+  - from: "TSPEC-A003"
+    to: "TSPEC-A016"
   - from: "TSPEC-A015"
     to: "TSPEC-E06"
   - from: "TSPEC-A005"
@@ -376,6 +406,16 @@ edges:
     to: "TSPEC-SC02"
   - from: "TSPEC-A013"
     to: "TSPEC-A014"
+  - from: "TSPEC-A003"
+    to: "TSPEC-A017"
+  - from: "TSPEC-A009"
+    to: "TSPEC-A017"
+  - from: "TSPEC-A009"
+    to: "TSPEC-A019"
+  - from: "TSPEC-A002"
+    to: "TSPEC-A020"
+  - from: "TSPEC-A011"
+    to: "TSPEC-A020"
   - from: "TSPEC-I001"
     to: "TSPEC-CI01"
   - from: "TSPEC-A008"
@@ -407,9 +447,19 @@ edges:
   - from: "TSPEC-I001"
     to: "TSPEC-I005"
   - from: "TSPEC-A014"
+    to: "TSPEC-A018"
+  - from: "TSPEC-A017"
+    to: "TSPEC-A018"
+  - from: "TSPEC-A008"
+    to: "TSPEC-DN01"
+  - from: "TSPEC-DF01"
+    to: "TSPEC-DN01"
+  - from: "TSPEC-A014"
     to: "TSPEC-E05"
   - from: "TSPEC-E04"
     to: "TSPEC-E05"
+  - from: "TSPEC-A020"
+    to: "TSPEC-E07"
   - from: "TSPEC-A005"
     to: "TSPEC-I006"
   - from: "TSPEC-A006"

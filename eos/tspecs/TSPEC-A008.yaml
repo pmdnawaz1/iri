@@ -23,6 +23,7 @@ blocks:
   - "TSPEC-DF04"
   - "TSPEC-DF05"
   - "TSPEC-DF06"
+  - "TSPEC-DN01"
 references:
   - "https://github.com/remarkjs/remark"
 architecture_documents:
