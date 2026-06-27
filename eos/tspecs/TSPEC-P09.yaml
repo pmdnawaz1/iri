@@ -3,7 +3,7 @@
 id: "TSPEC-P09"
 title: "CapabilityPass"
 owner: "ROLE_IMPLEMENTER"
-state: "DRAFT"
+state: "COMPLETE"
 package: "passes"
 module: "CapabilityPass"
 repository_path: "packages/passes"

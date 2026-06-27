@@ -3,7 +3,7 @@
 id: "TSPEC-CE03"
 title: "go adapter: emit CallFact.enclosing"
 owner: "ROLE_IMPLEMENTER"
-state: "DRAFT"
+state: "COMPLETE"
 package: "code-compiler"
 module: "language/go"
 repository_path: "packages/code-compiler"

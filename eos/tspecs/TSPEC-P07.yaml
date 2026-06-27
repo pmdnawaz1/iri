@@ -3,7 +3,7 @@
 id: "TSPEC-P07"
 title: "DependencyPass"
 owner: "ROLE_IMPLEMENTER"
-state: "DRAFT"
+state: "COMPLETE"
 package: "passes"
 module: "DependencyPass"
 repository_path: "packages/passes"

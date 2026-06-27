@@ -3,7 +3,7 @@
 id: "TSPEC-CE02"
 title: "python adapter: emit CallFact.enclosing"
 owner: "ROLE_IMPLEMENTER"
-state: "DRAFT"
+state: "COMPLETE"
 package: "code-compiler"
 module: "language/python"
 repository_path: "packages/code-compiler"
