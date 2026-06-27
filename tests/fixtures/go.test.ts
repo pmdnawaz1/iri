@@ -20,21 +20,14 @@ const ctx: CompilationContext = {
 
 const fixtureDir = join(import.meta.dirname, "../../fixtures/go");
 
-const repositorySource = readFileSync(
-  join(fixtureDir, "repository.go"),
-  "utf-8",
-);
+const repositorySource = readFileSync(join(fixtureDir, "repository.go"), "utf-8");
 const serviceSource = readFileSync(join(fixtureDir, "service.go"), "utf-8");
 
 describe("TSPEC-FX07: Go fixture", () => {
   it("symbols include struct UserRepository (kind class) and a method (kind method)", () => {
     const adapter = new GoAdapter();
     const result = adapter.parse("repository.go", repositorySource, ctx);
-    expect(
-      result.symbols.some(
-        (s) => s.name === "UserRepository" && s.kind === "class",
-      ),
-    ).toBe(true);
+    expect(result.symbols.some((s) => s.name === "UserRepository" && s.kind === "class")).toBe(true);
     expect(result.symbols.some((s) => s.kind === "method")).toBe(true);
   });
 
@@ -54,11 +47,7 @@ describe("TSPEC-FX07: Go fixture", () => {
   it("AuthService extracted from its file", () => {
     const adapter = new GoAdapter();
     const result = adapter.parse("service.go", serviceSource, ctx);
-    expect(
-      result.symbols.some(
-        (s) => s.name === "AuthService" && s.kind === "class",
-      ),
-    ).toBe(true);
+    expect(result.symbols.some((s) => s.name === "AuthService" && s.kind === "class")).toBe(true);
   });
 
   it("determinism: two parses of repository.go are deep-equal", () => {
