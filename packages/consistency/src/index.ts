@@ -9,6 +9,8 @@
 import { type CapabilityIR, type ConstraintIR, type RepositoryIR } from "@rir/ir";
 import { getCapability, type ConstraintType } from "@rir/ontology";
 
+export { CrossConsistencyEngine, CrossFindingCode, type CrossFinding } from "./cross.js";
+
 /** Severity of a consistency finding. */
 export const Severity = {
   Error: "ERROR",

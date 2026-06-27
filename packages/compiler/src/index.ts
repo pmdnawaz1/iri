@@ -36,8 +36,15 @@ import {
   SQLPass,
 } from "@rir/passes";
 import { DefaultClosureEngine, type ClosureResult } from "@rir/closure";
+import {
+  DefaultRequirementNormalizer,
+  FrontendRegistry,
+  MarkdownFrontend,
+  type DocumentStructure,
+} from "@rir/document-compiler";
+import { CrossConsistencyEngine, type CrossFinding } from "@rir/consistency";
 import type { Builder, CompilationContext, Pass } from "@rir/core";
-import type { RepositoryIR } from "@rir/ir";
+import type { ClosureState, RepositoryIR, RequirementSet } from "@rir/ir";
 
 const SOURCE_EXTENSIONS = new Set([
   ".ts",
@@ -52,6 +59,13 @@ const SOURCE_EXTENSIONS = new Set([
   ".rs",
   ".cs",
 ]);
+
+const DOC_EXTENSIONS = new Set([".md", ".markdown"]);
+
+/** A registry with every built document frontend. */
+export function defaultDocumentFrontends(): FrontendRegistry {
+  return new FrontendRegistry().register(new MarkdownFrontend());
+}
 
 /** A registry with every built language adapter. */
 export function defaultAdapters(): AdapterRegistry {
@@ -87,15 +101,19 @@ export class PipelineBuilder implements Builder {
   }
 }
 
-function listSourceFiles(dir: string): string[] {
+function listFiles(dir: string, accept: ReadonlySet<string>): string[] {
   const out: string[] = [];
   for (const entry of readdirSync(dir)) {
     if (entry === "node_modules" || entry === "dist" || entry.startsWith(".")) continue;
     const full = join(dir, entry);
-    if (statSync(full).isDirectory()) out.push(...listSourceFiles(full));
-    else if (SOURCE_EXTENSIONS.has(extname(full))) out.push(full);
+    if (statSync(full).isDirectory()) out.push(...listFiles(full, accept));
+    else if (accept.has(extname(full))) out.push(full);
   }
   return out;
+}
+
+function listSourceFiles(dir: string): string[] {
+  return listFiles(dir, SOURCE_EXTENSIONS);
 }
 
 export interface CompileResult {
@@ -135,4 +153,50 @@ export async function compileRepository(
   // Stage 3 — closure.
   const closure = new DefaultClosureEngine().evaluate(ir);
   return { ir, closure };
+}
+
+/**
+ * Compile a documentation directory into the Requirement IR (ADR-0019). Each markdown
+ * file is parsed by a structure-only frontend, then normalized against the ontology.
+ */
+export function compileDocuments(
+  docsDir: string,
+  registry: FrontendRegistry = defaultDocumentFrontends(),
+): RequirementSet {
+  const structures: DocumentStructure[] = [];
+  for (const file of listFiles(docsDir, DOC_EXTENSIONS)) {
+    const frontend = registry.select(file);
+    if (!frontend) continue;
+    structures.push(frontend.extract(file, readFileSync(file, "utf8")));
+  }
+  return new DefaultRequirementNormalizer().normalize(structures);
+}
+
+export interface ConsistencyResult extends CompileResult {
+  readonly requirements: RequirementSet;
+  readonly findings: readonly CrossFinding[];
+}
+
+/**
+ * Compile code + docs and report doc↔code consistency (ADR-0020). The cross engine joins
+ * the Requirement IR and the Repository IR by ontology id; closure state per ontology
+ * capability decides whether a documented capability is actually CLOSED.
+ */
+export async function compileWithDocuments(
+  dir: string,
+  docsDir: string,
+  registry: AdapterRegistry = defaultAdapters(),
+): Promise<ConsistencyResult> {
+  const { ir, closure } = await compileRepository(dir, registry);
+  const requirements = compileDocuments(docsDir);
+
+  const stateById = new Map(closure.map((c) => [c.capabilityId, c.state] as const));
+  const closureByCapability = new Map<string, ClosureState>();
+  for (const cap of ir.capabilities) {
+    const state = stateById.get(cap.id);
+    if (state) closureByCapability.set(cap.capability, state);
+  }
+
+  const findings = new CrossConsistencyEngine().check(requirements, ir, closureByCapability);
+  return { ir, closure, requirements, findings };
 }

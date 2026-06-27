@@ -3,7 +3,7 @@
 id: "TSPEC-DF01"
 title: "markdown document frontend"
 owner: "ROLE_IMPLEMENTER"
-state: "DRAFT"
+state: "COMPLETE"
 package: "document-compiler"
 module: "frontend/markdown"
 repository_path: "packages/document-compiler"

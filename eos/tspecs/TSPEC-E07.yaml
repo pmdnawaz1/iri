@@ -3,7 +3,7 @@
 id: "TSPEC-E07"
 title: "CrossConsistencyEngine (doc vs code)"
 owner: "ROLE_IMPLEMENTER"
-state: "DRAFT"
+state: "COMPLETE"
 package: "consistency"
 module: "cross-engine"
 repository_path: "packages/consistency"

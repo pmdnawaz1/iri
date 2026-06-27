@@ -9,6 +9,8 @@
     { "path": "../code-compiler" },
     { "path": "../passes" },
     { "path": "../builder-engine" },
-    { "path": "../closure" }
+    { "path": "../closure" },
+    { "path": "../document-compiler" },
+    { "path": "../consistency" }
   ]
 }

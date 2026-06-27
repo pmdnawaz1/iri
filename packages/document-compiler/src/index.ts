@@ -56,3 +56,6 @@ export class FrontendRegistry {
     return this.frontends.find((f) => f.supports(path));
   }
 }
+
+export { MarkdownFrontend } from "./markdown.js";
+export { DefaultRequirementNormalizer } from "./normalizer.js";

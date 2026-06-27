@@ -205,9 +205,15 @@ importers:
       '@rir/common':
         specifier: workspace:*
         version: link:../common
+      '@rir/consistency':
+        specifier: workspace:*
+        version: link:../consistency
       '@rir/core':
         specifier: workspace:*
         version: link:../core
+      '@rir/document-compiler':
+        specifier: workspace:*
+        version: link:../document-compiler
       '@rir/ir':
         specifier: workspace:*
         version: link:../ir
@@ -256,6 +262,9 @@ importers:
       '@rir/ir':
         specifier: workspace:*
         version: link:../ir
+      '@rir/ontology':
+        specifier: workspace:*
+        version: link:../ontology
 
   packages/graph: {}
 

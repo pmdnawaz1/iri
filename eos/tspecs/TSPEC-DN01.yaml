@@ -3,7 +3,7 @@
 id: "TSPEC-DN01"
 title: "RequirementNormalizer (statements -> Requirement IR)"
 owner: "ROLE_IMPLEMENTER"
-state: "DRAFT"
+state: "COMPLETE"
 package: "document-compiler"
 module: "requirement-normalizer"
 repository_path: "packages/document-compiler"

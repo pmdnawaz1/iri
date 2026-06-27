@@ -5,6 +5,7 @@
   "references": [
     { "path": "../ir" },
     { "path": "../core" },
+    { "path": "../ontology" },
     { "path": "../common" }
   ]
 }

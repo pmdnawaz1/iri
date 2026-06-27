@@ -3,7 +3,7 @@
 id: "TSPEC-A020"
 title: "Requirement <-> Repository consistency rules"
 owner: "ROLE_ARCHITECT"
-state: "DRAFT"
+state: "COMPLETE"
 package: "consistency"
 module: "cross"
 repository_path: "packages/consistency"
