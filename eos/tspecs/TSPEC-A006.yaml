@@ -61,3 +61,6 @@ updated_at: "2026-06-27T00:00:00Z"
 wave: 2
 critical_path: false
 parallel_group: "wave-2"
+spec_path: "eos/specs/TSPEC-A006.spec.md"
+spec_required: false
+spec_status: "MISSING"

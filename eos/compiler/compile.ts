@@ -11,7 +11,7 @@
  * Run: pnpm eos:compile   (tsx eos/compiler/compile.ts)
  */
 
-import { mkdirSync, writeFileSync, rmSync } from "node:fs";
+import { existsSync, mkdirSync, writeFileSync, rmSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { DATASET } from "./dataset.js";
@@ -178,6 +178,9 @@ function compile(dataset: readonly TspecSource[]): Compiled {
   // Derive full TSPECs.
   const tspecs: Tspec[] = dataset.map((s) => {
     const w = wave.get(s.id) ?? 0;
+    const spec_path = `eos/specs/${s.id}.spec.md`;
+    const spec_required = s.owner === Role.Implementer;
+    const spec_status: Tspec["spec_status"] = existsSync(resolve(ROOT, spec_path)) ? "WRITTEN" : "MISSING";
     return {
       ...s,
       state: State.Draft,
@@ -192,6 +195,9 @@ function compile(dataset: readonly TspecSource[]): Compiled {
       wave: w,
       critical_path: criticalSet.has(s.id),
       parallel_group: `wave-${w}`,
+      spec_path,
+      spec_required,
+      spec_status,
     };
   }).sort((a, b) => a.wave - b.wave || a.id.localeCompare(b.id));
 
@@ -210,6 +216,7 @@ function emit(c: Compiled): void {
     "priority", "complexity", "risk", "estimated_effort", "depends_on", "blocks", "references",
     "architecture_documents", "deliverables", "outputs", "tests", "reviewers", "acceptance_criteria",
     "forbidden_changes", "labels", "version", "created_at", "updated_at", "wave", "critical_path", "parallel_group",
+    "spec_path", "spec_required", "spec_status",
   ];
   for (const t of c.tspecs) {
     const ordered: Record<string, unknown> = {};
@@ -223,6 +230,11 @@ function emit(c: Compiled): void {
   const implementers = c.tspecs.filter((t) => t.owner === Role.Implementer);
   const totalEffort = c.tspecs.reduce((s, t) => s + t.estimated_effort, 0);
   const criticalIds = c.tspecs.filter((t) => t.critical_path).map((t) => t.id);
+  const specRequired = c.tspecs.filter((t) => t.spec_required);
+  const specWritten = specRequired.filter((t) => t.spec_status === "WRITTEN");
+  const specCoveragePct = specRequired.length
+    ? Number(((specWritten.length / specRequired.length) * 100).toFixed(1))
+    : 100;
 
   // project.index.json — full canonical record.
   writeFileSync(
@@ -301,6 +313,7 @@ function emit(c: Compiled): void {
     total_effort: totalEffort,
     critical_path_length: criticalIds.length,
     coverage_target: EOS.coverageTarget,
+    work_orders: { required: specRequired.length, written: specWritten.length, spec_coverage_pct: specCoveragePct },
   });
 
   // project.risks.yaml
@@ -326,6 +339,10 @@ function emit(c: Compiled): void {
   writeYaml(resolve(STATE_DIR, "project.health.yaml"), "Repository health", {
     completion_pct: Number(((complete / c.tspecs.length) * 100).toFixed(1)),
     coverage_target_pct: EOS.coverageTarget * 100,
+    work_orders_written: specWritten.length,
+    work_orders_required: specRequired.length,
+    work_order_coverage_pct: specCoveragePct,
+    ready_to_implement: specWritten.length,
     blocked_tspecs: 0,
     critical_path_progress_pct: 0,
     architecture_stability: c.errors.length === 0 ? "STABLE" : "DRIFT",
@@ -345,8 +362,12 @@ if (result.errors.length > 0) {
 }
 emit(result);
 const waves = new Set(result.tspecs.map((t) => t.wave)).size;
+const reqSpecs = result.tspecs.filter((t) => t.spec_required);
+const writtenSpecs = reqSpecs.filter((t) => t.spec_status === "WRITTEN");
 process.stdout.write(
   `Project Compiler OK — ${result.tspecs.length} TSPECs, ${waves} waves, ` +
     `${result.tspecs.filter((t) => t.critical_path).length} on critical path.\n` +
+    `Work orders: ${writtenSpecs.length}/${reqSpecs.length} written ` +
+    `(${reqSpecs.length - writtenSpecs.length} implementer TSPECs not yet ready).\n` +
     `Emitted eos/tspecs/*.yaml and eos/state/project.*\n`,
 );

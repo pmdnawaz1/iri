@@ -68,7 +68,10 @@
       "updated_at": "2026-06-27T00:00:00Z",
       "wave": 0,
       "critical_path": true,
-      "parallel_group": "wave-0"
+      "parallel_group": "wave-0",
+      "spec_path": "eos/specs/TSPEC-A001.spec.md",
+      "spec_required": false,
+      "spec_status": "MISSING"
     },
     {
       "priority": "P0",
@@ -128,7 +131,10 @@
       "updated_at": "2026-06-27T00:00:00Z",
       "wave": 1,
       "critical_path": false,
-      "parallel_group": "wave-1"
+      "parallel_group": "wave-1",
+      "spec_path": "eos/specs/TSPEC-A002.spec.md",
+      "spec_required": false,
+      "spec_status": "MISSING"
     },
     {
       "priority": "P0",
@@ -196,7 +202,10 @@
       "updated_at": "2026-06-27T00:00:00Z",
       "wave": 1,
       "critical_path": false,
-      "parallel_group": "wave-1"
+      "parallel_group": "wave-1",
+      "spec_path": "eos/specs/TSPEC-A003.spec.md",
+      "spec_required": false,
+      "spec_status": "MISSING"
     },
     {
       "priority": "P1",
@@ -258,7 +267,10 @@
       "updated_at": "2026-06-27T00:00:00Z",
       "wave": 1,
       "critical_path": false,
-      "parallel_group": "wave-1"
+      "parallel_group": "wave-1",
+      "spec_path": "eos/specs/TSPEC-A004.spec.md",
+      "spec_required": false,
+      "spec_status": "MISSING"
     },
     {
       "priority": "P0",
@@ -324,7 +336,10 @@
       "updated_at": "2026-06-27T00:00:00Z",
       "wave": 1,
       "critical_path": true,
-      "parallel_group": "wave-1"
+      "parallel_group": "wave-1",
+      "spec_path": "eos/specs/TSPEC-A005.spec.md",
+      "spec_required": false,
+      "spec_status": "MISSING"
     },
     {
       "priority": "P1",
@@ -385,7 +400,10 @@
       "updated_at": "2026-06-27T00:00:00Z",
       "wave": 1,
       "critical_path": false,
-      "parallel_group": "wave-1"
+      "parallel_group": "wave-1",
+      "spec_path": "eos/specs/TSPEC-A012.spec.md",
+      "spec_required": false,
+      "spec_status": "MISSING"
     },
     {
       "priority": "P3",
@@ -444,7 +462,10 @@
       "updated_at": "2026-06-27T00:00:00Z",
       "wave": 1,
       "critical_path": false,
-      "parallel_group": "wave-1"
+      "parallel_group": "wave-1",
+      "spec_path": "eos/specs/TSPEC-A015.spec.md",
+      "spec_required": false,
+      "spec_status": "MISSING"
     },
     {
       "priority": "P1",
@@ -516,7 +537,10 @@
       "updated_at": "2026-06-27T00:00:00Z",
       "wave": 2,
       "critical_path": false,
-      "parallel_group": "wave-2"
+      "parallel_group": "wave-2",
+      "spec_path": "eos/specs/TSPEC-A006.spec.md",
+      "spec_required": false,
+      "spec_status": "MISSING"
     },
     {
       "priority": "P1",
@@ -582,7 +606,10 @@
       "updated_at": "2026-06-27T00:00:00Z",
       "wave": 2,
       "critical_path": false,
-      "parallel_group": "wave-2"
+      "parallel_group": "wave-2",
+      "spec_path": "eos/specs/TSPEC-A007.spec.md",
+      "spec_required": false,
+      "spec_status": "MISSING"
     },
     {
       "priority": "P1",
@@ -647,7 +674,10 @@
       "updated_at": "2026-06-27T00:00:00Z",
       "wave": 2,
       "critical_path": false,
-      "parallel_group": "wave-2"
+      "parallel_group": "wave-2",
+      "spec_path": "eos/specs/TSPEC-A008.spec.md",
+      "spec_required": false,
+      "spec_status": "MISSING"
     },
     {
       "priority": "P0",
@@ -705,7 +735,10 @@
       "updated_at": "2026-06-27T00:00:00Z",
       "wave": 2,
       "critical_path": false,
-      "parallel_group": "wave-2"
+      "parallel_group": "wave-2",
+      "spec_path": "eos/specs/TSPEC-A009.spec.md",
+      "spec_required": false,
+      "spec_status": "MISSING"
     },
     {
       "priority": "P1",
@@ -762,7 +795,10 @@
       "updated_at": "2026-06-27T00:00:00Z",
       "wave": 2,
       "critical_path": false,
-      "parallel_group": "wave-2"
+      "parallel_group": "wave-2",
+      "spec_path": "eos/specs/TSPEC-A010.spec.md",
+      "spec_required": false,
+      "spec_status": "MISSING"
     },
     {
       "priority": "P1",
@@ -819,7 +855,10 @@
       "updated_at": "2026-06-27T00:00:00Z",
       "wave": 2,
       "critical_path": false,
-      "parallel_group": "wave-2"
+      "parallel_group": "wave-2",
+      "spec_path": "eos/specs/TSPEC-A011.spec.md",
+      "spec_required": false,
+      "spec_status": "MISSING"
     },
     {
       "priority": "P2",
@@ -877,7 +916,10 @@
       "updated_at": "2026-06-27T00:00:00Z",
       "wave": 2,
       "critical_path": false,
-      "parallel_group": "wave-2"
+      "parallel_group": "wave-2",
+      "spec_path": "eos/specs/TSPEC-A013.spec.md",
+      "spec_required": false,
+      "spec_status": "MISSING"
     },
     {
       "priority": "P3",
@@ -940,7 +982,10 @@
       "updated_at": "2026-06-27T00:00:00Z",
       "wave": 2,
       "critical_path": false,
-      "parallel_group": "wave-2"
+      "parallel_group": "wave-2",
+      "spec_path": "eos/specs/TSPEC-E06.spec.md",
+      "spec_required": true,
+      "spec_status": "MISSING"
     },
     {
       "priority": "P1",
@@ -1012,7 +1057,10 @@
       "updated_at": "2026-06-27T00:00:00Z",
       "wave": 2,
       "critical_path": true,
-      "parallel_group": "wave-2"
+      "parallel_group": "wave-2",
+      "spec_path": "eos/specs/TSPEC-I001.spec.md",
+      "spec_required": true,
+      "spec_status": "MISSING"
     },
     {
       "priority": "P1",
@@ -1077,7 +1125,10 @@
       "updated_at": "2026-06-27T00:00:00Z",
       "wave": 2,
       "critical_path": false,
-      "parallel_group": "wave-2"
+      "parallel_group": "wave-2",
+      "spec_path": "eos/specs/TSPEC-I002.spec.md",
+      "spec_required": true,
+      "spec_status": "MISSING"
     },
     {
       "priority": "P1",
@@ -1147,7 +1198,10 @@
       "updated_at": "2026-06-27T00:00:00Z",
       "wave": 2,
       "critical_path": false,
-      "parallel_group": "wave-2"
+      "parallel_group": "wave-2",
+      "spec_path": "eos/specs/TSPEC-I003.spec.md",
+      "spec_required": true,
+      "spec_status": "MISSING"
     },
     {
       "priority": "P2",
@@ -1209,7 +1263,10 @@
       "updated_at": "2026-06-27T00:00:00Z",
       "wave": 2,
       "critical_path": false,
-      "parallel_group": "wave-2"
+      "parallel_group": "wave-2",
+      "spec_path": "eos/specs/TSPEC-I007.spec.md",
+      "spec_required": true,
+      "spec_status": "MISSING"
     },
     {
       "priority": "P3",
@@ -1270,7 +1327,10 @@
       "updated_at": "2026-06-27T00:00:00Z",
       "wave": 2,
       "critical_path": false,
-      "parallel_group": "wave-2"
+      "parallel_group": "wave-2",
+      "spec_path": "eos/specs/TSPEC-SC02.spec.md",
+      "spec_required": true,
+      "spec_status": "MISSING"
     },
     {
       "priority": "P3",
@@ -1327,7 +1387,10 @@
       "updated_at": "2026-06-27T00:00:00Z",
       "wave": 3,
       "critical_path": false,
-      "parallel_group": "wave-3"
+      "parallel_group": "wave-3",
+      "spec_path": "eos/specs/TSPEC-A014.spec.md",
+      "spec_required": false,
+      "spec_status": "MISSING"
     },
     {
       "priority": "P1",
@@ -1390,7 +1453,10 @@
       "updated_at": "2026-06-27T00:00:00Z",
       "wave": 3,
       "critical_path": false,
-      "parallel_group": "wave-3"
+      "parallel_group": "wave-3",
+      "spec_path": "eos/specs/TSPEC-CI01.spec.md",
+      "spec_required": true,
+      "spec_status": "MISSING"
     },
     {
       "priority": "P1",
@@ -1453,7 +1519,10 @@
       "updated_at": "2026-06-27T00:00:00Z",
       "wave": 3,
       "critical_path": false,
-      "parallel_group": "wave-3"
+      "parallel_group": "wave-3",
+      "spec_path": "eos/specs/TSPEC-DF01.spec.md",
+      "spec_required": true,
+      "spec_status": "MISSING"
     },
     {
       "priority": "P2",
@@ -1516,7 +1585,10 @@
       "updated_at": "2026-06-27T00:00:00Z",
       "wave": 3,
       "critical_path": false,
-      "parallel_group": "wave-3"
+      "parallel_group": "wave-3",
+      "spec_path": "eos/specs/TSPEC-DF02.spec.md",
+      "spec_required": true,
+      "spec_status": "MISSING"
     },
     {
       "priority": "P2",
@@ -1579,7 +1651,10 @@
       "updated_at": "2026-06-27T00:00:00Z",
       "wave": 3,
       "critical_path": false,
-      "parallel_group": "wave-3"
+      "parallel_group": "wave-3",
+      "spec_path": "eos/specs/TSPEC-DF03.spec.md",
+      "spec_required": true,
+      "spec_status": "MISSING"
     },
     {
       "priority": "P2",
@@ -1642,7 +1717,10 @@
       "updated_at": "2026-06-27T00:00:00Z",
       "wave": 3,
       "critical_path": false,
-      "parallel_group": "wave-3"
+      "parallel_group": "wave-3",
+      "spec_path": "eos/specs/TSPEC-DF04.spec.md",
+      "spec_required": true,
+      "spec_status": "MISSING"
     },
     {
       "priority": "P2",
@@ -1705,7 +1783,10 @@
       "updated_at": "2026-06-27T00:00:00Z",
       "wave": 3,
       "critical_path": false,
-      "parallel_group": "wave-3"
+      "parallel_group": "wave-3",
+      "spec_path": "eos/specs/TSPEC-DF05.spec.md",
+      "spec_required": true,
+      "spec_status": "MISSING"
     },
     {
       "priority": "P2",
@@ -1768,7 +1849,10 @@
       "updated_at": "2026-06-27T00:00:00Z",
       "wave": 3,
       "critical_path": false,
-      "parallel_group": "wave-3"
+      "parallel_group": "wave-3",
+      "spec_path": "eos/specs/TSPEC-DF06.spec.md",
+      "spec_required": true,
+      "spec_status": "MISSING"
     },
     {
       "priority": "P2",
@@ -1832,7 +1916,10 @@
       "updated_at": "2026-06-27T00:00:00Z",
       "wave": 3,
       "critical_path": false,
-      "parallel_group": "wave-3"
+      "parallel_group": "wave-3",
+      "spec_path": "eos/specs/TSPEC-E02.spec.md",
+      "spec_required": true,
+      "spec_status": "MISSING"
     },
     {
       "priority": "P2",
@@ -1895,7 +1982,10 @@
       "updated_at": "2026-06-27T00:00:00Z",
       "wave": 3,
       "critical_path": false,
-      "parallel_group": "wave-3"
+      "parallel_group": "wave-3",
+      "spec_path": "eos/specs/TSPEC-E03.spec.md",
+      "spec_required": true,
+      "spec_status": "MISSING"
     },
     {
       "priority": "P2",
@@ -1961,7 +2051,10 @@
       "updated_at": "2026-06-27T00:00:00Z",
       "wave": 3,
       "critical_path": false,
-      "parallel_group": "wave-3"
+      "parallel_group": "wave-3",
+      "spec_path": "eos/specs/TSPEC-E04.spec.md",
+      "spec_required": true,
+      "spec_status": "MISSING"
     },
     {
       "priority": "P1",
@@ -2031,7 +2124,10 @@
       "updated_at": "2026-06-27T00:00:00Z",
       "wave": 3,
       "critical_path": false,
-      "parallel_group": "wave-3"
+      "parallel_group": "wave-3",
+      "spec_path": "eos/specs/TSPEC-I004.spec.md",
+      "spec_required": true,
+      "spec_status": "WRITTEN"
     },
     {
       "priority": "P1",
@@ -2097,7 +2193,10 @@
       "updated_at": "2026-06-27T00:00:00Z",
       "wave": 3,
       "critical_path": true,
-      "parallel_group": "wave-3"
+      "parallel_group": "wave-3",
+      "spec_path": "eos/specs/TSPEC-I005.spec.md",
+      "spec_required": true,
+      "spec_status": "MISSING"
     },
     {
       "priority": "P3",
@@ -2159,7 +2258,10 @@
       "updated_at": "2026-06-27T00:00:00Z",
       "wave": 4,
       "critical_path": false,
-      "parallel_group": "wave-4"
+      "parallel_group": "wave-4",
+      "spec_path": "eos/specs/TSPEC-E05.spec.md",
+      "spec_required": true,
+      "spec_status": "MISSING"
     },
     {
       "priority": "P1",
@@ -2247,7 +2349,10 @@
       "updated_at": "2026-06-27T00:00:00Z",
       "wave": 4,
       "critical_path": true,
-      "parallel_group": "wave-4"
+      "parallel_group": "wave-4",
+      "spec_path": "eos/specs/TSPEC-I006.spec.md",
+      "spec_required": true,
+      "spec_status": "MISSING"
     },
     {
       "priority": "P1",
@@ -2322,7 +2427,10 @@
       "updated_at": "2026-06-27T00:00:00Z",
       "wave": 5,
       "critical_path": false,
-      "parallel_group": "wave-5"
+      "parallel_group": "wave-5",
+      "spec_path": "eos/specs/TSPEC-AD01.spec.md",
+      "spec_required": true,
+      "spec_status": "MISSING"
     },
     {
       "priority": "P2",
@@ -2387,7 +2495,10 @@
       "updated_at": "2026-06-27T00:00:00Z",
       "wave": 5,
       "critical_path": false,
-      "parallel_group": "wave-5"
+      "parallel_group": "wave-5",
+      "spec_path": "eos/specs/TSPEC-AD02.spec.md",
+      "spec_required": true,
+      "spec_status": "MISSING"
     },
     {
       "priority": "P2",
@@ -2452,7 +2563,10 @@
       "updated_at": "2026-06-27T00:00:00Z",
       "wave": 5,
       "critical_path": false,
-      "parallel_group": "wave-5"
+      "parallel_group": "wave-5",
+      "spec_path": "eos/specs/TSPEC-AD03.spec.md",
+      "spec_required": true,
+      "spec_status": "MISSING"
     },
     {
       "priority": "P2",
@@ -2517,7 +2631,10 @@
       "updated_at": "2026-06-27T00:00:00Z",
       "wave": 5,
       "critical_path": false,
-      "parallel_group": "wave-5"
+      "parallel_group": "wave-5",
+      "spec_path": "eos/specs/TSPEC-AD04.spec.md",
+      "spec_required": true,
+      "spec_status": "MISSING"
     },
     {
       "priority": "P2",
@@ -2582,7 +2699,10 @@
       "updated_at": "2026-06-27T00:00:00Z",
       "wave": 5,
       "critical_path": false,
-      "parallel_group": "wave-5"
+      "parallel_group": "wave-5",
+      "spec_path": "eos/specs/TSPEC-AD05.spec.md",
+      "spec_required": true,
+      "spec_status": "MISSING"
     },
     {
       "priority": "P2",
@@ -2647,7 +2767,10 @@
       "updated_at": "2026-06-27T00:00:00Z",
       "wave": 5,
       "critical_path": false,
-      "parallel_group": "wave-5"
+      "parallel_group": "wave-5",
+      "spec_path": "eos/specs/TSPEC-AD06.spec.md",
+      "spec_required": true,
+      "spec_status": "MISSING"
     },
     {
       "priority": "P2",
@@ -2712,7 +2835,10 @@
       "updated_at": "2026-06-27T00:00:00Z",
       "wave": 5,
       "critical_path": false,
-      "parallel_group": "wave-5"
+      "parallel_group": "wave-5",
+      "spec_path": "eos/specs/TSPEC-AD07.spec.md",
+      "spec_required": true,
+      "spec_status": "MISSING"
     },
     {
       "priority": "P3",
@@ -2774,7 +2900,10 @@
       "updated_at": "2026-06-27T00:00:00Z",
       "wave": 5,
       "critical_path": false,
-      "parallel_group": "wave-5"
+      "parallel_group": "wave-5",
+      "spec_path": "eos/specs/TSPEC-APP3.spec.md",
+      "spec_required": true,
+      "spec_status": "MISSING"
     },
     {
       "priority": "P2",
@@ -2838,7 +2967,10 @@
       "updated_at": "2026-06-27T00:00:00Z",
       "wave": 5,
       "critical_path": false,
-      "parallel_group": "wave-5"
+      "parallel_group": "wave-5",
+      "spec_path": "eos/specs/TSPEC-P01.spec.md",
+      "spec_required": true,
+      "spec_status": "MISSING"
     },
     {
       "priority": "P2",
@@ -2902,7 +3034,10 @@
       "updated_at": "2026-06-27T00:00:00Z",
       "wave": 5,
       "critical_path": false,
-      "parallel_group": "wave-5"
+      "parallel_group": "wave-5",
+      "spec_path": "eos/specs/TSPEC-P02.spec.md",
+      "spec_required": true,
+      "spec_status": "MISSING"
     },
     {
       "priority": "P2",
@@ -2966,7 +3101,10 @@
       "updated_at": "2026-06-27T00:00:00Z",
       "wave": 5,
       "critical_path": false,
-      "parallel_group": "wave-5"
+      "parallel_group": "wave-5",
+      "spec_path": "eos/specs/TSPEC-P03.spec.md",
+      "spec_required": true,
+      "spec_status": "MISSING"
     },
     {
       "priority": "P2",
@@ -3030,7 +3168,10 @@
       "updated_at": "2026-06-27T00:00:00Z",
       "wave": 5,
       "critical_path": false,
-      "parallel_group": "wave-5"
+      "parallel_group": "wave-5",
+      "spec_path": "eos/specs/TSPEC-P04.spec.md",
+      "spec_required": true,
+      "spec_status": "MISSING"
     },
     {
       "priority": "P2",
@@ -3094,7 +3235,10 @@
       "updated_at": "2026-06-27T00:00:00Z",
       "wave": 5,
       "critical_path": false,
-      "parallel_group": "wave-5"
+      "parallel_group": "wave-5",
+      "spec_path": "eos/specs/TSPEC-P05.spec.md",
+      "spec_required": true,
+      "spec_status": "MISSING"
     },
     {
       "priority": "P2",
@@ -3158,7 +3302,10 @@
       "updated_at": "2026-06-27T00:00:00Z",
       "wave": 5,
       "critical_path": false,
-      "parallel_group": "wave-5"
+      "parallel_group": "wave-5",
+      "spec_path": "eos/specs/TSPEC-P06.spec.md",
+      "spec_required": true,
+      "spec_status": "MISSING"
     },
     {
       "priority": "P2",
@@ -3222,7 +3369,10 @@
       "updated_at": "2026-06-27T00:00:00Z",
       "wave": 5,
       "critical_path": false,
-      "parallel_group": "wave-5"
+      "parallel_group": "wave-5",
+      "spec_path": "eos/specs/TSPEC-P07.spec.md",
+      "spec_required": true,
+      "spec_status": "MISSING"
     },
     {
       "priority": "P2",
@@ -3286,7 +3436,10 @@
       "updated_at": "2026-06-27T00:00:00Z",
       "wave": 5,
       "critical_path": false,
-      "parallel_group": "wave-5"
+      "parallel_group": "wave-5",
+      "spec_path": "eos/specs/TSPEC-P08.spec.md",
+      "spec_required": true,
+      "spec_status": "MISSING"
     },
     {
       "priority": "P2",
@@ -3352,7 +3505,10 @@
       "updated_at": "2026-06-27T00:00:00Z",
       "wave": 5,
       "critical_path": true,
-      "parallel_group": "wave-5"
+      "parallel_group": "wave-5",
+      "spec_path": "eos/specs/TSPEC-P09.spec.md",
+      "spec_required": true,
+      "spec_status": "MISSING"
     },
     {
       "priority": "P2",
@@ -3416,7 +3572,10 @@
       "updated_at": "2026-06-27T00:00:00Z",
       "wave": 5,
       "critical_path": false,
-      "parallel_group": "wave-5"
+      "parallel_group": "wave-5",
+      "spec_path": "eos/specs/TSPEC-P10.spec.md",
+      "spec_required": true,
+      "spec_status": "MISSING"
     },
     {
       "priority": "P2",
@@ -3480,7 +3639,10 @@
       "updated_at": "2026-06-27T00:00:00Z",
       "wave": 5,
       "critical_path": false,
-      "parallel_group": "wave-5"
+      "parallel_group": "wave-5",
+      "spec_path": "eos/specs/TSPEC-P11.spec.md",
+      "spec_required": true,
+      "spec_status": "MISSING"
     },
     {
       "priority": "P2",
@@ -3546,7 +3708,10 @@
       "updated_at": "2026-06-27T00:00:00Z",
       "wave": 5,
       "critical_path": false,
-      "parallel_group": "wave-5"
+      "parallel_group": "wave-5",
+      "spec_path": "eos/specs/TSPEC-P12.spec.md",
+      "spec_required": true,
+      "spec_status": "MISSING"
     },
     {
       "priority": "P2",
@@ -3610,7 +3775,10 @@
       "updated_at": "2026-06-27T00:00:00Z",
       "wave": 5,
       "critical_path": false,
-      "parallel_group": "wave-5"
+      "parallel_group": "wave-5",
+      "spec_path": "eos/specs/TSPEC-P13.spec.md",
+      "spec_required": true,
+      "spec_status": "MISSING"
     },
     {
       "priority": "P2",
@@ -3674,7 +3842,10 @@
       "updated_at": "2026-06-27T00:00:00Z",
       "wave": 5,
       "critical_path": false,
-      "parallel_group": "wave-5"
+      "parallel_group": "wave-5",
+      "spec_path": "eos/specs/TSPEC-P14.spec.md",
+      "spec_required": true,
+      "spec_status": "MISSING"
     },
     {
       "priority": "P2",
@@ -3738,7 +3909,10 @@
       "updated_at": "2026-06-27T00:00:00Z",
       "wave": 5,
       "critical_path": false,
-      "parallel_group": "wave-5"
+      "parallel_group": "wave-5",
+      "spec_path": "eos/specs/TSPEC-P15.spec.md",
+      "spec_required": true,
+      "spec_status": "MISSING"
     },
     {
       "priority": "P1",
@@ -3805,7 +3979,10 @@
       "updated_at": "2026-06-27T00:00:00Z",
       "wave": 6,
       "critical_path": true,
-      "parallel_group": "wave-6"
+      "parallel_group": "wave-6",
+      "spec_path": "eos/specs/TSPEC-E01.spec.md",
+      "spec_required": true,
+      "spec_status": "MISSING"
     },
     {
       "priority": "P2",
@@ -3864,7 +4041,10 @@
       "updated_at": "2026-06-27T00:00:00Z",
       "wave": 6,
       "critical_path": false,
-      "parallel_group": "wave-6"
+      "parallel_group": "wave-6",
+      "spec_path": "eos/specs/TSPEC-FX01.spec.md",
+      "spec_required": true,
+      "spec_status": "MISSING"
     },
     {
       "priority": "P2",
@@ -3923,7 +4103,10 @@
       "updated_at": "2026-06-27T00:00:00Z",
       "wave": 6,
       "critical_path": false,
-      "parallel_group": "wave-6"
+      "parallel_group": "wave-6",
+      "spec_path": "eos/specs/TSPEC-FX02.spec.md",
+      "spec_required": true,
+      "spec_status": "MISSING"
     },
     {
       "priority": "P2",
@@ -3982,7 +4165,10 @@
       "updated_at": "2026-06-27T00:00:00Z",
       "wave": 6,
       "critical_path": false,
-      "parallel_group": "wave-6"
+      "parallel_group": "wave-6",
+      "spec_path": "eos/specs/TSPEC-FX03.spec.md",
+      "spec_required": true,
+      "spec_status": "MISSING"
     },
     {
       "priority": "P2",
@@ -4041,7 +4227,10 @@
       "updated_at": "2026-06-27T00:00:00Z",
       "wave": 6,
       "critical_path": false,
-      "parallel_group": "wave-6"
+      "parallel_group": "wave-6",
+      "spec_path": "eos/specs/TSPEC-FX04.spec.md",
+      "spec_required": true,
+      "spec_status": "MISSING"
     },
     {
       "priority": "P2",
@@ -4100,7 +4289,10 @@
       "updated_at": "2026-06-27T00:00:00Z",
       "wave": 6,
       "critical_path": false,
-      "parallel_group": "wave-6"
+      "parallel_group": "wave-6",
+      "spec_path": "eos/specs/TSPEC-FX05.spec.md",
+      "spec_required": true,
+      "spec_status": "MISSING"
     },
     {
       "priority": "P2",
@@ -4159,7 +4351,10 @@
       "updated_at": "2026-06-27T00:00:00Z",
       "wave": 6,
       "critical_path": false,
-      "parallel_group": "wave-6"
+      "parallel_group": "wave-6",
+      "spec_path": "eos/specs/TSPEC-FX06.spec.md",
+      "spec_required": true,
+      "spec_status": "MISSING"
     },
     {
       "priority": "P2",
@@ -4218,7 +4413,10 @@
       "updated_at": "2026-06-27T00:00:00Z",
       "wave": 6,
       "critical_path": false,
-      "parallel_group": "wave-6"
+      "parallel_group": "wave-6",
+      "spec_path": "eos/specs/TSPEC-FX07.spec.md",
+      "spec_required": true,
+      "spec_status": "MISSING"
     },
     {
       "priority": "P2",
@@ -4277,7 +4475,10 @@
       "updated_at": "2026-06-27T00:00:00Z",
       "wave": 6,
       "critical_path": false,
-      "parallel_group": "wave-6"
+      "parallel_group": "wave-6",
+      "spec_path": "eos/specs/TSPEC-FX08.spec.md",
+      "spec_required": true,
+      "spec_status": "MISSING"
     },
     {
       "priority": "P2",
@@ -4336,7 +4537,10 @@
       "updated_at": "2026-06-27T00:00:00Z",
       "wave": 6,
       "critical_path": false,
-      "parallel_group": "wave-6"
+      "parallel_group": "wave-6",
+      "spec_path": "eos/specs/TSPEC-FX09.spec.md",
+      "spec_required": true,
+      "spec_status": "MISSING"
     },
     {
       "priority": "P2",
@@ -4403,7 +4607,10 @@
       "updated_at": "2026-06-27T00:00:00Z",
       "wave": 7,
       "critical_path": true,
-      "parallel_group": "wave-7"
+      "parallel_group": "wave-7",
+      "spec_path": "eos/specs/TSPEC-APP1.spec.md",
+      "spec_required": true,
+      "spec_status": "MISSING"
     },
     {
       "priority": "P2",
@@ -4470,7 +4677,10 @@
       "updated_at": "2026-06-27T00:00:00Z",
       "wave": 7,
       "critical_path": false,
-      "parallel_group": "wave-7"
+      "parallel_group": "wave-7",
+      "spec_path": "eos/specs/TSPEC-APP2.spec.md",
+      "spec_required": true,
+      "spec_status": "MISSING"
     },
     {
       "priority": "P2",
@@ -4531,7 +4741,10 @@
       "updated_at": "2026-06-27T00:00:00Z",
       "wave": 8,
       "critical_path": true,
-      "parallel_group": "wave-8"
+      "parallel_group": "wave-8",
+      "spec_path": "eos/specs/TSPEC-SC01.spec.md",
+      "spec_required": true,
+      "spec_status": "MISSING"
     },
     {
       "priority": "P3",
@@ -4592,7 +4805,10 @@
       "updated_at": "2026-06-27T00:00:00Z",
       "wave": 8,
       "critical_path": false,
-      "parallel_group": "wave-8"
+      "parallel_group": "wave-8",
+      "spec_path": "eos/specs/TSPEC-SC03.spec.md",
+      "spec_required": true,
+      "spec_status": "MISSING"
     }
   ]
 }

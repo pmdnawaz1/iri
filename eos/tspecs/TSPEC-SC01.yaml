@@ -51,3 +51,6 @@ updated_at: "2026-06-27T00:00:00Z"
 wave: 8
 critical_path: true
 parallel_group: "wave-8"
+spec_path: "eos/specs/TSPEC-SC01.spec.md"
+spec_required: true
+spec_status: "MISSING"

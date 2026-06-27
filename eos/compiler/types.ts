@@ -78,6 +78,11 @@ export interface Tspec extends TspecSource {
   readonly wave: number;
   readonly critical_path: boolean;
   readonly parallel_group: string;
+  /** Path to the architect-authored work order (eos/specs/<id>.spec.md). */
+  readonly spec_path: string;
+  /** Implementer TSPECs require a work order before READY_FOR_IMPLEMENTATION. */
+  readonly spec_required: boolean;
+  readonly spec_status: "WRITTEN" | "MISSING";
 }
 
 /** Repository-wide compile constants (deterministic). */

@@ -38,5 +38,11 @@ ARCHITECTURE_REVIEW → CHANGES_REQUESTED → IMPLEMENTING
   NEXT_TSPECS_UNLOCKED`.
 - A TSPEC may not enter `READY_FOR_IMPLEMENTATION` until every `depends_on` TSPEC is
   `COMPLETE`. This is what the wave ordering guarantees.
+- An implementer TSPEC (`spec_required: true`) may not enter
+  `READY_FOR_IMPLEMENTATION` until its **work order** exists at `spec_path`
+  (`eos/specs/<id>.spec.md`, `spec_status: WRITTEN`). Authoring the work order IS the
+  `ARCHITECTURE_REVIEW → READY_FOR_IMPLEMENTATION` transition. Template:
+  `eos/templates/tspec-spec-template.md`; worked example: `eos/specs/TSPEC-I004.spec.md`.
+  `project.health.yaml` reports `work_order_coverage_pct`.
 - Only `ROLE_ARCHITECT` may move a TSPEC out of `ARCHITECTURE_REVIEW` or
   `ARCHITECT_REVIEW`.
