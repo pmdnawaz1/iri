@@ -1,0 +1,104 @@
+# TSPEC-AD03 — Python language adapter (Work Order)
+
+> Authored by ROLE_ARCHITECT. Implement using ONLY this document. No architectural
+> decisions; if ambiguous, STOP and escalate. This is the REFERENCE Tree-sitter adapter;
+> AD04–AD07 follow the same structure with per-language node types.
+
+- **TSPEC:** TSPEC-AD03 · **Owner:** ROLE_IMPLEMENTER · **Header:** `eos/tspecs/TSPEC-AD03.yaml`
+- **Depends on:** TSPEC-A007, TSPEC-I006 — COMPLETE · **Wave:** 5
+
+## 1. Objective
+
+Parse a single Python source file with Tree-sitter and emit the `ParseResult` facts
+(symbols, imports, exports, calls). Routes are out of scope for this adapter (see §4).
+Non-semantic.
+
+## 2. Contract (fixed — do not change)
+
+Implement `LanguageAdapter` from `packages/code-compiler/src/index.ts` with
+`language = "python"`, `extensions = [".py"]`. `ParseResult` shape is identical to AD01
+(`packages/code-compiler/src/language/typescript.ts` is the reference for the output).
+
+## 3. Files
+
+| Action | Path | Purpose |
+| --- | --- | --- |
+| create | `packages/code-compiler/src/language/python.ts` | `PythonAdapter` |
+| modify | `packages/code-compiler/src/index.ts` | export `PythonAdapter` (single line) |
+| modify | `packages/code-compiler/package.json` | add deps `tree-sitter`, `tree-sitter-python` |
+| modify | root `package.json` | add `tree-sitter`, `tree-sitter-python` to `pnpm.onlyBuiltDependencies` |
+| create | `tests/compiler/python-adapter.test.ts` | tests from §7 |
+
+> Collision note: the only shared files are the one export line in `index.ts` and the
+> dep lines in `package.json`. Merge adapters one at a time (trivial conflicts).
+
+## 4. Behavior / Algorithm
+
+1. Load Tree-sitter: `import Parser from "tree-sitter"; import Python from "tree-sitter-python";`
+   then `const parser = new Parser(); parser.setLanguage(Python);`.
+2. `parse(path, source)`: `const tree = parser.parse(source);` walk `tree.rootNode`.
+3. Build `ArtifactIR`: `{ id: makeId("art", path), kind: "CODE", path, language: "python", hash: hash64(source) }`.
+4. Extract by Tree-sitter node type (use `node.type`):
+   - **symbols**: `class_definition` → `class`; `function_definition` → `function` if top
+     level else `method` (a `function_definition` whose nearest named ancestor is a
+     `class_definition` is a `method`). `name` = the `name`-field child's text. `exported`
+     = `true` for every top-level definition (Python has no export keyword; treat
+     module-level defs as exported, nested as not).
+   - **imports**: `import_statement` and `import_from_statement` → `specifier` = the
+     module text; `imported` = imported names (the `name`/`aliased_import` children).
+   - **exports**: names of module-level `class_definition`/`function_definition`.
+   - **calls**: `call` nodes → `callee` = the text of the `function` field
+     (`node.childForFieldName("function").text`), with `span` from the node.
+   - **routes**: `[]` (Python web frameworks vary — Flask/FastAPI route detection is a
+     separate future TSPEC; do NOT attempt it here).
+5. `span` from Tree-sitter: `{ startLine: node.startPosition.row, startColumn:
+   node.startPosition.column, endLine: node.endPosition.row, endColumn: node.endPosition.column }`.
+6. Deterministic: facts in source (pre-order traversal) order.
+
+## 5. Input → Output examples (golden)
+
+Inline fixture in the test:
+```python
+import os
+from app.db import UserRepository
+
+class AuthService:
+    def login(self, email):
+        return self.repo.find(email)
+```
+- `symbols` contains class `AuthService` and method `login`.
+- `imports` contains `{ specifier: "os", ... }` and `{ specifier: "app.db", imported: ["UserRepository"] }`.
+- `calls` contains `self.repo.find`.
+
+## 6. Edge cases
+
+- Empty file → all fact arrays empty, artifact present with a stable hash.
+- Nested function inside a method → `method`/not exported (top-level rule).
+- Determinism: two parses of the same source are deep-equal.
+
+## 7. Acceptance criteria (each is a test)
+
+1. `PythonAdapter` is assignable to `LanguageAdapter`.
+2. `supports("a.py")` true; `supports("a.ts")` false.
+3. the inline fixture yields class `AuthService` + method `login`.
+4. imports include `os` and `app.db`.
+5. `calls` include `self.repo.find`.
+6. determinism: two parses deep-equal.
+7. coverage for `python.ts` ≥ 95%.
+
+## 8. Forbidden changes
+
+- Do NOT change `LanguageAdapter`/`ParseResult` (TSPEC-A007).
+- Do NOT resolve calls, build IR, or compute reachability here.
+- Do NOT touch packages other than `code-compiler` (and the two `package.json` dep edits).
+
+## 9. References
+
+- node-tree-sitter API: https://github.com/tree-sitter/node-tree-sitter
+- tree-sitter-python grammar: https://github.com/tree-sitter/tree-sitter-python
+- Tree-sitter node API (`childForFieldName`, positions): https://tree-sitter.github.io/tree-sitter/using-parsers
+- Output shape reference: `packages/code-compiler/src/language/typescript.ts`.
+
+## 10. Definition of done
+
+build · typecheck · lint · the §7 tests · coverage ≥ 95% · PR `feat(tspec-ad03): python language adapter`.
