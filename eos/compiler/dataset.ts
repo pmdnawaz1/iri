@@ -609,6 +609,10 @@ const ENCLOSING_DEFS: Array<[string, string, string, string]> = [
   ["CE01", "typescript", "language/typescript", "TSPEC-AD01"],
   ["CE02", "python", "language/python", "TSPEC-AD03"],
   ["CE03", "go", "language/go", "TSPEC-AD05"],
+  ["CE04", "java", "language/java", "TSPEC-AD04"],
+  ["CE05", "rust", "language/rust", "TSPEC-AD06"],
+  ["CE06", "csharp", "language/csharp", "TSPEC-AD07"],
+  ["CE07", "javascript", "language/javascript", "TSPEC-AD02"],
 ];
 const ENHANCEMENTS: TspecSource[] = ENCLOSING_DEFS.map(([id, lang, mod, adapter]) =>
   T({

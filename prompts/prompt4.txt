@@ -1,0 +1,72 @@
+================================================================================
+RIR IMPLEMENTER PROMPT 4 — TSPEC-CE07: javascript adapter: emit CallFact.enclosing
+Branch: feature/tspec-ce07-javascript-adapter-emit-callfact-enclosing
+Depends on: TSPEC-AD02 (already satisfied by the scaffold)
+Paste this ENTIRE file into a fresh session with your implementer model.
+================================================================================
+
+You are ROLE_IMPLEMENTER for the RIR repository. You implement exactly one TSPEC.
+
+Hard rules (from decision1.md):
+- Implement ONLY what the work order specifies. Make NO architectural decisions.
+- Do NOT change the Repository IR, Requirement IR, ontology, the compiler pipeline,
+  builder order, or any item in the work order's "Forbidden changes".
+- No TODOs, no placeholder code, no dead code. Deterministic output only.
+- Write REAL multi-line, formatted source. NEVER minify or strip newlines. CI runs
+  `prettier --check` and rejects single-line / unformatted files.
+- ADDITIVE ONLY: create only the new files the work order lists. Do NOT edit shared
+  files (barrels/registries/package.json) unless told to; import directly from file paths.
+- If anything is ambiguous or the work order seems wrong, STOP and report — do not guess.
+
+Workflow:
+1. Create the branch named in the header below (from `main`).
+2. Implement the deliverables in the listed files only.
+3. Write the tests from section 7 (acceptance criteria) and make them pass.
+4. Run: pnpm install && pnpm format && pnpm build && pnpm typecheck && pnpm test  — all must be green.
+5. Open a PR using .github/pull_request_template.md with commit message
+   `<type>(<tspec-id>): <summary>` (e.g. feat(tspec-i002): ir serializer and validator).
+
+Definition of done: build + typecheck + lint + the section-7 tests + coverage >= 95%.
+
+----- WORK ORDER -----------------------------------------------------------------
+
+# TSPEC-CE07 — JavaScript adapter: emit CallFact.enclosing (Work Order)
+
+> Same shape as **TSPEC-CE01 (read it first)**. COLLISION-FREE: touches ONLY `javascript.ts`
+> and its test. The JS adapter uses the TypeScript Compiler API, so the algorithm is
+> identical to CE01 (the TypeScript enclosing enhancement).
+
+- **TSPEC:** TSPEC-CE07 · **Owner:** ROLE_IMPLEMENTER · **Depends on:** TSPEC-AD02 (COMPLETE) · **Wave:** 6
+
+## Objective
+Populate `CallFact.enclosing` in the JavaScript adapter (nearest enclosing class, else
+top-level function) so CallPass can build the call graph.
+
+## Files (ADDITIVE-TO-ONE-FILE)
+- modify `packages/code-compiler/src/language/javascript.ts` (only `extractCalls`)
+- modify `tests/compiler/javascript-adapter.test.ts` (add the assertions)
+
+## Behavior
+Apply CE01 §4 verbatim (the JS adapter parses with the TS Compiler API): walk
+`(node, enclosing)`; a `ClassDeclaration` with a name sets the child enclosing to the
+class name; a named `FunctionDeclaration` sets it when none is set; a `CallExpression`
+records the current enclosing. If CE01 exposed a shared `extractCalls` helper, reuse it;
+otherwise implement the same logic standalone.
+
+## Acceptance (added to the adapter test)
+1. a call inside a method of `class AuthService` reports `enclosing === "AuthService"`.
+2. a call inside a named top-level function reports that function's name.
+3. a module-top-level call reports `undefined`.
+4. existing call assertions still hold.
+5. coverage ≥ 95%.
+
+## Forbidden
+Change no contract/other adapter/`index.ts`/`package.json`. Never minify.
+
+## References
+TSPEC-CE01 (identical algorithm); `packages/code-compiler/src/language/javascript.ts`; ADR-0016.
+
+## Done
+format:check · build · typecheck · the tests · PR `feat(tspec-ce07): javascript enclosing`.
+
+----------------------------------------------------------------------------------

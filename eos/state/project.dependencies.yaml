@@ -265,7 +265,8 @@ dependencies:
     depends_on:
       - "TSPEC-A007"
       - "TSPEC-I006"
-    blocks: []
+    blocks:
+      - "TSPEC-CE07"
   - id: "TSPEC-AD03"
     depends_on:
       - "TSPEC-A007"
@@ -277,7 +278,8 @@ dependencies:
     depends_on:
       - "TSPEC-A007"
       - "TSPEC-I006"
-    blocks: []
+    blocks:
+      - "TSPEC-CE04"
   - id: "TSPEC-AD05"
     depends_on:
       - "TSPEC-A007"
@@ -289,12 +291,14 @@ dependencies:
       - "TSPEC-A007"
       - "TSPEC-I006"
     blocks:
+      - "TSPEC-CE05"
       - "TSPEC-FX11"
   - id: "TSPEC-AD07"
     depends_on:
       - "TSPEC-A007"
       - "TSPEC-I006"
     blocks:
+      - "TSPEC-CE06"
       - "TSPEC-FX12"
   - id: "TSPEC-APP3"
     depends_on:
@@ -389,6 +393,22 @@ dependencies:
   - id: "TSPEC-CE03"
     depends_on:
       - "TSPEC-AD05"
+    blocks: []
+  - id: "TSPEC-CE04"
+    depends_on:
+      - "TSPEC-AD04"
+    blocks: []
+  - id: "TSPEC-CE05"
+    depends_on:
+      - "TSPEC-AD06"
+    blocks: []
+  - id: "TSPEC-CE06"
+    depends_on:
+      - "TSPEC-AD07"
+    blocks: []
+  - id: "TSPEC-CE07"
+    depends_on:
+      - "TSPEC-AD02"
     blocks: []
   - id: "TSPEC-E01"
     depends_on:

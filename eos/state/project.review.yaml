@@ -189,6 +189,18 @@ reviews:
   - id: "TSPEC-CE03"
     reviewers:
       - "ROLE_ARCHITECT"
+  - id: "TSPEC-CE04"
+    reviewers:
+      - "ROLE_ARCHITECT"
+  - id: "TSPEC-CE05"
+    reviewers:
+      - "ROLE_ARCHITECT"
+  - id: "TSPEC-CE06"
+    reviewers:
+      - "ROLE_ARCHITECT"
+  - id: "TSPEC-CE07"
+    reviewers:
+      - "ROLE_ARCHITECT"
   - id: "TSPEC-E01"
     reviewers:
       - "ROLE_ARCHITECT"

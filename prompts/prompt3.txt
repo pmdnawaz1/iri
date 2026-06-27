@@ -1,0 +1,69 @@
+================================================================================
+RIR IMPLEMENTER PROMPT 3 — TSPEC-CE06: csharp adapter: emit CallFact.enclosing
+Branch: feature/tspec-ce06-csharp-adapter-emit-callfact-enclosing
+Depends on: TSPEC-AD07 (already satisfied by the scaffold)
+Paste this ENTIRE file into a fresh session with your implementer model.
+================================================================================
+
+You are ROLE_IMPLEMENTER for the RIR repository. You implement exactly one TSPEC.
+
+Hard rules (from decision1.md):
+- Implement ONLY what the work order specifies. Make NO architectural decisions.
+- Do NOT change the Repository IR, Requirement IR, ontology, the compiler pipeline,
+  builder order, or any item in the work order's "Forbidden changes".
+- No TODOs, no placeholder code, no dead code. Deterministic output only.
+- Write REAL multi-line, formatted source. NEVER minify or strip newlines. CI runs
+  `prettier --check` and rejects single-line / unformatted files.
+- ADDITIVE ONLY: create only the new files the work order lists. Do NOT edit shared
+  files (barrels/registries/package.json) unless told to; import directly from file paths.
+- If anything is ambiguous or the work order seems wrong, STOP and report — do not guess.
+
+Workflow:
+1. Create the branch named in the header below (from `main`).
+2. Implement the deliverables in the listed files only.
+3. Write the tests from section 7 (acceptance criteria) and make them pass.
+4. Run: pnpm install && pnpm format && pnpm build && pnpm typecheck && pnpm test  — all must be green.
+5. Open a PR using .github/pull_request_template.md with commit message
+   `<type>(<tspec-id>): <summary>` (e.g. feat(tspec-i002): ir serializer and validator).
+
+Definition of done: build + typecheck + lint + the section-7 tests + coverage >= 95%.
+
+----- WORK ORDER -----------------------------------------------------------------
+
+# TSPEC-CE06 — C# adapter: emit CallFact.enclosing (Work Order)
+
+> Same shape as **TSPEC-CE01 (read it first)**. COLLISION-FREE: touches ONLY `csharp.ts`
+> and its test. Note: the C# adapter uses web-tree-sitter (WASM) with a top-level-await init.
+
+- **TSPEC:** TSPEC-CE06 · **Owner:** ROLE_IMPLEMENTER · **Depends on:** TSPEC-AD07 (COMPLETE) · **Wave:** 6
+
+## Objective
+Populate `CallFact.enclosing` in the C# adapter (nearest enclosing class) so CallPass can
+build the call graph.
+
+## Files (ADDITIVE-TO-ONE-FILE)
+- modify `packages/code-compiler/src/language/csharp.ts` (only the call extraction)
+- modify `tests/compiler/csharp-adapter.test.ts` (add the assertions)
+
+## Behavior (deltas from CE01 §4)
+Track `enclosing` down the recursive visit: a `class_declaration` (or
+`interface_declaration`) with a `name` field sets the child enclosing to that name; an
+`invocation_expression` gets the current enclosing. A call inside `AuthController.Login`
+reports `enclosing === "AuthController"`.
+
+## Acceptance (added to the adapter test)
+1. an `invocation_expression` inside a method of `class AuthService` reports `enclosing === "AuthService"`.
+2. a call not inside any class reports `undefined`.
+3. existing call assertions still hold.
+4. coverage ≥ 95%.
+
+## Forbidden
+Change no contract/other adapter/`index.ts`/`package.json`. Never minify.
+
+## References
+TSPEC-CE01; `packages/code-compiler/src/language/csharp.ts`; ADR-0016.
+
+## Done
+format:check · build · typecheck · the tests · PR `feat(tspec-ce06): csharp enclosing`.
+
+----------------------------------------------------------------------------------

@@ -1,0 +1,70 @@
+================================================================================
+RIR IMPLEMENTER PROMPT 2 — TSPEC-CE05: rust adapter: emit CallFact.enclosing
+Branch: feature/tspec-ce05-rust-adapter-emit-callfact-enclosing
+Depends on: TSPEC-AD06 (already satisfied by the scaffold)
+Paste this ENTIRE file into a fresh session with your implementer model.
+================================================================================
+
+You are ROLE_IMPLEMENTER for the RIR repository. You implement exactly one TSPEC.
+
+Hard rules (from decision1.md):
+- Implement ONLY what the work order specifies. Make NO architectural decisions.
+- Do NOT change the Repository IR, Requirement IR, ontology, the compiler pipeline,
+  builder order, or any item in the work order's "Forbidden changes".
+- No TODOs, no placeholder code, no dead code. Deterministic output only.
+- Write REAL multi-line, formatted source. NEVER minify or strip newlines. CI runs
+  `prettier --check` and rejects single-line / unformatted files.
+- ADDITIVE ONLY: create only the new files the work order lists. Do NOT edit shared
+  files (barrels/registries/package.json) unless told to; import directly from file paths.
+- If anything is ambiguous or the work order seems wrong, STOP and report — do not guess.
+
+Workflow:
+1. Create the branch named in the header below (from `main`).
+2. Implement the deliverables in the listed files only.
+3. Write the tests from section 7 (acceptance criteria) and make them pass.
+4. Run: pnpm install && pnpm format && pnpm build && pnpm typecheck && pnpm test  — all must be green.
+5. Open a PR using .github/pull_request_template.md with commit message
+   `<type>(<tspec-id>): <summary>` (e.g. feat(tspec-i002): ir serializer and validator).
+
+Definition of done: build + typecheck + lint + the section-7 tests + coverage >= 95%.
+
+----- WORK ORDER -----------------------------------------------------------------
+
+# TSPEC-CE05 — Rust adapter: emit CallFact.enclosing (Work Order)
+
+> Same shape as **TSPEC-CE01 (read it first)**. COLLISION-FREE: touches ONLY `rust.ts`
+> and its test.
+
+- **TSPEC:** TSPEC-CE05 · **Owner:** ROLE_IMPLEMENTER · **Depends on:** TSPEC-AD06 (COMPLETE) · **Wave:** 6
+
+## Objective
+Populate `CallFact.enclosing` in the Rust adapter so CallPass can build the call graph.
+
+## Files (ADDITIVE-TO-ONE-FILE)
+- modify `packages/code-compiler/src/language/rust.ts` (only the call extraction)
+- modify `tests/compiler/rust-adapter.test.ts` (add the assertions)
+
+## Behavior (deltas from CE01 §4)
+Track `enclosing` down the recursive visit. The "class" of a Rust method is the type its
+`impl_item` implements: an `impl_item` sets the child enclosing to its `type` field name
+(e.g. `impl AuthService { ... }` → enclosing `AuthService` for calls inside). A top-level
+`function_item` sets enclosing to its name when none is set. A `call_expression` gets the
+current enclosing.
+
+## Acceptance (added to the adapter test)
+1. a `call_expression` inside `impl AuthService { fn login() { ... } }` reports `enclosing === "AuthService"`.
+2. a call inside a top-level `fn main()` reports `"main"`.
+3. a call outside any function/impl reports `undefined`.
+4. existing call assertions still hold.
+5. coverage ≥ 95%.
+
+## Forbidden
+Change no contract/other adapter/`index.ts`/`package.json`. Never minify.
+
+## References
+TSPEC-CE01; `packages/code-compiler/src/language/rust.ts`; ADR-0016.
+
+## Done
+format:check · build · typecheck · the tests · PR `feat(tspec-ce05): rust enclosing`.
+
+----------------------------------------------------------------------------------

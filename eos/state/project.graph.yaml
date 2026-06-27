@@ -245,6 +245,22 @@ nodes:
     owner: "ROLE_IMPLEMENTER"
     wave: 6
     critical_path: false
+  - id: "TSPEC-CE04"
+    owner: "ROLE_IMPLEMENTER"
+    wave: 6
+    critical_path: false
+  - id: "TSPEC-CE05"
+    owner: "ROLE_IMPLEMENTER"
+    wave: 6
+    critical_path: false
+  - id: "TSPEC-CE06"
+    owner: "ROLE_IMPLEMENTER"
+    wave: 6
+    critical_path: false
+  - id: "TSPEC-CE07"
+    owner: "ROLE_IMPLEMENTER"
+    wave: 6
+    critical_path: false
   - id: "TSPEC-E01"
     owner: "ROLE_IMPLEMENTER"
     wave: 6
@@ -498,6 +514,14 @@ edges:
     to: "TSPEC-CE02"
   - from: "TSPEC-AD05"
     to: "TSPEC-CE03"
+  - from: "TSPEC-AD04"
+    to: "TSPEC-CE04"
+  - from: "TSPEC-AD06"
+    to: "TSPEC-CE05"
+  - from: "TSPEC-AD07"
+    to: "TSPEC-CE06"
+  - from: "TSPEC-AD02"
+    to: "TSPEC-CE07"
   - from: "TSPEC-A009"
     to: "TSPEC-E01"
   - from: "TSPEC-I003"
