@@ -66,16 +66,11 @@ function extractSymbols(root: Parser.SyntaxNode): SymbolFact[] {
 function extractImports(root: Parser.SyntaxNode): ImportFact[] {
   const imports: ImportFact[] = [];
   const visit = (node: Parser.SyntaxNode): void => {
-    if (node.type === "import_declaration") {
-      for (let i = 0; i < node.childCount; i++) {
-        const child = node.child(i);
-        if (child && child.type === "import_spec") {
-          const pathNode = child.childForFieldName("path");
-          if (pathNode) {
-            const specifier = pathNode.text.replace(/^["']|["']$/g, "");
-            imports.push({ specifier, imported: [], span: getSpan(child) });
-          }
-        }
+    if (node.type === "import_spec") {
+      const pathNode = node.childForFieldName("path");
+      if (pathNode) {
+        const specifier = pathNode.text.replace(/^["']|["']$/g, "");
+        imports.push({ specifier, imported: [], span: getSpan(node) });
       }
     }
     for (let i = 0; i < node.childCount; i++) {
