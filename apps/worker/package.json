@@ -10,8 +10,10 @@
     "start": "node --import tsx src/index.ts"
   },
   "dependencies": {
+    "@rir/common": "workspace:*",
+    "@rir/compiler": "workspace:^",
     "@rir/core": "workspace:*",
-    "@rir/storage": "workspace:*",
-    "@rir/common": "workspace:*"
+    "@rir/ir": "workspace:^",
+    "@rir/storage": "workspace:*"
   }
 }
