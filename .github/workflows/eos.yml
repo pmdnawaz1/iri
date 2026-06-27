@@ -33,7 +33,6 @@ jobs:
 
       - name: Lint
         run: pnpm lint
-        continue-on-error: true # enabled once TSPEC-CI lands an eslint config
 
       - name: Tests (unit / integration / golden)
         run: pnpm test

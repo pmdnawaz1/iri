@@ -13,6 +13,7 @@
     { "path": "../../packages/closure" },
     { "path": "../../packages/coverage" },
     { "path": "../../packages/consistency" },
-    { "path": "../../packages/query-engine" }
+    { "path": "../../packages/query-engine" },
+    { "path": "../worker" }
   ]
 }

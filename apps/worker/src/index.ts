@@ -43,7 +43,5 @@ export class Worker {
   }
 }
 
-if (import.meta.url === `file://${process.argv[1]}`) {
-  const logger = new ConsoleLogger("info");
-  logger.info("worker ready", { jobs: JOB_NAMES });
-}
+import { CompileRepository } from "./jobs/compile-repository.js";
+export { CompileRepository };
