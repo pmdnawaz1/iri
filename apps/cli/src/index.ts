@@ -130,12 +130,21 @@ async function main(rawArgv: readonly string[]): Promise<number> {
       return result.state === ClosureState.Closed ? 0 : 1;
     }
     case "compile": {
-      const dir = rest[0];
+      const dir = rest.find((a) => !a.startsWith("--"));
       if (!dir) {
-        process.stderr.write("usage: rir compile <dir>\n");
+        process.stderr.write("usage: rir compile <dir> [--json]\n");
         return 64;
       }
       const { ir, closure } = await compileRepository(dir);
+      if (rest.includes("--json")) {
+        // Full IR + closure for downstream analysis (e.g. ontology self-evolution).
+        const routes = ir.nodes.filter((n) => n.kind === "ROUTE").map((n) => n.name);
+        const mapped = new Set(ir.capabilities.map((c) => c.capability));
+        process.stdout.write(
+          JSON.stringify({ dir, ir, closure, routes, mappedCapabilities: [...mapped] }, null, 2) + "\n",
+        );
+        return 0;
+      }
       process.stdout.write(
         `Compiled ${dir}: ${ir.nodes.length} nodes, ${ir.edges.length} edges, ${ir.capabilities.length} capabilities\n`,
       );
