@@ -3,7 +3,7 @@
 id: "TSPEC-AD04"
 title: "java language adapter"
 owner: "ROLE_IMPLEMENTER"
-state: "DRAFT"
+state: "COMPLETE"
 package: "code-compiler"
 module: "language/java"
 repository_path: "packages/code-compiler"

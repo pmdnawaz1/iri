@@ -3,7 +3,7 @@
 id: "TSPEC-AD07"
 title: "csharp language adapter"
 owner: "ROLE_IMPLEMENTER"
-state: "DRAFT"
+state: "COMPLETE"
 package: "code-compiler"
 module: "language/csharp"
 repository_path: "packages/code-compiler"

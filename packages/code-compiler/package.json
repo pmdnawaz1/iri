@@ -14,6 +14,11 @@
     "@rir/common": "workspace:*",
     "typescript": "^5.7.2",
     "tree-sitter": "^0.22.4",
-    "tree-sitter-python": "0.21.0"
+    "tree-sitter-python": "0.21.0",
+    "tree-sitter-java": "^0.23.5",
+    "tree-sitter-go": "^0.23.3",
+    "tree-sitter-rust": "^0.23.0",
+    "tree-sitter-c-sharp": "^0.23.5",
+    "web-tree-sitter": "^0.26.9"
   }
 }

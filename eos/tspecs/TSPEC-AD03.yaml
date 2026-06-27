@@ -3,7 +3,7 @@
 id: "TSPEC-AD03"
 title: "python language adapter"
 owner: "ROLE_IMPLEMENTER"
-state: "DRAFT"
+state: "COMPLETE"
 package: "code-compiler"
 module: "language/python"
 repository_path: "packages/code-compiler"

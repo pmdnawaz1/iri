@@ -3,7 +3,7 @@
 id: "TSPEC-AD05"
 title: "go language adapter"
 owner: "ROLE_IMPLEMENTER"
-state: "DRAFT"
+state: "COMPLETE"
 package: "code-compiler"
 module: "language/go"
 repository_path: "packages/code-compiler"
