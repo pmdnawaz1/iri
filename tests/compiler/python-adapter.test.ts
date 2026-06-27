@@ -73,4 +73,44 @@ describe("PythonAdapter", () => {
     expect(result.artifact).toBeDefined();
     expect(result.artifact.hash).toBeTruthy();
   });
+
+  it("yields enclosing === 'AuthService' for calls inside its methods", () => {
+    const adapter = new PythonAdapter();
+    const result = adapter.parse("test.py", fixture, ctx);
+    const repoFindCall = result.calls.find((c) => c.callee.includes("self.repo.find"));
+    expect(repoFindCall).toBeDefined();
+    expect(repoFindCall!.enclosing).toBe("AuthService");
+  });
+
+  it("yields a function's name for calls inside top-level functions", () => {
+    const source = `
+def my_helper():
+    do_something()
+`;
+    const adapter = new PythonAdapter();
+    const result = adapter.parse("helper.py", source, ctx);
+    expect(result.calls.length).toBe(1);
+    expect(result.calls[0].callee).toBe("do_something");
+    expect(result.calls[0].enclosing).toBe("my_helper");
+  });
+
+  it("yields undefined enclosing for module top-level calls", () => {
+    const source = `
+init_app()
+
+class Foo:
+    def bar(self):
+        do_bar()
+`;
+    const adapter = new PythonAdapter();
+    const result = adapter.parse("top.py", source, ctx);
+    const initCall = result.calls.find((c) => c.callee === "init_app");
+    const barCall = result.calls.find((c) => c.callee === "do_bar");
+
+    expect(initCall).toBeDefined();
+    expect(initCall!.enclosing).toBeUndefined();
+
+    expect(barCall).toBeDefined();
+    expect(barCall!.enclosing).toBe("Foo");
+  });
 });
