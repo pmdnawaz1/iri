@@ -3,7 +3,7 @@
 id: "TSPEC-P15"
 title: "GitPass"
 owner: "ROLE_IMPLEMENTER"
-state: "DRAFT"
+state: "COMPLETE"
 package: "passes"
 module: "GitPass"
 repository_path: "packages/passes"

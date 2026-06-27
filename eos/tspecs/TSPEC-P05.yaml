@@ -3,7 +3,7 @@
 id: "TSPEC-P05"
 title: "SQLPass"
 owner: "ROLE_IMPLEMENTER"
-state: "DRAFT"
+state: "COMPLETE"
 package: "passes"
 module: "SQLPass"
 repository_path: "packages/passes"

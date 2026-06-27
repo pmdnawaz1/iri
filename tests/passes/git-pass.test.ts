@@ -1,92 +1,70 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect } from "vitest";
 import { DefaultIRDraft } from "@rir/builder-engine";
 import type { CompilationContext, NodeIR } from "@rir/core";
+import type { ArtifactIR } from "@rir/ir";
 import { makeId } from "@rir/common";
-import { GitPass } from "../../packages/passes/src/GitPass.js";
-import * as fs from "fs";
-import * as cp from "child_process";
+import { GitPass } from "../../packages/passes/src/GitPass";
 
-vi.mock("fs");
-vi.mock("child_process");
-
-const ctx: CompilationContext = {
-  repositoryRoot: "/mock/repo",
-  artifacts: [],
-  logger: {
-    debug() {},
-    info() {},
-    warn() {},
-    error() {},
-    child() {
-      return this;
-    },
+const logger = {
+  debug() {},
+  info() {},
+  warn() {},
+  error() {},
+  child() {
+    return this;
   },
 };
 
+const artifact: ArtifactIR = {
+  id: makeId("art", "src/app.ts"),
+  kind: "CODE",
+  path: "src/app.ts",
+  language: "typescript",
+  hash: "0",
+};
+
+const ctx: CompilationContext = { repositoryRoot: ".", artifacts: [artifact], parseResults: [], logger };
+
+function node(): NodeIR {
+  return {
+    id: makeId("decl", "App"),
+    kind: "CONTROLLER",
+    name: "App",
+    language: "typescript",
+    artifactId: artifact.id,
+    span: null,
+    hash: "0",
+    execution: { reachable: false, entryDistance: null, runtimeObserved: false, tested: false },
+    evidence: [{ source: "AST", locator: "src/app.ts", confidence: 1 }],
+  };
+}
+
 describe("GitPass", () => {
-  beforeEach(() => {
-    vi.resetAllMocks();
+  it("attaches a GIT evidence entry from the injected runner", () => {
+    const draft = new DefaultIRDraft();
+    draft.addNode(node());
+    new GitPass(() => "abc123").run(ctx, draft);
+    const n = draft.getNodes().find((x) => x.name === "App")!;
+    const git = n.evidence.find((e) => e.source === "GIT");
+    expect(git).toBeDefined();
+    expect(git!.locator).toBe("abc123");
   });
 
-  it("skips if .git directory is missing", async () => {
-    vi.mocked(fs.existsSync).mockReturnValue(false);
-
+  it("leaves evidence unchanged when the runner returns null", () => {
     const draft = new DefaultIRDraft();
-    await new GitPass().run(ctx, draft);
-
-    expect(cp.execSync).not.toHaveBeenCalled();
+    draft.addNode(node());
+    new GitPass(() => null).run(ctx, draft);
+    const n = draft.getNodes().find((x) => x.name === "App")!;
+    expect(n.evidence.length).toBe(1);
   });
 
-  it("executes git log and enriches matching nodes with GIT_HISTORY evidence", async () => {
-    vi.mocked(fs.existsSync).mockReturnValue(true);
-
-    const mockGitLog = `abcd123 initial commit
-src/app.ts
-src/utils.ts
-`;
-    vi.mocked(cp.execSync).mockReturnValue(mockGitLog as any);
-
+  it("does not duplicate the GIT evidence on re-run", () => {
     const draft = new DefaultIRDraft();
-
-    // Seed a node that matches src/app.ts
-    const appNode: NodeIR = {
-      id: makeId("decl", "App"),
-      kind: "CONTROLLER",
-      name: "App",
-      language: "typescript",
-      artifactId: "artifact|src/app.ts",
-      span: { startLine: 1, startColumn: 0, endLine: 1, endColumn: 0 },
-      hash: "0",
-      execution: "DEFAULT",
-      evidence: [{ source: "AST", locator: "src/app.ts", confidence: 1 }],
-    };
-    draft.addNode(appNode);
-
-    // Seed a node that does NOT match
-    const otherNode: NodeIR = {
-      id: makeId("decl", "Other"),
-      kind: "CONTROLLER",
-      name: "Other",
-      language: "typescript",
-      artifactId: "artifact|src/other.ts",
-      span: { startLine: 1, startColumn: 0, endLine: 1, endColumn: 0 },
-      hash: "0",
-      execution: "DEFAULT",
-      evidence: [{ source: "AST", locator: "src/other.ts", confidence: 1 }],
-    };
-    draft.addNode(otherNode);
-
-    await new GitPass().run(ctx, draft);
-
-    const nodes = draft.getNodes();
-
-    const finalAppNode = nodes.find((n) => n.name === "App")!;
-    expect(finalAppNode.evidence.length).toBe(2);
-    expect(finalAppNode.evidence[1].source).toBe("GIT_HISTORY");
-    expect(finalAppNode.evidence[1].confidence).toBe(0.8);
-    expect(finalAppNode.evidence[1].locator).toBe("src/app.ts");
-
-    const finalOtherNode = nodes.find((n) => n.name === "Other")!;
-    expect(finalOtherNode.evidence.length).toBe(1);
+    draft.addNode(node());
+    const pass = new GitPass(() => "abc123");
+    pass.run(ctx, draft);
+    pass.run(ctx, draft);
+    const n = draft.getNodes().find((x) => x.name === "App")!;
+    expect(n.evidence.filter((e) => e.source === "GIT").length).toBe(1);
   });
 });

@@ -3,7 +3,7 @@
 id: "TSPEC-CI01"
 title: "CI/CD gates workflow"
 owner: "ROLE_IMPLEMENTER"
-state: "DRAFT"
+state: "COMPLETE"
 package: "ci"
 module: "github-actions"
 repository_path: ".github"

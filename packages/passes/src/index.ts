@@ -20,3 +20,7 @@ export { RoutePass } from "./RoutePass.js";
 export { DependencyPass } from "./DependencyPass.js";
 export { CapabilityPass } from "./CapabilityPass.js";
 export { ReachabilityPass } from "./ReachabilityPass.js";
+export { ComponentPass } from "./ComponentPass.js";
+export { SQLPass } from "./SQLPass.js";
+export { EventPass } from "./EventPass.js";
+export { GitPass, type GitRunner } from "./GitPass.js";

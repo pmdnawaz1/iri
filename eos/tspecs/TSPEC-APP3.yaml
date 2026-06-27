@@ -3,7 +3,7 @@
 id: "TSPEC-APP3"
 title: "Worker"
 owner: "ROLE_IMPLEMENTER"
-state: "DRAFT"
+state: "COMPLETE"
 package: "worker"
 module: "app"
 repository_path: "apps/worker"

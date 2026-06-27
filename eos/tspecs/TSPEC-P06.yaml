@@ -3,7 +3,7 @@
 id: "TSPEC-P06"
 title: "EventPass"
 owner: "ROLE_IMPLEMENTER"
-state: "DRAFT"
+state: "COMPLETE"
 package: "passes"
 module: "EventPass"
 repository_path: "packages/passes"

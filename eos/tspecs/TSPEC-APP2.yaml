@@ -3,7 +3,7 @@
 id: "TSPEC-APP2"
 title: "Compiler API"
 owner: "ROLE_IMPLEMENTER"
-state: "DRAFT"
+state: "COMPLETE"
 package: "compiler-api"
 module: "app"
 repository_path: "apps/compiler-api"

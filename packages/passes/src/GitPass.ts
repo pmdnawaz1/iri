@@ -1,65 +1,48 @@
 import { AbstractPass } from "./base.js";
 import type { CompilationContext, IRDraft } from "@rir/core";
-import { execSync } from "child_process";
-import * as fs from "fs";
-import * as path from "path";
+import { execFileSync } from "node:child_process";
+import { dirname } from "node:path";
 
+/** Resolve the last-commit sha for a file, or null. Injectable for testing. */
+export type GitRunner = (filePath: string) => string | null;
+
+function defaultRunner(filePath: string): string | null {
+  try {
+    const sha = execFileSync("git", ["log", "-1", "--format=%H", "--", filePath], {
+      cwd: dirname(filePath),
+      encoding: "utf-8",
+      stdio: ["ignore", "pipe", "ignore"],
+    }).trim();
+    return sha || null;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * GitPass — attaches GIT provenance evidence to nodes from the git history of their
+ * source file. Deterministic given the injected runner; not in the default pipeline.
+ * Per TSPEC-P15 / ADR-0016.
+ */
 export class GitPass extends AbstractPass {
   readonly name = "GitPass";
 
-  async run(ctx: CompilationContext, draft: IRDraft): Promise<void> {
-    const gitDir = path.join(ctx.repositoryRoot, ".git");
-    if (!fs.existsSync(gitDir)) {
-      ctx.logger.debug("no .git directory found, skipping GitPass");
-      return;
-    }
+  constructor(private readonly runGit: GitRunner = defaultRunner) {
+    super();
+  }
 
-    let output: string;
-    try {
-      output = execSync("git log -n 50 --name-only --oneline", {
-        cwd: ctx.repositoryRoot,
-        encoding: "utf-8",
-        stdio: ["ignore", "pipe", "ignore"],
-      });
-    } catch (e) {
-      ctx.logger.debug("git log failed, skipping GitPass");
-      return;
-    }
-
-    const changedFiles = new Set<string>();
-    for (const line of output.split("\n")) {
-      const trimmed = line.trim();
-      if (!trimmed) continue;
-      changedFiles.add(trimmed);
-    }
-
-    // Now find all nodes in the draft whose artifactId matches one of the changed files.
+  run(ctx: CompilationContext, draft: IRDraft): void {
+    const pathByArtifact = new Map(ctx.artifacts.map((a) => [a.id, a.path]));
     for (const node of draft.getNodes()) {
-      if (!node.artifactId) continue;
-
-      // artifactId format is typically "artifact|<path>" or similar.
-      // We can check if any changed file matches the locator or artifact path.
-      // Let's extract the path from the artifactId.
-      const prefix = "artifact|";
-      if (node.artifactId.startsWith(prefix)) {
-        const filePath = node.artifactId.slice(prefix.length);
-        // git log uses forward slashes.
-        const normalizedPath = filePath.replace(/\\/g, "/");
-        if (changedFiles.has(normalizedPath)) {
-          // Reassign evidence to bypass readonly constraints
-          draft.addNode({
-            ...node,
-            evidence: [
-              ...node.evidence,
-              {
-                source: "GIT_HISTORY",
-                locator: normalizedPath,
-                confidence: 0.8,
-              } as any,
-            ],
-          });
-        }
-      }
+      const filePath = pathByArtifact.get(node.artifactId);
+      if (!filePath) continue;
+      const sha = this.runGit(filePath);
+      if (!sha) continue;
+      if (node.evidence.some((e) => e.source === "GIT" && e.locator === sha)) continue;
+      draft.addNode({
+        ...node,
+        evidence: [...node.evidence, { source: "GIT", locator: sha, confidence: 1 }],
+      });
     }
   }
 }

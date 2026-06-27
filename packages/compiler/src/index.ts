@@ -27,10 +27,13 @@ import { BuilderEngine } from "@rir/builder-engine";
 import {
   CallPass,
   CapabilityPass,
+  ComponentPass,
   DependencyPass,
+  EventPass,
   ImportPass,
   ReachabilityPass,
   RoutePass,
+  SQLPass,
 } from "@rir/passes";
 import { DefaultClosureEngine, type ClosureResult } from "@rir/closure";
 import type { Builder, CompilationContext, Pass } from "@rir/core";
@@ -74,6 +77,9 @@ export class PipelineBuilder implements Builder {
       new ImportPass(),
       new CallPass(),
       new RoutePass(),
+      new ComponentPass(),
+      new SQLPass(),
+      new EventPass(),
       new DependencyPass(),
       new CapabilityPass(),
       new ReachabilityPass(),

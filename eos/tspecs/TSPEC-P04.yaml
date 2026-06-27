@@ -3,7 +3,7 @@
 id: "TSPEC-P04"
 title: "ComponentPass"
 owner: "ROLE_IMPLEMENTER"
-state: "DRAFT"
+state: "COMPLETE"
 package: "passes"
 module: "ComponentPass"
 repository_path: "packages/passes"
