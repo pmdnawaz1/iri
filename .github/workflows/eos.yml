@@ -1,0 +1,52 @@
+# EOS CI/CD gates. Every PR must pass all gates. No bypass.
+name: eos
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  gates:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install
+        run: pnpm install --frozen-lockfile
+
+      - name: Build (tsc -b)
+        run: pnpm build
+
+      - name: Typecheck
+        run: pnpm typecheck
+
+      - name: Lint
+        run: pnpm lint
+        continue-on-error: true # enabled once TSPEC-CI lands an eslint config
+
+      - name: Tests (unit / integration / golden)
+        run: pnpm test
+
+      - name: Project Compiler (Project IR validator)
+        run: pnpm eos:compile
+
+      - name: Generated artifacts up to date (determinism gate)
+        run: |
+          git diff --exit-code -- eos/tspecs eos/state \
+            || (echo "::error::eos artifacts are stale — run 'pnpm eos:compile' and commit" && exit 1)
+
+      - name: Architecture lock validator
+        run: |
+          # Block protected-artifact changes that lack a ROLE_ARCHITECT TSPEC.
+          # Implemented in TSPEC-CI01; placeholder gate keeps the contract visible.
+          echo "architecture-lock: see eos/state/project.lock.yaml"

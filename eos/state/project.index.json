@@ -1,0 +1,4598 @@
+{
+  "version": "1.0.0",
+  "generated_at": "2026-06-27T00:00:00Z",
+  "count": 72,
+  "tspecs": [
+    {
+      "priority": "P0",
+      "complexity": "HIGH",
+      "risk": "HIGH",
+      "estimated_effort": 5,
+      "depends_on": [],
+      "references": [
+        "https://llvm.org/docs/WritingAnLLVMNewPMPass.html",
+        "https://json-schema.org/specification"
+      ],
+      "architecture_documents": [
+        "docs/ADR-0001-repository-ir.md",
+        "requirement.md",
+        "decision2.md"
+      ],
+      "deliverables": [
+        "NodeIR/EdgeIR/ArtifactIR/CapabilityIR/EvidenceIR schemas",
+        "docs/ADR-0001-repository-ir.md"
+      ],
+      "outputs": [
+        "@rir/ir"
+      ],
+      "tests": [
+        "ADR review",
+        "schema golden test"
+      ],
+      "acceptance_criteria": [
+        "ADR accepted",
+        "No ambiguity remains",
+        "Versioned"
+      ],
+      "forbidden_changes": [
+        "Implementation code beyond reference snippets",
+        "CRUD / boilerplate"
+      ],
+      "labels": [
+        "architecture",
+        "ir"
+      ],
+      "id": "TSPEC-A001",
+      "title": "Repository IR v1",
+      "owner": "ROLE_ARCHITECT",
+      "package": "ir",
+      "module": "schema",
+      "state": "DRAFT",
+      "repository_path": "packages/ir",
+      "branch": "feature/tspec-a001-repository-ir-v1",
+      "parent_branch": "main",
+      "blocks": [
+        "TSPEC-A002",
+        "TSPEC-A003",
+        "TSPEC-A004",
+        "TSPEC-A005",
+        "TSPEC-A012",
+        "TSPEC-A015",
+        "TSPEC-I002"
+      ],
+      "reviewers": [
+        "ROLE_ARCHITECT"
+      ],
+      "version": "1.0.0",
+      "created_at": "2026-06-27T00:00:00Z",
+      "updated_at": "2026-06-27T00:00:00Z",
+      "wave": 0,
+      "critical_path": true,
+      "parallel_group": "wave-0"
+    },
+    {
+      "priority": "P0",
+      "complexity": "MEDIUM",
+      "risk": "HIGH",
+      "estimated_effort": 4,
+      "depends_on": [
+        "TSPEC-A001"
+      ],
+      "references": [],
+      "architecture_documents": [
+        "repo_structure.md",
+        "requirement.md",
+        "decision2.md"
+      ],
+      "deliverables": [
+        "RequirementIR / RequirementSet schema"
+      ],
+      "outputs": [
+        "@rir/ir"
+      ],
+      "tests": [
+        "ADR review",
+        "schema golden test"
+      ],
+      "acceptance_criteria": [
+        "ADR accepted",
+        "No ambiguity remains",
+        "Versioned"
+      ],
+      "forbidden_changes": [
+        "Implementation code beyond reference snippets",
+        "CRUD / boilerplate"
+      ],
+      "labels": [
+        "architecture",
+        "ir"
+      ],
+      "id": "TSPEC-A002",
+      "title": "Requirement IR",
+      "owner": "ROLE_ARCHITECT",
+      "package": "ir",
+      "module": "requirement",
+      "state": "DRAFT",
+      "repository_path": "packages/ir",
+      "branch": "feature/tspec-a002-requirement-ir",
+      "parent_branch": "main",
+      "blocks": [
+        "TSPEC-A008",
+        "TSPEC-I002"
+      ],
+      "reviewers": [
+        "ROLE_ARCHITECT"
+      ],
+      "version": "1.0.0",
+      "created_at": "2026-06-27T00:00:00Z",
+      "updated_at": "2026-06-27T00:00:00Z",
+      "wave": 1,
+      "critical_path": false,
+      "parallel_group": "wave-1"
+    },
+    {
+      "priority": "P0",
+      "complexity": "HIGH",
+      "risk": "HIGH",
+      "estimated_effort": 5,
+      "depends_on": [
+        "TSPEC-A001"
+      ],
+      "references": [
+        "https://schema.org/",
+        "https://www.w3.org/RDF/"
+      ],
+      "architecture_documents": [
+        "repo_structure.md",
+        "requirement.md",
+        "decision2.md"
+      ],
+      "deliverables": [
+        "Feature/Capability/Constraint definitions",
+        "AUTH fully specified"
+      ],
+      "outputs": [
+        "@rir/ontology"
+      ],
+      "tests": [
+        "ADR review",
+        "schema golden test"
+      ],
+      "acceptance_criteria": [
+        "ADR accepted",
+        "No ambiguity remains",
+        "Versioned"
+      ],
+      "forbidden_changes": [
+        "Implementation code beyond reference snippets",
+        "CRUD / boilerplate"
+      ],
+      "labels": [
+        "architecture",
+        "ontology"
+      ],
+      "id": "TSPEC-A003",
+      "title": "Capability Ontology",
+      "owner": "ROLE_ARCHITECT",
+      "package": "ontology",
+      "module": "ontology",
+      "state": "DRAFT",
+      "repository_path": "packages/ontology",
+      "branch": "feature/tspec-a003-capability-ontology",
+      "parent_branch": "main",
+      "blocks": [
+        "TSPEC-A008",
+        "TSPEC-A009",
+        "TSPEC-A010",
+        "TSPEC-A011",
+        "TSPEC-I007",
+        "TSPEC-SC02"
+      ],
+      "reviewers": [
+        "ROLE_ARCHITECT"
+      ],
+      "version": "1.0.0",
+      "created_at": "2026-06-27T00:00:00Z",
+      "updated_at": "2026-06-27T00:00:00Z",
+      "wave": 1,
+      "critical_path": false,
+      "parallel_group": "wave-1"
+    },
+    {
+      "priority": "P1",
+      "complexity": "MEDIUM",
+      "risk": "MEDIUM",
+      "estimated_effort": 3,
+      "depends_on": [
+        "TSPEC-A001"
+      ],
+      "references": [
+        "https://en.wikipedia.org/wiki/Tarjan%27s_strongly_connected_components_algorithm",
+        "https://graphology.github.io/"
+      ],
+      "architecture_documents": [
+        "repo_structure.md",
+        "requirement.md",
+        "decision2.md"
+      ],
+      "deliverables": [
+        "Node/edge traversal & reachability semantics"
+      ],
+      "outputs": [],
+      "tests": [
+        "ADR review",
+        "schema golden test"
+      ],
+      "acceptance_criteria": [
+        "ADR accepted",
+        "No ambiguity remains",
+        "Versioned"
+      ],
+      "forbidden_changes": [
+        "Implementation code beyond reference snippets",
+        "CRUD / boilerplate"
+      ],
+      "labels": [
+        "architecture",
+        "graph"
+      ],
+      "id": "TSPEC-A004",
+      "title": "Graph Semantics",
+      "owner": "ROLE_ARCHITECT",
+      "package": "graph",
+      "module": "semantics",
+      "state": "DRAFT",
+      "repository_path": "packages/graph",
+      "branch": "feature/tspec-a004-graph-semantics",
+      "parent_branch": "main",
+      "blocks": [
+        "TSPEC-A009",
+        "TSPEC-A013",
+        "TSPEC-I003"
+      ],
+      "reviewers": [
+        "ROLE_ARCHITECT"
+      ],
+      "version": "1.0.0",
+      "created_at": "2026-06-27T00:00:00Z",
+      "updated_at": "2026-06-27T00:00:00Z",
+      "wave": 1,
+      "critical_path": false,
+      "parallel_group": "wave-1"
+    },
+    {
+      "priority": "P0",
+      "complexity": "HIGH",
+      "risk": "HIGH",
+      "estimated_effort": 5,
+      "depends_on": [
+        "TSPEC-A001"
+      ],
+      "references": [
+        "https://llvm.org/docs/WritingAnLLVMNewPMPass.html"
+      ],
+      "architecture_documents": [
+        "repo_structure.md",
+        "requirement.md",
+        "decision2.md"
+      ],
+      "deliverables": [
+        "Compiler/Builder/Pass/IRDraft interfaces",
+        "PluginRegistry ordering"
+      ],
+      "outputs": [
+        "@rir/core"
+      ],
+      "tests": [
+        "ADR review",
+        "schema golden test"
+      ],
+      "acceptance_criteria": [
+        "ADR accepted",
+        "No ambiguity remains",
+        "Versioned"
+      ],
+      "forbidden_changes": [
+        "Implementation code beyond reference snippets",
+        "CRUD / boilerplate"
+      ],
+      "labels": [
+        "architecture",
+        "core"
+      ],
+      "id": "TSPEC-A005",
+      "title": "Compiler Pipeline & Builder Contracts",
+      "owner": "ROLE_ARCHITECT",
+      "package": "core",
+      "module": "pipeline",
+      "state": "DRAFT",
+      "repository_path": "packages/core",
+      "branch": "feature/tspec-a005-compiler-pipeline-builder-contracts",
+      "parent_branch": "main",
+      "blocks": [
+        "TSPEC-A006",
+        "TSPEC-A007",
+        "TSPEC-I001",
+        "TSPEC-I005",
+        "TSPEC-I006"
+      ],
+      "reviewers": [
+        "ROLE_ARCHITECT"
+      ],
+      "version": "1.0.0",
+      "created_at": "2026-06-27T00:00:00Z",
+      "updated_at": "2026-06-27T00:00:00Z",
+      "wave": 1,
+      "critical_path": true,
+      "parallel_group": "wave-1"
+    },
+    {
+      "priority": "P1",
+      "complexity": "MEDIUM",
+      "risk": "MEDIUM",
+      "estimated_effort": 3,
+      "depends_on": [
+        "TSPEC-A001"
+      ],
+      "references": [
+        "https://github.com/WiseLibs/better-sqlite3",
+        "https://kysely.dev/docs/intro"
+      ],
+      "architecture_documents": [
+        "repo_structure.md",
+        "requirement.md",
+        "decision2.md"
+      ],
+      "deliverables": [
+        "Canonical SQLite DDL",
+        "Storage interface"
+      ],
+      "outputs": [],
+      "tests": [
+        "ADR review",
+        "schema golden test"
+      ],
+      "acceptance_criteria": [
+        "ADR accepted",
+        "No ambiguity remains",
+        "Versioned"
+      ],
+      "forbidden_changes": [
+        "Implementation code beyond reference snippets",
+        "CRUD / boilerplate"
+      ],
+      "labels": [
+        "architecture",
+        "storage"
+      ],
+      "id": "TSPEC-A012",
+      "title": "Storage Schema",
+      "owner": "ROLE_ARCHITECT",
+      "package": "storage",
+      "module": "schema",
+      "state": "DRAFT",
+      "repository_path": "packages/storage",
+      "branch": "feature/tspec-a012-storage-schema",
+      "parent_branch": "main",
+      "blocks": [
+        "TSPEC-I004"
+      ],
+      "reviewers": [
+        "ROLE_ARCHITECT"
+      ],
+      "version": "1.0.0",
+      "created_at": "2026-06-27T00:00:00Z",
+      "updated_at": "2026-06-27T00:00:00Z",
+      "wave": 1,
+      "critical_path": false,
+      "parallel_group": "wave-1"
+    },
+    {
+      "priority": "P3",
+      "complexity": "MEDIUM",
+      "risk": "MEDIUM",
+      "estimated_effort": 2,
+      "depends_on": [
+        "TSPEC-A001"
+      ],
+      "references": [
+        "https://opentelemetry.io/docs/"
+      ],
+      "architecture_documents": [
+        "repo_structure.md",
+        "requirement.md",
+        "decision2.md"
+      ],
+      "deliverables": [
+        "RuntimeTrace -> EvidenceIR mapping"
+      ],
+      "outputs": [],
+      "tests": [
+        "ADR review",
+        "schema golden test"
+      ],
+      "acceptance_criteria": [
+        "ADR accepted",
+        "No ambiguity remains",
+        "Versioned"
+      ],
+      "forbidden_changes": [
+        "Implementation code beyond reference snippets",
+        "CRUD / boilerplate"
+      ],
+      "labels": [
+        "architecture",
+        "telemetry"
+      ],
+      "id": "TSPEC-A015",
+      "title": "Telemetry Evidence Model",
+      "owner": "ROLE_ARCHITECT",
+      "package": "telemetry",
+      "module": "model",
+      "state": "DRAFT",
+      "repository_path": "packages/telemetry",
+      "branch": "feature/tspec-a015-telemetry-evidence-model",
+      "parent_branch": "main",
+      "blocks": [
+        "TSPEC-E06"
+      ],
+      "reviewers": [
+        "ROLE_ARCHITECT"
+      ],
+      "version": "1.0.0",
+      "created_at": "2026-06-27T00:00:00Z",
+      "updated_at": "2026-06-27T00:00:00Z",
+      "wave": 1,
+      "critical_path": false,
+      "parallel_group": "wave-1"
+    },
+    {
+      "priority": "P1",
+      "complexity": "MEDIUM",
+      "risk": "MEDIUM",
+      "estimated_effort": 3,
+      "depends_on": [
+        "TSPEC-A005"
+      ],
+      "references": [],
+      "architecture_documents": [
+        "repo_structure.md",
+        "requirement.md",
+        "decision2.md"
+      ],
+      "deliverables": [
+        "Canonical pass names + fixed priorities"
+      ],
+      "outputs": [],
+      "tests": [
+        "ADR review",
+        "schema golden test"
+      ],
+      "acceptance_criteria": [
+        "ADR accepted",
+        "No ambiguity remains",
+        "Versioned"
+      ],
+      "forbidden_changes": [
+        "Implementation code beyond reference snippets",
+        "CRUD / boilerplate"
+      ],
+      "labels": [
+        "architecture",
+        "passes"
+      ],
+      "id": "TSPEC-A006",
+      "title": "Pass Roster & Ordering",
+      "owner": "ROLE_ARCHITECT",
+      "package": "passes",
+      "module": "roster",
+      "state": "DRAFT",
+      "repository_path": "packages/passes",
+      "branch": "feature/tspec-a006-pass-roster-ordering",
+      "parent_branch": "main",
+      "blocks": [
+        "TSPEC-I006",
+        "TSPEC-P01",
+        "TSPEC-P02",
+        "TSPEC-P03",
+        "TSPEC-P04",
+        "TSPEC-P05",
+        "TSPEC-P06",
+        "TSPEC-P07",
+        "TSPEC-P08",
+        "TSPEC-P09",
+        "TSPEC-P10",
+        "TSPEC-P11",
+        "TSPEC-P12",
+        "TSPEC-P13",
+        "TSPEC-P14",
+        "TSPEC-P15"
+      ],
+      "reviewers": [
+        "ROLE_ARCHITECT"
+      ],
+      "version": "1.0.0",
+      "created_at": "2026-06-27T00:00:00Z",
+      "updated_at": "2026-06-27T00:00:00Z",
+      "wave": 2,
+      "critical_path": false,
+      "parallel_group": "wave-2"
+    },
+    {
+      "priority": "P1",
+      "complexity": "MEDIUM",
+      "risk": "MEDIUM",
+      "estimated_effort": 3,
+      "depends_on": [
+        "TSPEC-A005"
+      ],
+      "references": [
+        "https://tree-sitter.github.io/tree-sitter/",
+        "https://ast-grep.github.io/"
+      ],
+      "architecture_documents": [
+        "repo_structure.md",
+        "requirement.md",
+        "decision2.md"
+      ],
+      "deliverables": [
+        "LanguageAdapter interface (parse/symbols/imports/exports/calls/routes)"
+      ],
+      "outputs": [],
+      "tests": [
+        "ADR review",
+        "schema golden test"
+      ],
+      "acceptance_criteria": [
+        "ADR accepted",
+        "No ambiguity remains",
+        "Versioned"
+      ],
+      "forbidden_changes": [
+        "Implementation code beyond reference snippets",
+        "CRUD / boilerplate"
+      ],
+      "labels": [
+        "architecture",
+        "code-compiler"
+      ],
+      "id": "TSPEC-A007",
+      "title": "Language Adapter Contract",
+      "owner": "ROLE_ARCHITECT",
+      "package": "code-compiler",
+      "module": "contract",
+      "state": "DRAFT",
+      "repository_path": "packages/code-compiler",
+      "branch": "feature/tspec-a007-language-adapter-contract",
+      "parent_branch": "main",
+      "blocks": [
+        "TSPEC-AD01",
+        "TSPEC-AD02",
+        "TSPEC-AD03",
+        "TSPEC-AD04",
+        "TSPEC-AD05",
+        "TSPEC-AD06",
+        "TSPEC-AD07"
+      ],
+      "reviewers": [
+        "ROLE_ARCHITECT"
+      ],
+      "version": "1.0.0",
+      "created_at": "2026-06-27T00:00:00Z",
+      "updated_at": "2026-06-27T00:00:00Z",
+      "wave": 2,
+      "critical_path": false,
+      "parallel_group": "wave-2"
+    },
+    {
+      "priority": "P1",
+      "complexity": "MEDIUM",
+      "risk": "HIGH",
+      "estimated_effort": 4,
+      "depends_on": [
+        "TSPEC-A002",
+        "TSPEC-A003"
+      ],
+      "references": [
+        "https://github.com/remarkjs/remark"
+      ],
+      "architecture_documents": [
+        "repo_structure.md",
+        "requirement.md",
+        "decision2.md"
+      ],
+      "deliverables": [
+        "statement->assertion->Requirement IR normalization rules"
+      ],
+      "outputs": [],
+      "tests": [
+        "ADR review",
+        "schema golden test"
+      ],
+      "acceptance_criteria": [
+        "ADR accepted",
+        "No ambiguity remains",
+        "Versioned"
+      ],
+      "forbidden_changes": [
+        "Implementation code beyond reference snippets",
+        "CRUD / boilerplate"
+      ],
+      "labels": [
+        "architecture",
+        "document-compiler"
+      ],
+      "id": "TSPEC-A008",
+      "title": "Document Compiler Semantics",
+      "owner": "ROLE_ARCHITECT",
+      "package": "document-compiler",
+      "module": "semantics",
+      "state": "DRAFT",
+      "repository_path": "packages/document-compiler",
+      "branch": "feature/tspec-a008-document-compiler-semantics",
+      "parent_branch": "main",
+      "blocks": [
+        "TSPEC-DF01",
+        "TSPEC-DF02",
+        "TSPEC-DF03",
+        "TSPEC-DF04",
+        "TSPEC-DF05",
+        "TSPEC-DF06"
+      ],
+      "reviewers": [
+        "ROLE_ARCHITECT"
+      ],
+      "version": "1.0.0",
+      "created_at": "2026-06-27T00:00:00Z",
+      "updated_at": "2026-06-27T00:00:00Z",
+      "wave": 2,
+      "critical_path": false,
+      "parallel_group": "wave-2"
+    },
+    {
+      "priority": "P0",
+      "complexity": "HIGH",
+      "risk": "HIGH",
+      "estimated_effort": 5,
+      "depends_on": [
+        "TSPEC-A003",
+        "TSPEC-A004"
+      ],
+      "references": [],
+      "architecture_documents": [
+        "docs/ADR-0002-execution-closure.md",
+        "decision2.md"
+      ],
+      "deliverables": [
+        "Stage mapping + closure classification rules",
+        "docs/ADR-0002-execution-closure.md"
+      ],
+      "outputs": [],
+      "tests": [
+        "ADR review",
+        "schema golden test"
+      ],
+      "acceptance_criteria": [
+        "ADR accepted",
+        "No ambiguity remains",
+        "Versioned"
+      ],
+      "forbidden_changes": [
+        "Implementation code beyond reference snippets",
+        "CRUD / boilerplate"
+      ],
+      "labels": [
+        "architecture",
+        "closure"
+      ],
+      "id": "TSPEC-A009",
+      "title": "Execution Closure Algorithm",
+      "owner": "ROLE_ARCHITECT",
+      "package": "closure",
+      "module": "algorithm",
+      "state": "DRAFT",
+      "repository_path": "packages/closure",
+      "branch": "feature/tspec-a009-execution-closure-algorithm",
+      "parent_branch": "main",
+      "blocks": [
+        "TSPEC-E01"
+      ],
+      "reviewers": [
+        "ROLE_ARCHITECT"
+      ],
+      "version": "1.0.0",
+      "created_at": "2026-06-27T00:00:00Z",
+      "updated_at": "2026-06-27T00:00:00Z",
+      "wave": 2,
+      "critical_path": false,
+      "parallel_group": "wave-2"
+    },
+    {
+      "priority": "P1",
+      "complexity": "MEDIUM",
+      "risk": "MEDIUM",
+      "estimated_effort": 3,
+      "depends_on": [
+        "TSPEC-A003"
+      ],
+      "references": [],
+      "architecture_documents": [
+        "repo_structure.md",
+        "requirement.md",
+        "decision2.md"
+      ],
+      "deliverables": [
+        "Coverage dimension definitions"
+      ],
+      "outputs": [],
+      "tests": [
+        "ADR review",
+        "schema golden test"
+      ],
+      "acceptance_criteria": [
+        "ADR accepted",
+        "No ambiguity remains",
+        "Versioned"
+      ],
+      "forbidden_changes": [
+        "Implementation code beyond reference snippets",
+        "CRUD / boilerplate"
+      ],
+      "labels": [
+        "architecture",
+        "coverage"
+      ],
+      "id": "TSPEC-A010",
+      "title": "Coverage Rules",
+      "owner": "ROLE_ARCHITECT",
+      "package": "coverage",
+      "module": "rules",
+      "state": "DRAFT",
+      "repository_path": "packages/coverage",
+      "branch": "feature/tspec-a010-coverage-rules",
+      "parent_branch": "main",
+      "blocks": [
+        "TSPEC-E02"
+      ],
+      "reviewers": [
+        "ROLE_ARCHITECT"
+      ],
+      "version": "1.0.0",
+      "created_at": "2026-06-27T00:00:00Z",
+      "updated_at": "2026-06-27T00:00:00Z",
+      "wave": 2,
+      "critical_path": false,
+      "parallel_group": "wave-2"
+    },
+    {
+      "priority": "P1",
+      "complexity": "MEDIUM",
+      "risk": "MEDIUM",
+      "estimated_effort": 3,
+      "depends_on": [
+        "TSPEC-A003"
+      ],
+      "references": [],
+      "architecture_documents": [
+        "repo_structure.md",
+        "requirement.md",
+        "decision2.md"
+      ],
+      "deliverables": [
+        "Finding codes + severity model"
+      ],
+      "outputs": [],
+      "tests": [
+        "ADR review",
+        "schema golden test"
+      ],
+      "acceptance_criteria": [
+        "ADR accepted",
+        "No ambiguity remains",
+        "Versioned"
+      ],
+      "forbidden_changes": [
+        "Implementation code beyond reference snippets",
+        "CRUD / boilerplate"
+      ],
+      "labels": [
+        "architecture",
+        "consistency"
+      ],
+      "id": "TSPEC-A011",
+      "title": "Consistency Rules",
+      "owner": "ROLE_ARCHITECT",
+      "package": "consistency",
+      "module": "rules",
+      "state": "DRAFT",
+      "repository_path": "packages/consistency",
+      "branch": "feature/tspec-a011-consistency-rules",
+      "parent_branch": "main",
+      "blocks": [
+        "TSPEC-E03"
+      ],
+      "reviewers": [
+        "ROLE_ARCHITECT"
+      ],
+      "version": "1.0.0",
+      "created_at": "2026-06-27T00:00:00Z",
+      "updated_at": "2026-06-27T00:00:00Z",
+      "wave": 2,
+      "critical_path": false,
+      "parallel_group": "wave-2"
+    },
+    {
+      "priority": "P2",
+      "complexity": "MEDIUM",
+      "risk": "MEDIUM",
+      "estimated_effort": 3,
+      "depends_on": [
+        "TSPEC-A004"
+      ],
+      "references": [],
+      "architecture_documents": [
+        "repo_structure.md",
+        "requirement.md",
+        "decision2.md"
+      ],
+      "deliverables": [
+        "Subgraph extraction & expansion semantics"
+      ],
+      "outputs": [],
+      "tests": [
+        "ADR review",
+        "schema golden test"
+      ],
+      "acceptance_criteria": [
+        "ADR accepted",
+        "No ambiguity remains",
+        "Versioned"
+      ],
+      "forbidden_changes": [
+        "Implementation code beyond reference snippets",
+        "CRUD / boilerplate"
+      ],
+      "labels": [
+        "architecture",
+        "query-engine"
+      ],
+      "id": "TSPEC-A013",
+      "title": "Query Language",
+      "owner": "ROLE_ARCHITECT",
+      "package": "query-engine",
+      "module": "querylang",
+      "state": "DRAFT",
+      "repository_path": "packages/query-engine",
+      "branch": "feature/tspec-a013-query-language",
+      "parent_branch": "main",
+      "blocks": [
+        "TSPEC-A014",
+        "TSPEC-E04"
+      ],
+      "reviewers": [
+        "ROLE_ARCHITECT"
+      ],
+      "version": "1.0.0",
+      "created_at": "2026-06-27T00:00:00Z",
+      "updated_at": "2026-06-27T00:00:00Z",
+      "wave": 2,
+      "critical_path": false,
+      "parallel_group": "wave-2"
+    },
+    {
+      "priority": "P3",
+      "complexity": "MEDIUM",
+      "risk": "MEDIUM",
+      "estimated_effort": 2,
+      "depends_on": [
+        "TSPEC-A015"
+      ],
+      "references": [
+        "https://opentelemetry.io/docs/"
+      ],
+      "architecture_documents": [
+        "repo_structure.md",
+        "requirement.md",
+        "decision1.md"
+      ],
+      "deliverables": [
+        "DefaultTelemetryIngestor"
+      ],
+      "outputs": [],
+      "tests": [
+        "unit",
+        "integration",
+        "golden"
+      ],
+      "acceptance_criteria": [
+        "Builds",
+        "Typechecks",
+        "Lint clean",
+        "Tests pass",
+        "Coverage >= 95%"
+      ],
+      "forbidden_changes": [
+        "Repository IR schema",
+        "Requirement IR schema",
+        "Ontology ids / properties",
+        "Compiler pipeline / builder order",
+        "Closure / coverage / consistency rules"
+      ],
+      "labels": [
+        "implementation",
+        "telemetry"
+      ],
+      "id": "TSPEC-E06",
+      "title": "Telemetry ingestor impl",
+      "owner": "ROLE_IMPLEMENTER",
+      "package": "telemetry",
+      "module": "ingestor",
+      "state": "DRAFT",
+      "repository_path": "packages/telemetry",
+      "branch": "feature/tspec-e06-telemetry-ingestor-impl",
+      "parent_branch": "main",
+      "blocks": [],
+      "reviewers": [
+        "ROLE_ARCHITECT"
+      ],
+      "version": "1.0.0",
+      "created_at": "2026-06-27T00:00:00Z",
+      "updated_at": "2026-06-27T00:00:00Z",
+      "wave": 2,
+      "critical_path": false,
+      "parallel_group": "wave-2"
+    },
+    {
+      "priority": "P1",
+      "complexity": "LOW",
+      "risk": "LOW",
+      "estimated_effort": 2,
+      "depends_on": [
+        "TSPEC-A005"
+      ],
+      "references": [
+        "https://getpino.io/"
+      ],
+      "architecture_documents": [
+        "repo_structure.md",
+        "requirement.md",
+        "decision1.md"
+      ],
+      "deliverables": [
+        "logger",
+        "errors",
+        "hash64",
+        "makeId"
+      ],
+      "outputs": [
+        "@rir/common"
+      ],
+      "tests": [
+        "unit",
+        "integration",
+        "golden"
+      ],
+      "acceptance_criteria": [
+        "Builds",
+        "Typechecks",
+        "Lint clean",
+        "Tests pass",
+        "Coverage >= 95%"
+      ],
+      "forbidden_changes": [
+        "Repository IR schema",
+        "Requirement IR schema",
+        "Ontology ids / properties",
+        "Compiler pipeline / builder order",
+        "Closure / coverage / consistency rules"
+      ],
+      "labels": [
+        "implementation",
+        "common"
+      ],
+      "id": "TSPEC-I001",
+      "title": "Common utilities",
+      "owner": "ROLE_IMPLEMENTER",
+      "package": "common",
+      "module": "common",
+      "state": "DRAFT",
+      "repository_path": "packages/common",
+      "branch": "feature/tspec-i001-common-utilities",
+      "parent_branch": "main",
+      "blocks": [
+        "TSPEC-CI01",
+        "TSPEC-I004",
+        "TSPEC-I005"
+      ],
+      "reviewers": [
+        "ROLE_ARCHITECT"
+      ],
+      "version": "1.0.0",
+      "created_at": "2026-06-27T00:00:00Z",
+      "updated_at": "2026-06-27T00:00:00Z",
+      "wave": 2,
+      "critical_path": true,
+      "parallel_group": "wave-2"
+    },
+    {
+      "priority": "P1",
+      "complexity": "MEDIUM",
+      "risk": "MEDIUM",
+      "estimated_effort": 3,
+      "depends_on": [
+        "TSPEC-A001",
+        "TSPEC-A002"
+      ],
+      "references": [
+        "https://zod.dev/"
+      ],
+      "architecture_documents": [
+        "repo_structure.md",
+        "requirement.md",
+        "decision1.md"
+      ],
+      "deliverables": [
+        "Deterministic serializer",
+        "Schema guards"
+      ],
+      "outputs": [],
+      "tests": [
+        "unit",
+        "integration",
+        "golden"
+      ],
+      "acceptance_criteria": [
+        "Builds",
+        "Typechecks",
+        "Lint clean",
+        "Tests pass",
+        "Coverage >= 95%"
+      ],
+      "forbidden_changes": [
+        "Repository IR schema",
+        "Requirement IR schema",
+        "Ontology ids / properties",
+        "Compiler pipeline / builder order",
+        "Closure / coverage / consistency rules"
+      ],
+      "labels": [
+        "implementation",
+        "ir"
+      ],
+      "id": "TSPEC-I002",
+      "title": "IR serializer & validator",
+      "owner": "ROLE_IMPLEMENTER",
+      "package": "ir",
+      "module": "validator",
+      "state": "DRAFT",
+      "repository_path": "packages/ir",
+      "branch": "feature/tspec-i002-ir-serializer-validator",
+      "parent_branch": "main",
+      "blocks": [],
+      "reviewers": [
+        "ROLE_ARCHITECT"
+      ],
+      "version": "1.0.0",
+      "created_at": "2026-06-27T00:00:00Z",
+      "updated_at": "2026-06-27T00:00:00Z",
+      "wave": 2,
+      "critical_path": false,
+      "parallel_group": "wave-2"
+    },
+    {
+      "priority": "P1",
+      "complexity": "MEDIUM",
+      "risk": "MEDIUM",
+      "estimated_effort": 3,
+      "depends_on": [
+        "TSPEC-A004"
+      ],
+      "references": [
+        "https://en.wikipedia.org/wiki/Tarjan%27s_strongly_connected_components_algorithm"
+      ],
+      "architecture_documents": [
+        "repo_structure.md",
+        "requirement.md",
+        "decision1.md"
+      ],
+      "deliverables": [
+        "reachableFrom",
+        "distancesFrom",
+        "topologicalSort",
+        "SCC",
+        "connectedComponents"
+      ],
+      "outputs": [],
+      "tests": [
+        "unit",
+        "integration",
+        "golden"
+      ],
+      "acceptance_criteria": [
+        "Builds",
+        "Typechecks",
+        "Lint clean",
+        "Tests pass",
+        "Coverage >= 95%"
+      ],
+      "forbidden_changes": [
+        "Repository IR schema",
+        "Requirement IR schema",
+        "Ontology ids / properties",
+        "Compiler pipeline / builder order",
+        "Closure / coverage / consistency rules"
+      ],
+      "labels": [
+        "implementation",
+        "graph"
+      ],
+      "id": "TSPEC-I003",
+      "title": "Graph algorithms",
+      "owner": "ROLE_IMPLEMENTER",
+      "package": "graph",
+      "module": "algorithms",
+      "state": "DRAFT",
+      "repository_path": "packages/graph",
+      "branch": "feature/tspec-i003-graph-algorithms",
+      "parent_branch": "main",
+      "blocks": [
+        "TSPEC-E01",
+        "TSPEC-E04"
+      ],
+      "reviewers": [
+        "ROLE_ARCHITECT"
+      ],
+      "version": "1.0.0",
+      "created_at": "2026-06-27T00:00:00Z",
+      "updated_at": "2026-06-27T00:00:00Z",
+      "wave": 2,
+      "critical_path": false,
+      "parallel_group": "wave-2"
+    },
+    {
+      "priority": "P2",
+      "complexity": "MEDIUM",
+      "risk": "MEDIUM",
+      "estimated_effort": 2,
+      "depends_on": [
+        "TSPEC-A003"
+      ],
+      "references": [],
+      "architecture_documents": [
+        "repo_structure.md",
+        "requirement.md",
+        "decision1.md"
+      ],
+      "deliverables": [
+        "Constraint validators",
+        "Alias resolution tests"
+      ],
+      "outputs": [],
+      "tests": [
+        "unit",
+        "integration",
+        "golden"
+      ],
+      "acceptance_criteria": [
+        "Builds",
+        "Typechecks",
+        "Lint clean",
+        "Tests pass",
+        "Coverage >= 95%"
+      ],
+      "forbidden_changes": [
+        "Repository IR schema",
+        "Requirement IR schema",
+        "Ontology ids / properties",
+        "Compiler pipeline / builder order",
+        "Closure / coverage / consistency rules"
+      ],
+      "labels": [
+        "implementation",
+        "ontology"
+      ],
+      "id": "TSPEC-I007",
+      "title": "Ontology validators",
+      "owner": "ROLE_IMPLEMENTER",
+      "package": "ontology",
+      "module": "validators",
+      "state": "DRAFT",
+      "repository_path": "packages/ontology",
+      "branch": "feature/tspec-i007-ontology-validators",
+      "parent_branch": "main",
+      "blocks": [],
+      "reviewers": [
+        "ROLE_ARCHITECT"
+      ],
+      "version": "1.0.0",
+      "created_at": "2026-06-27T00:00:00Z",
+      "updated_at": "2026-06-27T00:00:00Z",
+      "wave": 2,
+      "critical_path": false,
+      "parallel_group": "wave-2"
+    },
+    {
+      "priority": "P3",
+      "complexity": "MEDIUM",
+      "risk": "MEDIUM",
+      "estimated_effort": 1,
+      "depends_on": [
+        "TSPEC-A003"
+      ],
+      "references": [],
+      "architecture_documents": [
+        "repo_structure.md",
+        "requirement.md",
+        "decision1.md"
+      ],
+      "deliverables": [
+        "ontology export tool"
+      ],
+      "outputs": [],
+      "tests": [
+        "unit",
+        "integration",
+        "golden"
+      ],
+      "acceptance_criteria": [
+        "Builds",
+        "Typechecks",
+        "Lint clean",
+        "Tests pass",
+        "Coverage >= 95%"
+      ],
+      "forbidden_changes": [
+        "Repository IR schema",
+        "Requirement IR schema",
+        "Ontology ids / properties",
+        "Compiler pipeline / builder order",
+        "Closure / coverage / consistency rules"
+      ],
+      "labels": [
+        "implementation",
+        "scripts"
+      ],
+      "id": "TSPEC-SC02",
+      "title": "Script: generate-ontology",
+      "owner": "ROLE_IMPLEMENTER",
+      "package": "scripts",
+      "module": "generate-ontology",
+      "state": "DRAFT",
+      "repository_path": "scripts/generate-ontology",
+      "branch": "feature/tspec-sc02-script-generate-ontology",
+      "parent_branch": "main",
+      "blocks": [],
+      "reviewers": [
+        "ROLE_ARCHITECT"
+      ],
+      "version": "1.0.0",
+      "created_at": "2026-06-27T00:00:00Z",
+      "updated_at": "2026-06-27T00:00:00Z",
+      "wave": 2,
+      "critical_path": false,
+      "parallel_group": "wave-2"
+    },
+    {
+      "priority": "P3",
+      "complexity": "MEDIUM",
+      "risk": "MEDIUM",
+      "estimated_effort": 2,
+      "depends_on": [
+        "TSPEC-A013"
+      ],
+      "references": [],
+      "architecture_documents": [
+        "repo_structure.md",
+        "requirement.md",
+        "decision2.md"
+      ],
+      "deliverables": [
+        "Read-only LLM projection contract; AI isolation rules"
+      ],
+      "outputs": [],
+      "tests": [
+        "ADR review",
+        "schema golden test"
+      ],
+      "acceptance_criteria": [
+        "ADR accepted",
+        "No ambiguity remains",
+        "Versioned"
+      ],
+      "forbidden_changes": [
+        "Implementation code beyond reference snippets",
+        "CRUD / boilerplate"
+      ],
+      "labels": [
+        "architecture",
+        "semantic"
+      ],
+      "id": "TSPEC-A014",
+      "title": "Semantic Projection Contract",
+      "owner": "ROLE_ARCHITECT",
+      "package": "semantic",
+      "module": "contract",
+      "state": "DRAFT",
+      "repository_path": "packages/semantic",
+      "branch": "feature/tspec-a014-semantic-projection-contract",
+      "parent_branch": "main",
+      "blocks": [
+        "TSPEC-E05"
+      ],
+      "reviewers": [
+        "ROLE_ARCHITECT"
+      ],
+      "version": "1.0.0",
+      "created_at": "2026-06-27T00:00:00Z",
+      "updated_at": "2026-06-27T00:00:00Z",
+      "wave": 3,
+      "critical_path": false,
+      "parallel_group": "wave-3"
+    },
+    {
+      "priority": "P1",
+      "complexity": "MEDIUM",
+      "risk": "MEDIUM",
+      "estimated_effort": 2,
+      "depends_on": [
+        "TSPEC-I001"
+      ],
+      "references": [
+        "https://docs.github.com/actions"
+      ],
+      "architecture_documents": [
+        "repo_structure.md",
+        "requirement.md",
+        "decision1.md"
+      ],
+      "deliverables": [
+        ".github/workflows/eos.yml enforcing all gates"
+      ],
+      "outputs": [],
+      "tests": [
+        "unit",
+        "integration",
+        "golden"
+      ],
+      "acceptance_criteria": [
+        "Builds",
+        "Typechecks",
+        "Lint clean",
+        "Tests pass",
+        "Coverage >= 95%"
+      ],
+      "forbidden_changes": [
+        "Repository IR schema",
+        "Requirement IR schema",
+        "Ontology ids / properties",
+        "Compiler pipeline / builder order",
+        "Closure / coverage / consistency rules"
+      ],
+      "labels": [
+        "implementation",
+        "ci"
+      ],
+      "id": "TSPEC-CI01",
+      "title": "CI/CD gates workflow",
+      "owner": "ROLE_IMPLEMENTER",
+      "package": "ci",
+      "module": "github-actions",
+      "state": "DRAFT",
+      "repository_path": ".github",
+      "branch": "feature/tspec-ci01-ci-cd-gates-workflow",
+      "parent_branch": "main",
+      "blocks": [],
+      "reviewers": [
+        "ROLE_ARCHITECT"
+      ],
+      "version": "1.0.0",
+      "created_at": "2026-06-27T00:00:00Z",
+      "updated_at": "2026-06-27T00:00:00Z",
+      "wave": 3,
+      "critical_path": false,
+      "parallel_group": "wave-3"
+    },
+    {
+      "priority": "P1",
+      "complexity": "MEDIUM",
+      "risk": "MEDIUM",
+      "estimated_effort": 3,
+      "depends_on": [
+        "TSPEC-A008"
+      ],
+      "references": [
+        "https://github.com/remarkjs/remark"
+      ],
+      "architecture_documents": [
+        "repo_structure.md",
+        "requirement.md",
+        "decision1.md"
+      ],
+      "deliverables": [
+        "markdown structure extraction (no semantics)"
+      ],
+      "outputs": [],
+      "tests": [
+        "unit",
+        "integration",
+        "golden"
+      ],
+      "acceptance_criteria": [
+        "Builds",
+        "Typechecks",
+        "Lint clean",
+        "Tests pass",
+        "Coverage >= 95%"
+      ],
+      "forbidden_changes": [
+        "Repository IR schema",
+        "Requirement IR schema",
+        "Ontology ids / properties",
+        "Compiler pipeline / builder order",
+        "Closure / coverage / consistency rules"
+      ],
+      "labels": [
+        "implementation",
+        "document-compiler"
+      ],
+      "id": "TSPEC-DF01",
+      "title": "markdown document frontend",
+      "owner": "ROLE_IMPLEMENTER",
+      "package": "document-compiler",
+      "module": "frontend/markdown",
+      "state": "DRAFT",
+      "repository_path": "packages/document-compiler",
+      "branch": "feature/tspec-df01-markdown-document-frontend",
+      "parent_branch": "main",
+      "blocks": [],
+      "reviewers": [
+        "ROLE_ARCHITECT"
+      ],
+      "version": "1.0.0",
+      "created_at": "2026-06-27T00:00:00Z",
+      "updated_at": "2026-06-27T00:00:00Z",
+      "wave": 3,
+      "critical_path": false,
+      "parallel_group": "wave-3"
+    },
+    {
+      "priority": "P2",
+      "complexity": "MEDIUM",
+      "risk": "MEDIUM",
+      "estimated_effort": 3,
+      "depends_on": [
+        "TSPEC-A008"
+      ],
+      "references": [
+        "https://spec.openapis.org/oas/latest.html"
+      ],
+      "architecture_documents": [
+        "repo_structure.md",
+        "requirement.md",
+        "decision1.md"
+      ],
+      "deliverables": [
+        "openapi structure extraction (no semantics)"
+      ],
+      "outputs": [],
+      "tests": [
+        "unit",
+        "integration",
+        "golden"
+      ],
+      "acceptance_criteria": [
+        "Builds",
+        "Typechecks",
+        "Lint clean",
+        "Tests pass",
+        "Coverage >= 95%"
+      ],
+      "forbidden_changes": [
+        "Repository IR schema",
+        "Requirement IR schema",
+        "Ontology ids / properties",
+        "Compiler pipeline / builder order",
+        "Closure / coverage / consistency rules"
+      ],
+      "labels": [
+        "implementation",
+        "document-compiler"
+      ],
+      "id": "TSPEC-DF02",
+      "title": "openapi document frontend",
+      "owner": "ROLE_IMPLEMENTER",
+      "package": "document-compiler",
+      "module": "frontend/openapi",
+      "state": "DRAFT",
+      "repository_path": "packages/document-compiler",
+      "branch": "feature/tspec-df02-openapi-document-frontend",
+      "parent_branch": "main",
+      "blocks": [],
+      "reviewers": [
+        "ROLE_ARCHITECT"
+      ],
+      "version": "1.0.0",
+      "created_at": "2026-06-27T00:00:00Z",
+      "updated_at": "2026-06-27T00:00:00Z",
+      "wave": 3,
+      "critical_path": false,
+      "parallel_group": "wave-3"
+    },
+    {
+      "priority": "P2",
+      "complexity": "MEDIUM",
+      "risk": "MEDIUM",
+      "estimated_effort": 3,
+      "depends_on": [
+        "TSPEC-A008"
+      ],
+      "references": [
+        "https://www.asyncapi.com/docs/reference/specification/latest"
+      ],
+      "architecture_documents": [
+        "repo_structure.md",
+        "requirement.md",
+        "decision1.md"
+      ],
+      "deliverables": [
+        "asyncapi structure extraction (no semantics)"
+      ],
+      "outputs": [],
+      "tests": [
+        "unit",
+        "integration",
+        "golden"
+      ],
+      "acceptance_criteria": [
+        "Builds",
+        "Typechecks",
+        "Lint clean",
+        "Tests pass",
+        "Coverage >= 95%"
+      ],
+      "forbidden_changes": [
+        "Repository IR schema",
+        "Requirement IR schema",
+        "Ontology ids / properties",
+        "Compiler pipeline / builder order",
+        "Closure / coverage / consistency rules"
+      ],
+      "labels": [
+        "implementation",
+        "document-compiler"
+      ],
+      "id": "TSPEC-DF03",
+      "title": "asyncapi document frontend",
+      "owner": "ROLE_IMPLEMENTER",
+      "package": "document-compiler",
+      "module": "frontend/asyncapi",
+      "state": "DRAFT",
+      "repository_path": "packages/document-compiler",
+      "branch": "feature/tspec-df03-asyncapi-document-frontend",
+      "parent_branch": "main",
+      "blocks": [],
+      "reviewers": [
+        "ROLE_ARCHITECT"
+      ],
+      "version": "1.0.0",
+      "created_at": "2026-06-27T00:00:00Z",
+      "updated_at": "2026-06-27T00:00:00Z",
+      "wave": 3,
+      "critical_path": false,
+      "parallel_group": "wave-3"
+    },
+    {
+      "priority": "P2",
+      "complexity": "MEDIUM",
+      "risk": "MEDIUM",
+      "estimated_effort": 3,
+      "depends_on": [
+        "TSPEC-A008"
+      ],
+      "references": [
+        "https://json-schema.org/specification"
+      ],
+      "architecture_documents": [
+        "repo_structure.md",
+        "requirement.md",
+        "decision1.md"
+      ],
+      "deliverables": [
+        "json-schema structure extraction (no semantics)"
+      ],
+      "outputs": [],
+      "tests": [
+        "unit",
+        "integration",
+        "golden"
+      ],
+      "acceptance_criteria": [
+        "Builds",
+        "Typechecks",
+        "Lint clean",
+        "Tests pass",
+        "Coverage >= 95%"
+      ],
+      "forbidden_changes": [
+        "Repository IR schema",
+        "Requirement IR schema",
+        "Ontology ids / properties",
+        "Compiler pipeline / builder order",
+        "Closure / coverage / consistency rules"
+      ],
+      "labels": [
+        "implementation",
+        "document-compiler"
+      ],
+      "id": "TSPEC-DF04",
+      "title": "json-schema document frontend",
+      "owner": "ROLE_IMPLEMENTER",
+      "package": "document-compiler",
+      "module": "frontend/json-schema",
+      "state": "DRAFT",
+      "repository_path": "packages/document-compiler",
+      "branch": "feature/tspec-df04-json-schema-document-frontend",
+      "parent_branch": "main",
+      "blocks": [],
+      "reviewers": [
+        "ROLE_ARCHITECT"
+      ],
+      "version": "1.0.0",
+      "created_at": "2026-06-27T00:00:00Z",
+      "updated_at": "2026-06-27T00:00:00Z",
+      "wave": 3,
+      "critical_path": false,
+      "parallel_group": "wave-3"
+    },
+    {
+      "priority": "P2",
+      "complexity": "MEDIUM",
+      "risk": "MEDIUM",
+      "estimated_effort": 3,
+      "depends_on": [
+        "TSPEC-A008"
+      ],
+      "references": [
+        "https://mozilla.github.io/pdf.js/"
+      ],
+      "architecture_documents": [
+        "repo_structure.md",
+        "requirement.md",
+        "decision1.md"
+      ],
+      "deliverables": [
+        "pdf structure extraction (no semantics)"
+      ],
+      "outputs": [],
+      "tests": [
+        "unit",
+        "integration",
+        "golden"
+      ],
+      "acceptance_criteria": [
+        "Builds",
+        "Typechecks",
+        "Lint clean",
+        "Tests pass",
+        "Coverage >= 95%"
+      ],
+      "forbidden_changes": [
+        "Repository IR schema",
+        "Requirement IR schema",
+        "Ontology ids / properties",
+        "Compiler pipeline / builder order",
+        "Closure / coverage / consistency rules"
+      ],
+      "labels": [
+        "implementation",
+        "document-compiler"
+      ],
+      "id": "TSPEC-DF05",
+      "title": "pdf document frontend",
+      "owner": "ROLE_IMPLEMENTER",
+      "package": "document-compiler",
+      "module": "frontend/pdf",
+      "state": "DRAFT",
+      "repository_path": "packages/document-compiler",
+      "branch": "feature/tspec-df05-pdf-document-frontend",
+      "parent_branch": "main",
+      "blocks": [],
+      "reviewers": [
+        "ROLE_ARCHITECT"
+      ],
+      "version": "1.0.0",
+      "created_at": "2026-06-27T00:00:00Z",
+      "updated_at": "2026-06-27T00:00:00Z",
+      "wave": 3,
+      "critical_path": false,
+      "parallel_group": "wave-3"
+    },
+    {
+      "priority": "P2",
+      "complexity": "MEDIUM",
+      "risk": "MEDIUM",
+      "estimated_effort": 3,
+      "depends_on": [
+        "TSPEC-A008"
+      ],
+      "references": [
+        "https://github.com/dolanmiu/docx"
+      ],
+      "architecture_documents": [
+        "repo_structure.md",
+        "requirement.md",
+        "decision1.md"
+      ],
+      "deliverables": [
+        "docx structure extraction (no semantics)"
+      ],
+      "outputs": [],
+      "tests": [
+        "unit",
+        "integration",
+        "golden"
+      ],
+      "acceptance_criteria": [
+        "Builds",
+        "Typechecks",
+        "Lint clean",
+        "Tests pass",
+        "Coverage >= 95%"
+      ],
+      "forbidden_changes": [
+        "Repository IR schema",
+        "Requirement IR schema",
+        "Ontology ids / properties",
+        "Compiler pipeline / builder order",
+        "Closure / coverage / consistency rules"
+      ],
+      "labels": [
+        "implementation",
+        "document-compiler"
+      ],
+      "id": "TSPEC-DF06",
+      "title": "docx document frontend",
+      "owner": "ROLE_IMPLEMENTER",
+      "package": "document-compiler",
+      "module": "frontend/docx",
+      "state": "DRAFT",
+      "repository_path": "packages/document-compiler",
+      "branch": "feature/tspec-df06-docx-document-frontend",
+      "parent_branch": "main",
+      "blocks": [],
+      "reviewers": [
+        "ROLE_ARCHITECT"
+      ],
+      "version": "1.0.0",
+      "created_at": "2026-06-27T00:00:00Z",
+      "updated_at": "2026-06-27T00:00:00Z",
+      "wave": 3,
+      "critical_path": false,
+      "parallel_group": "wave-3"
+    },
+    {
+      "priority": "P2",
+      "complexity": "MEDIUM",
+      "risk": "MEDIUM",
+      "estimated_effort": 3,
+      "depends_on": [
+        "TSPEC-A010"
+      ],
+      "references": [],
+      "architecture_documents": [
+        "repo_structure.md",
+        "requirement.md",
+        "decision1.md"
+      ],
+      "deliverables": [
+        "DefaultCoverageEngine"
+      ],
+      "outputs": [],
+      "tests": [
+        "unit",
+        "integration",
+        "golden"
+      ],
+      "acceptance_criteria": [
+        "Builds",
+        "Typechecks",
+        "Lint clean",
+        "Tests pass",
+        "Coverage >= 95%"
+      ],
+      "forbidden_changes": [
+        "Repository IR schema",
+        "Requirement IR schema",
+        "Ontology ids / properties",
+        "Compiler pipeline / builder order",
+        "Closure / coverage / consistency rules"
+      ],
+      "labels": [
+        "implementation",
+        "coverage"
+      ],
+      "id": "TSPEC-E02",
+      "title": "Coverage engine impl",
+      "owner": "ROLE_IMPLEMENTER",
+      "package": "coverage",
+      "module": "engine",
+      "state": "DRAFT",
+      "repository_path": "packages/coverage",
+      "branch": "feature/tspec-e02-coverage-engine-impl",
+      "parent_branch": "main",
+      "blocks": [
+        "TSPEC-APP1",
+        "TSPEC-APP2"
+      ],
+      "reviewers": [
+        "ROLE_ARCHITECT"
+      ],
+      "version": "1.0.0",
+      "created_at": "2026-06-27T00:00:00Z",
+      "updated_at": "2026-06-27T00:00:00Z",
+      "wave": 3,
+      "critical_path": false,
+      "parallel_group": "wave-3"
+    },
+    {
+      "priority": "P2",
+      "complexity": "MEDIUM",
+      "risk": "MEDIUM",
+      "estimated_effort": 3,
+      "depends_on": [
+        "TSPEC-A011"
+      ],
+      "references": [],
+      "architecture_documents": [
+        "repo_structure.md",
+        "requirement.md",
+        "decision1.md"
+      ],
+      "deliverables": [
+        "DefaultConsistencyEngine"
+      ],
+      "outputs": [],
+      "tests": [
+        "unit",
+        "integration",
+        "golden"
+      ],
+      "acceptance_criteria": [
+        "Builds",
+        "Typechecks",
+        "Lint clean",
+        "Tests pass",
+        "Coverage >= 95%"
+      ],
+      "forbidden_changes": [
+        "Repository IR schema",
+        "Requirement IR schema",
+        "Ontology ids / properties",
+        "Compiler pipeline / builder order",
+        "Closure / coverage / consistency rules"
+      ],
+      "labels": [
+        "implementation",
+        "consistency"
+      ],
+      "id": "TSPEC-E03",
+      "title": "Consistency engine impl",
+      "owner": "ROLE_IMPLEMENTER",
+      "package": "consistency",
+      "module": "engine",
+      "state": "DRAFT",
+      "repository_path": "packages/consistency",
+      "branch": "feature/tspec-e03-consistency-engine-impl",
+      "parent_branch": "main",
+      "blocks": [
+        "TSPEC-APP2"
+      ],
+      "reviewers": [
+        "ROLE_ARCHITECT"
+      ],
+      "version": "1.0.0",
+      "created_at": "2026-06-27T00:00:00Z",
+      "updated_at": "2026-06-27T00:00:00Z",
+      "wave": 3,
+      "critical_path": false,
+      "parallel_group": "wave-3"
+    },
+    {
+      "priority": "P2",
+      "complexity": "MEDIUM",
+      "risk": "MEDIUM",
+      "estimated_effort": 3,
+      "depends_on": [
+        "TSPEC-A013",
+        "TSPEC-I003"
+      ],
+      "references": [],
+      "architecture_documents": [
+        "repo_structure.md",
+        "requirement.md",
+        "decision1.md"
+      ],
+      "deliverables": [
+        "QueryEngine subgraph extraction"
+      ],
+      "outputs": [],
+      "tests": [
+        "unit",
+        "integration",
+        "golden"
+      ],
+      "acceptance_criteria": [
+        "Builds",
+        "Typechecks",
+        "Lint clean",
+        "Tests pass",
+        "Coverage >= 95%"
+      ],
+      "forbidden_changes": [
+        "Repository IR schema",
+        "Requirement IR schema",
+        "Ontology ids / properties",
+        "Compiler pipeline / builder order",
+        "Closure / coverage / consistency rules"
+      ],
+      "labels": [
+        "implementation",
+        "query-engine"
+      ],
+      "id": "TSPEC-E04",
+      "title": "Query engine impl",
+      "owner": "ROLE_IMPLEMENTER",
+      "package": "query-engine",
+      "module": "engine",
+      "state": "DRAFT",
+      "repository_path": "packages/query-engine",
+      "branch": "feature/tspec-e04-query-engine-impl",
+      "parent_branch": "main",
+      "blocks": [
+        "TSPEC-APP1",
+        "TSPEC-APP2",
+        "TSPEC-E05"
+      ],
+      "reviewers": [
+        "ROLE_ARCHITECT"
+      ],
+      "version": "1.0.0",
+      "created_at": "2026-06-27T00:00:00Z",
+      "updated_at": "2026-06-27T00:00:00Z",
+      "wave": 3,
+      "critical_path": false,
+      "parallel_group": "wave-3"
+    },
+    {
+      "priority": "P1",
+      "complexity": "MEDIUM",
+      "risk": "MEDIUM",
+      "estimated_effort": 4,
+      "depends_on": [
+        "TSPEC-A012",
+        "TSPEC-I001"
+      ],
+      "references": [
+        "https://github.com/WiseLibs/better-sqlite3",
+        "https://kysely.dev/docs/intro"
+      ],
+      "architecture_documents": [
+        "repo_structure.md",
+        "requirement.md",
+        "decision1.md"
+      ],
+      "deliverables": [
+        "SQLite Storage impl",
+        "Migrations",
+        "CRUD + transactions"
+      ],
+      "outputs": [],
+      "tests": [
+        "unit",
+        "integration",
+        "golden"
+      ],
+      "acceptance_criteria": [
+        "Builds",
+        "Typechecks",
+        "Lint clean",
+        "Tests pass",
+        "Coverage >= 95%"
+      ],
+      "forbidden_changes": [
+        "Repository IR schema",
+        "Requirement IR schema",
+        "Ontology ids / properties",
+        "Compiler pipeline / builder order",
+        "Closure / coverage / consistency rules"
+      ],
+      "labels": [
+        "implementation",
+        "storage"
+      ],
+      "id": "TSPEC-I004",
+      "title": "SQLite storage repository",
+      "owner": "ROLE_IMPLEMENTER",
+      "package": "storage",
+      "module": "sqlite",
+      "state": "DRAFT",
+      "repository_path": "packages/storage",
+      "branch": "feature/tspec-i004-sqlite-storage-repository",
+      "parent_branch": "main",
+      "blocks": [
+        "TSPEC-APP1",
+        "TSPEC-APP3"
+      ],
+      "reviewers": [
+        "ROLE_ARCHITECT"
+      ],
+      "version": "1.0.0",
+      "created_at": "2026-06-27T00:00:00Z",
+      "updated_at": "2026-06-27T00:00:00Z",
+      "wave": 3,
+      "critical_path": false,
+      "parallel_group": "wave-3"
+    },
+    {
+      "priority": "P1",
+      "complexity": "MEDIUM",
+      "risk": "MEDIUM",
+      "estimated_effort": 3,
+      "depends_on": [
+        "TSPEC-A005",
+        "TSPEC-I001"
+      ],
+      "references": [],
+      "architecture_documents": [
+        "repo_structure.md",
+        "requirement.md",
+        "decision1.md"
+      ],
+      "deliverables": [
+        "PluginRegistry",
+        "Container",
+        "IRDraft"
+      ],
+      "outputs": [],
+      "tests": [
+        "unit",
+        "integration",
+        "golden"
+      ],
+      "acceptance_criteria": [
+        "Builds",
+        "Typechecks",
+        "Lint clean",
+        "Tests pass",
+        "Coverage >= 95%"
+      ],
+      "forbidden_changes": [
+        "Repository IR schema",
+        "Requirement IR schema",
+        "Ontology ids / properties",
+        "Compiler pipeline / builder order",
+        "Closure / coverage / consistency rules"
+      ],
+      "labels": [
+        "implementation",
+        "core"
+      ],
+      "id": "TSPEC-I005",
+      "title": "Core pipeline, DI & registry impl",
+      "owner": "ROLE_IMPLEMENTER",
+      "package": "core",
+      "module": "runtime",
+      "state": "DRAFT",
+      "repository_path": "packages/core",
+      "branch": "feature/tspec-i005-core-pipeline-di-registry-impl",
+      "parent_branch": "main",
+      "blocks": [
+        "TSPEC-I006"
+      ],
+      "reviewers": [
+        "ROLE_ARCHITECT"
+      ],
+      "version": "1.0.0",
+      "created_at": "2026-06-27T00:00:00Z",
+      "updated_at": "2026-06-27T00:00:00Z",
+      "wave": 3,
+      "critical_path": true,
+      "parallel_group": "wave-3"
+    },
+    {
+      "priority": "P3",
+      "complexity": "MEDIUM",
+      "risk": "MEDIUM",
+      "estimated_effort": 2,
+      "depends_on": [
+        "TSPEC-A014",
+        "TSPEC-E04"
+      ],
+      "references": [],
+      "architecture_documents": [
+        "repo_structure.md",
+        "requirement.md",
+        "decision1.md"
+      ],
+      "deliverables": [
+        "SemanticProjector (read-only)"
+      ],
+      "outputs": [],
+      "tests": [
+        "unit",
+        "integration",
+        "golden"
+      ],
+      "acceptance_criteria": [
+        "Builds",
+        "Typechecks",
+        "Lint clean",
+        "Tests pass",
+        "Coverage >= 95%"
+      ],
+      "forbidden_changes": [
+        "Repository IR schema",
+        "Requirement IR schema",
+        "Ontology ids / properties",
+        "Compiler pipeline / builder order",
+        "Closure / coverage / consistency rules"
+      ],
+      "labels": [
+        "implementation",
+        "semantic"
+      ],
+      "id": "TSPEC-E05",
+      "title": "Semantic projector impl",
+      "owner": "ROLE_IMPLEMENTER",
+      "package": "semantic",
+      "module": "projector",
+      "state": "DRAFT",
+      "repository_path": "packages/semantic",
+      "branch": "feature/tspec-e05-semantic-projector-impl",
+      "parent_branch": "main",
+      "blocks": [],
+      "reviewers": [
+        "ROLE_ARCHITECT"
+      ],
+      "version": "1.0.0",
+      "created_at": "2026-06-27T00:00:00Z",
+      "updated_at": "2026-06-27T00:00:00Z",
+      "wave": 4,
+      "critical_path": false,
+      "parallel_group": "wave-4"
+    },
+    {
+      "priority": "P1",
+      "complexity": "MEDIUM",
+      "risk": "MEDIUM",
+      "estimated_effort": 3,
+      "depends_on": [
+        "TSPEC-A005",
+        "TSPEC-A006",
+        "TSPEC-I005"
+      ],
+      "references": [],
+      "architecture_documents": [
+        "repo_structure.md",
+        "requirement.md",
+        "decision1.md"
+      ],
+      "deliverables": [
+        "BuilderEngine",
+        "DefaultIRDraft"
+      ],
+      "outputs": [],
+      "tests": [
+        "unit",
+        "integration",
+        "golden"
+      ],
+      "acceptance_criteria": [
+        "Builds",
+        "Typechecks",
+        "Lint clean",
+        "Tests pass",
+        "Coverage >= 95%"
+      ],
+      "forbidden_changes": [
+        "Repository IR schema",
+        "Requirement IR schema",
+        "Ontology ids / properties",
+        "Compiler pipeline / builder order",
+        "Closure / coverage / consistency rules"
+      ],
+      "labels": [
+        "implementation",
+        "builder-engine"
+      ],
+      "id": "TSPEC-I006",
+      "title": "Builder engine pass runner",
+      "owner": "ROLE_IMPLEMENTER",
+      "package": "builder-engine",
+      "module": "engine",
+      "state": "DRAFT",
+      "repository_path": "packages/builder-engine",
+      "branch": "feature/tspec-i006-builder-engine-pass-runner",
+      "parent_branch": "main",
+      "blocks": [
+        "TSPEC-AD01",
+        "TSPEC-AD02",
+        "TSPEC-AD03",
+        "TSPEC-AD04",
+        "TSPEC-AD05",
+        "TSPEC-AD06",
+        "TSPEC-AD07",
+        "TSPEC-APP3",
+        "TSPEC-P01",
+        "TSPEC-P02",
+        "TSPEC-P03",
+        "TSPEC-P04",
+        "TSPEC-P05",
+        "TSPEC-P06",
+        "TSPEC-P07",
+        "TSPEC-P08",
+        "TSPEC-P09",
+        "TSPEC-P10",
+        "TSPEC-P11",
+        "TSPEC-P12",
+        "TSPEC-P13",
+        "TSPEC-P14",
+        "TSPEC-P15"
+      ],
+      "reviewers": [
+        "ROLE_ARCHITECT"
+      ],
+      "version": "1.0.0",
+      "created_at": "2026-06-27T00:00:00Z",
+      "updated_at": "2026-06-27T00:00:00Z",
+      "wave": 4,
+      "critical_path": true,
+      "parallel_group": "wave-4"
+    },
+    {
+      "priority": "P1",
+      "complexity": "MEDIUM",
+      "risk": "MEDIUM",
+      "estimated_effort": 4,
+      "depends_on": [
+        "TSPEC-A007",
+        "TSPEC-I006"
+      ],
+      "references": [
+        "https://tree-sitter.github.io/tree-sitter/",
+        "https://ast-grep.github.io/"
+      ],
+      "architecture_documents": [
+        "repo_structure.md",
+        "requirement.md",
+        "decision1.md"
+      ],
+      "deliverables": [
+        "typescript Tree-sitter adapter: parse/symbols/imports/exports/calls/routes"
+      ],
+      "outputs": [],
+      "tests": [
+        "unit",
+        "integration",
+        "golden"
+      ],
+      "acceptance_criteria": [
+        "Builds",
+        "Typechecks",
+        "Lint clean",
+        "Tests pass",
+        "Coverage >= 95%"
+      ],
+      "forbidden_changes": [
+        "Repository IR schema",
+        "Requirement IR schema",
+        "Ontology ids / properties",
+        "Compiler pipeline / builder order",
+        "Closure / coverage / consistency rules"
+      ],
+      "labels": [
+        "implementation",
+        "code-compiler"
+      ],
+      "id": "TSPEC-AD01",
+      "title": "typescript language adapter",
+      "owner": "ROLE_IMPLEMENTER",
+      "package": "code-compiler",
+      "module": "language/typescript",
+      "state": "DRAFT",
+      "repository_path": "packages/code-compiler",
+      "branch": "feature/tspec-ad01-typescript-language-adapter",
+      "parent_branch": "main",
+      "blocks": [
+        "TSPEC-FX01",
+        "TSPEC-FX02",
+        "TSPEC-FX03",
+        "TSPEC-FX04",
+        "TSPEC-FX05",
+        "TSPEC-FX06",
+        "TSPEC-FX07",
+        "TSPEC-FX08",
+        "TSPEC-FX09"
+      ],
+      "reviewers": [
+        "ROLE_ARCHITECT"
+      ],
+      "version": "1.0.0",
+      "created_at": "2026-06-27T00:00:00Z",
+      "updated_at": "2026-06-27T00:00:00Z",
+      "wave": 5,
+      "critical_path": false,
+      "parallel_group": "wave-5"
+    },
+    {
+      "priority": "P2",
+      "complexity": "MEDIUM",
+      "risk": "MEDIUM",
+      "estimated_effort": 3,
+      "depends_on": [
+        "TSPEC-A007",
+        "TSPEC-I006"
+      ],
+      "references": [
+        "https://tree-sitter.github.io/tree-sitter/",
+        "https://ast-grep.github.io/"
+      ],
+      "architecture_documents": [
+        "repo_structure.md",
+        "requirement.md",
+        "decision1.md"
+      ],
+      "deliverables": [
+        "javascript Tree-sitter adapter: parse/symbols/imports/exports/calls/routes"
+      ],
+      "outputs": [],
+      "tests": [
+        "unit",
+        "integration",
+        "golden"
+      ],
+      "acceptance_criteria": [
+        "Builds",
+        "Typechecks",
+        "Lint clean",
+        "Tests pass",
+        "Coverage >= 95%"
+      ],
+      "forbidden_changes": [
+        "Repository IR schema",
+        "Requirement IR schema",
+        "Ontology ids / properties",
+        "Compiler pipeline / builder order",
+        "Closure / coverage / consistency rules"
+      ],
+      "labels": [
+        "implementation",
+        "code-compiler"
+      ],
+      "id": "TSPEC-AD02",
+      "title": "javascript language adapter",
+      "owner": "ROLE_IMPLEMENTER",
+      "package": "code-compiler",
+      "module": "language/javascript",
+      "state": "DRAFT",
+      "repository_path": "packages/code-compiler",
+      "branch": "feature/tspec-ad02-javascript-language-adapter",
+      "parent_branch": "main",
+      "blocks": [],
+      "reviewers": [
+        "ROLE_ARCHITECT"
+      ],
+      "version": "1.0.0",
+      "created_at": "2026-06-27T00:00:00Z",
+      "updated_at": "2026-06-27T00:00:00Z",
+      "wave": 5,
+      "critical_path": false,
+      "parallel_group": "wave-5"
+    },
+    {
+      "priority": "P2",
+      "complexity": "MEDIUM",
+      "risk": "MEDIUM",
+      "estimated_effort": 3,
+      "depends_on": [
+        "TSPEC-A007",
+        "TSPEC-I006"
+      ],
+      "references": [
+        "https://tree-sitter.github.io/tree-sitter/",
+        "https://ast-grep.github.io/"
+      ],
+      "architecture_documents": [
+        "repo_structure.md",
+        "requirement.md",
+        "decision1.md"
+      ],
+      "deliverables": [
+        "python Tree-sitter adapter: parse/symbols/imports/exports/calls/routes"
+      ],
+      "outputs": [],
+      "tests": [
+        "unit",
+        "integration",
+        "golden"
+      ],
+      "acceptance_criteria": [
+        "Builds",
+        "Typechecks",
+        "Lint clean",
+        "Tests pass",
+        "Coverage >= 95%"
+      ],
+      "forbidden_changes": [
+        "Repository IR schema",
+        "Requirement IR schema",
+        "Ontology ids / properties",
+        "Compiler pipeline / builder order",
+        "Closure / coverage / consistency rules"
+      ],
+      "labels": [
+        "implementation",
+        "code-compiler"
+      ],
+      "id": "TSPEC-AD03",
+      "title": "python language adapter",
+      "owner": "ROLE_IMPLEMENTER",
+      "package": "code-compiler",
+      "module": "language/python",
+      "state": "DRAFT",
+      "repository_path": "packages/code-compiler",
+      "branch": "feature/tspec-ad03-python-language-adapter",
+      "parent_branch": "main",
+      "blocks": [],
+      "reviewers": [
+        "ROLE_ARCHITECT"
+      ],
+      "version": "1.0.0",
+      "created_at": "2026-06-27T00:00:00Z",
+      "updated_at": "2026-06-27T00:00:00Z",
+      "wave": 5,
+      "critical_path": false,
+      "parallel_group": "wave-5"
+    },
+    {
+      "priority": "P2",
+      "complexity": "MEDIUM",
+      "risk": "MEDIUM",
+      "estimated_effort": 3,
+      "depends_on": [
+        "TSPEC-A007",
+        "TSPEC-I006"
+      ],
+      "references": [
+        "https://tree-sitter.github.io/tree-sitter/",
+        "https://ast-grep.github.io/"
+      ],
+      "architecture_documents": [
+        "repo_structure.md",
+        "requirement.md",
+        "decision1.md"
+      ],
+      "deliverables": [
+        "java Tree-sitter adapter: parse/symbols/imports/exports/calls/routes"
+      ],
+      "outputs": [],
+      "tests": [
+        "unit",
+        "integration",
+        "golden"
+      ],
+      "acceptance_criteria": [
+        "Builds",
+        "Typechecks",
+        "Lint clean",
+        "Tests pass",
+        "Coverage >= 95%"
+      ],
+      "forbidden_changes": [
+        "Repository IR schema",
+        "Requirement IR schema",
+        "Ontology ids / properties",
+        "Compiler pipeline / builder order",
+        "Closure / coverage / consistency rules"
+      ],
+      "labels": [
+        "implementation",
+        "code-compiler"
+      ],
+      "id": "TSPEC-AD04",
+      "title": "java language adapter",
+      "owner": "ROLE_IMPLEMENTER",
+      "package": "code-compiler",
+      "module": "language/java",
+      "state": "DRAFT",
+      "repository_path": "packages/code-compiler",
+      "branch": "feature/tspec-ad04-java-language-adapter",
+      "parent_branch": "main",
+      "blocks": [],
+      "reviewers": [
+        "ROLE_ARCHITECT"
+      ],
+      "version": "1.0.0",
+      "created_at": "2026-06-27T00:00:00Z",
+      "updated_at": "2026-06-27T00:00:00Z",
+      "wave": 5,
+      "critical_path": false,
+      "parallel_group": "wave-5"
+    },
+    {
+      "priority": "P2",
+      "complexity": "MEDIUM",
+      "risk": "MEDIUM",
+      "estimated_effort": 3,
+      "depends_on": [
+        "TSPEC-A007",
+        "TSPEC-I006"
+      ],
+      "references": [
+        "https://tree-sitter.github.io/tree-sitter/",
+        "https://ast-grep.github.io/"
+      ],
+      "architecture_documents": [
+        "repo_structure.md",
+        "requirement.md",
+        "decision1.md"
+      ],
+      "deliverables": [
+        "go Tree-sitter adapter: parse/symbols/imports/exports/calls/routes"
+      ],
+      "outputs": [],
+      "tests": [
+        "unit",
+        "integration",
+        "golden"
+      ],
+      "acceptance_criteria": [
+        "Builds",
+        "Typechecks",
+        "Lint clean",
+        "Tests pass",
+        "Coverage >= 95%"
+      ],
+      "forbidden_changes": [
+        "Repository IR schema",
+        "Requirement IR schema",
+        "Ontology ids / properties",
+        "Compiler pipeline / builder order",
+        "Closure / coverage / consistency rules"
+      ],
+      "labels": [
+        "implementation",
+        "code-compiler"
+      ],
+      "id": "TSPEC-AD05",
+      "title": "go language adapter",
+      "owner": "ROLE_IMPLEMENTER",
+      "package": "code-compiler",
+      "module": "language/go",
+      "state": "DRAFT",
+      "repository_path": "packages/code-compiler",
+      "branch": "feature/tspec-ad05-go-language-adapter",
+      "parent_branch": "main",
+      "blocks": [],
+      "reviewers": [
+        "ROLE_ARCHITECT"
+      ],
+      "version": "1.0.0",
+      "created_at": "2026-06-27T00:00:00Z",
+      "updated_at": "2026-06-27T00:00:00Z",
+      "wave": 5,
+      "critical_path": false,
+      "parallel_group": "wave-5"
+    },
+    {
+      "priority": "P2",
+      "complexity": "MEDIUM",
+      "risk": "MEDIUM",
+      "estimated_effort": 3,
+      "depends_on": [
+        "TSPEC-A007",
+        "TSPEC-I006"
+      ],
+      "references": [
+        "https://tree-sitter.github.io/tree-sitter/",
+        "https://ast-grep.github.io/"
+      ],
+      "architecture_documents": [
+        "repo_structure.md",
+        "requirement.md",
+        "decision1.md"
+      ],
+      "deliverables": [
+        "rust Tree-sitter adapter: parse/symbols/imports/exports/calls/routes"
+      ],
+      "outputs": [],
+      "tests": [
+        "unit",
+        "integration",
+        "golden"
+      ],
+      "acceptance_criteria": [
+        "Builds",
+        "Typechecks",
+        "Lint clean",
+        "Tests pass",
+        "Coverage >= 95%"
+      ],
+      "forbidden_changes": [
+        "Repository IR schema",
+        "Requirement IR schema",
+        "Ontology ids / properties",
+        "Compiler pipeline / builder order",
+        "Closure / coverage / consistency rules"
+      ],
+      "labels": [
+        "implementation",
+        "code-compiler"
+      ],
+      "id": "TSPEC-AD06",
+      "title": "rust language adapter",
+      "owner": "ROLE_IMPLEMENTER",
+      "package": "code-compiler",
+      "module": "language/rust",
+      "state": "DRAFT",
+      "repository_path": "packages/code-compiler",
+      "branch": "feature/tspec-ad06-rust-language-adapter",
+      "parent_branch": "main",
+      "blocks": [],
+      "reviewers": [
+        "ROLE_ARCHITECT"
+      ],
+      "version": "1.0.0",
+      "created_at": "2026-06-27T00:00:00Z",
+      "updated_at": "2026-06-27T00:00:00Z",
+      "wave": 5,
+      "critical_path": false,
+      "parallel_group": "wave-5"
+    },
+    {
+      "priority": "P2",
+      "complexity": "MEDIUM",
+      "risk": "MEDIUM",
+      "estimated_effort": 3,
+      "depends_on": [
+        "TSPEC-A007",
+        "TSPEC-I006"
+      ],
+      "references": [
+        "https://tree-sitter.github.io/tree-sitter/",
+        "https://ast-grep.github.io/"
+      ],
+      "architecture_documents": [
+        "repo_structure.md",
+        "requirement.md",
+        "decision1.md"
+      ],
+      "deliverables": [
+        "csharp Tree-sitter adapter: parse/symbols/imports/exports/calls/routes"
+      ],
+      "outputs": [],
+      "tests": [
+        "unit",
+        "integration",
+        "golden"
+      ],
+      "acceptance_criteria": [
+        "Builds",
+        "Typechecks",
+        "Lint clean",
+        "Tests pass",
+        "Coverage >= 95%"
+      ],
+      "forbidden_changes": [
+        "Repository IR schema",
+        "Requirement IR schema",
+        "Ontology ids / properties",
+        "Compiler pipeline / builder order",
+        "Closure / coverage / consistency rules"
+      ],
+      "labels": [
+        "implementation",
+        "code-compiler"
+      ],
+      "id": "TSPEC-AD07",
+      "title": "csharp language adapter",
+      "owner": "ROLE_IMPLEMENTER",
+      "package": "code-compiler",
+      "module": "language/csharp",
+      "state": "DRAFT",
+      "repository_path": "packages/code-compiler",
+      "branch": "feature/tspec-ad07-csharp-language-adapter",
+      "parent_branch": "main",
+      "blocks": [],
+      "reviewers": [
+        "ROLE_ARCHITECT"
+      ],
+      "version": "1.0.0",
+      "created_at": "2026-06-27T00:00:00Z",
+      "updated_at": "2026-06-27T00:00:00Z",
+      "wave": 5,
+      "critical_path": false,
+      "parallel_group": "wave-5"
+    },
+    {
+      "priority": "P3",
+      "complexity": "MEDIUM",
+      "risk": "MEDIUM",
+      "estimated_effort": 2,
+      "depends_on": [
+        "TSPEC-I004",
+        "TSPEC-I006"
+      ],
+      "references": [],
+      "architecture_documents": [
+        "repo_structure.md",
+        "requirement.md",
+        "decision1.md"
+      ],
+      "deliverables": [
+        "Job registry + dispatch"
+      ],
+      "outputs": [],
+      "tests": [
+        "unit",
+        "integration",
+        "golden"
+      ],
+      "acceptance_criteria": [
+        "Builds",
+        "Typechecks",
+        "Lint clean",
+        "Tests pass",
+        "Coverage >= 95%"
+      ],
+      "forbidden_changes": [
+        "Repository IR schema",
+        "Requirement IR schema",
+        "Ontology ids / properties",
+        "Compiler pipeline / builder order",
+        "Closure / coverage / consistency rules"
+      ],
+      "labels": [
+        "implementation",
+        "worker"
+      ],
+      "id": "TSPEC-APP3",
+      "title": "Worker",
+      "owner": "ROLE_IMPLEMENTER",
+      "package": "worker",
+      "module": "app",
+      "state": "DRAFT",
+      "repository_path": "apps/worker",
+      "branch": "feature/tspec-app3-worker",
+      "parent_branch": "main",
+      "blocks": [],
+      "reviewers": [
+        "ROLE_ARCHITECT"
+      ],
+      "version": "1.0.0",
+      "created_at": "2026-06-27T00:00:00Z",
+      "updated_at": "2026-06-27T00:00:00Z",
+      "wave": 5,
+      "critical_path": false,
+      "parallel_group": "wave-5"
+    },
+    {
+      "priority": "P2",
+      "complexity": "MEDIUM",
+      "risk": "MEDIUM",
+      "estimated_effort": 3,
+      "depends_on": [
+        "TSPEC-A006",
+        "TSPEC-I006"
+      ],
+      "references": [
+        "https://llvm.org/docs/WritingAnLLVMNewPMPass.html"
+      ],
+      "architecture_documents": [
+        "repo_structure.md",
+        "requirement.md",
+        "decision1.md"
+      ],
+      "deliverables": [
+        "ImportPass: deterministic facts into IRDraft"
+      ],
+      "outputs": [],
+      "tests": [
+        "unit",
+        "integration",
+        "golden"
+      ],
+      "acceptance_criteria": [
+        "Builds",
+        "Typechecks",
+        "Lint clean",
+        "Tests pass",
+        "Coverage >= 95%"
+      ],
+      "forbidden_changes": [
+        "Repository IR schema",
+        "Requirement IR schema",
+        "Ontology ids / properties",
+        "Compiler pipeline / builder order",
+        "Closure / coverage / consistency rules"
+      ],
+      "labels": [
+        "implementation",
+        "passes"
+      ],
+      "id": "TSPEC-P01",
+      "title": "ImportPass",
+      "owner": "ROLE_IMPLEMENTER",
+      "package": "passes",
+      "module": "ImportPass",
+      "state": "DRAFT",
+      "repository_path": "packages/passes",
+      "branch": "feature/tspec-p01-importpass",
+      "parent_branch": "main",
+      "blocks": [],
+      "reviewers": [
+        "ROLE_ARCHITECT"
+      ],
+      "version": "1.0.0",
+      "created_at": "2026-06-27T00:00:00Z",
+      "updated_at": "2026-06-27T00:00:00Z",
+      "wave": 5,
+      "critical_path": false,
+      "parallel_group": "wave-5"
+    },
+    {
+      "priority": "P2",
+      "complexity": "MEDIUM",
+      "risk": "MEDIUM",
+      "estimated_effort": 3,
+      "depends_on": [
+        "TSPEC-A006",
+        "TSPEC-I006"
+      ],
+      "references": [
+        "https://llvm.org/docs/WritingAnLLVMNewPMPass.html"
+      ],
+      "architecture_documents": [
+        "repo_structure.md",
+        "requirement.md",
+        "decision1.md"
+      ],
+      "deliverables": [
+        "CallPass: deterministic facts into IRDraft"
+      ],
+      "outputs": [],
+      "tests": [
+        "unit",
+        "integration",
+        "golden"
+      ],
+      "acceptance_criteria": [
+        "Builds",
+        "Typechecks",
+        "Lint clean",
+        "Tests pass",
+        "Coverage >= 95%"
+      ],
+      "forbidden_changes": [
+        "Repository IR schema",
+        "Requirement IR schema",
+        "Ontology ids / properties",
+        "Compiler pipeline / builder order",
+        "Closure / coverage / consistency rules"
+      ],
+      "labels": [
+        "implementation",
+        "passes"
+      ],
+      "id": "TSPEC-P02",
+      "title": "CallPass",
+      "owner": "ROLE_IMPLEMENTER",
+      "package": "passes",
+      "module": "CallPass",
+      "state": "DRAFT",
+      "repository_path": "packages/passes",
+      "branch": "feature/tspec-p02-callpass",
+      "parent_branch": "main",
+      "blocks": [],
+      "reviewers": [
+        "ROLE_ARCHITECT"
+      ],
+      "version": "1.0.0",
+      "created_at": "2026-06-27T00:00:00Z",
+      "updated_at": "2026-06-27T00:00:00Z",
+      "wave": 5,
+      "critical_path": false,
+      "parallel_group": "wave-5"
+    },
+    {
+      "priority": "P2",
+      "complexity": "MEDIUM",
+      "risk": "MEDIUM",
+      "estimated_effort": 3,
+      "depends_on": [
+        "TSPEC-A006",
+        "TSPEC-I006"
+      ],
+      "references": [
+        "https://llvm.org/docs/WritingAnLLVMNewPMPass.html"
+      ],
+      "architecture_documents": [
+        "repo_structure.md",
+        "requirement.md",
+        "decision1.md"
+      ],
+      "deliverables": [
+        "RoutePass: deterministic facts into IRDraft"
+      ],
+      "outputs": [],
+      "tests": [
+        "unit",
+        "integration",
+        "golden"
+      ],
+      "acceptance_criteria": [
+        "Builds",
+        "Typechecks",
+        "Lint clean",
+        "Tests pass",
+        "Coverage >= 95%"
+      ],
+      "forbidden_changes": [
+        "Repository IR schema",
+        "Requirement IR schema",
+        "Ontology ids / properties",
+        "Compiler pipeline / builder order",
+        "Closure / coverage / consistency rules"
+      ],
+      "labels": [
+        "implementation",
+        "passes"
+      ],
+      "id": "TSPEC-P03",
+      "title": "RoutePass",
+      "owner": "ROLE_IMPLEMENTER",
+      "package": "passes",
+      "module": "RoutePass",
+      "state": "DRAFT",
+      "repository_path": "packages/passes",
+      "branch": "feature/tspec-p03-routepass",
+      "parent_branch": "main",
+      "blocks": [],
+      "reviewers": [
+        "ROLE_ARCHITECT"
+      ],
+      "version": "1.0.0",
+      "created_at": "2026-06-27T00:00:00Z",
+      "updated_at": "2026-06-27T00:00:00Z",
+      "wave": 5,
+      "critical_path": false,
+      "parallel_group": "wave-5"
+    },
+    {
+      "priority": "P2",
+      "complexity": "MEDIUM",
+      "risk": "MEDIUM",
+      "estimated_effort": 3,
+      "depends_on": [
+        "TSPEC-A006",
+        "TSPEC-I006"
+      ],
+      "references": [
+        "https://llvm.org/docs/WritingAnLLVMNewPMPass.html"
+      ],
+      "architecture_documents": [
+        "repo_structure.md",
+        "requirement.md",
+        "decision1.md"
+      ],
+      "deliverables": [
+        "ComponentPass: deterministic facts into IRDraft"
+      ],
+      "outputs": [],
+      "tests": [
+        "unit",
+        "integration",
+        "golden"
+      ],
+      "acceptance_criteria": [
+        "Builds",
+        "Typechecks",
+        "Lint clean",
+        "Tests pass",
+        "Coverage >= 95%"
+      ],
+      "forbidden_changes": [
+        "Repository IR schema",
+        "Requirement IR schema",
+        "Ontology ids / properties",
+        "Compiler pipeline / builder order",
+        "Closure / coverage / consistency rules"
+      ],
+      "labels": [
+        "implementation",
+        "passes"
+      ],
+      "id": "TSPEC-P04",
+      "title": "ComponentPass",
+      "owner": "ROLE_IMPLEMENTER",
+      "package": "passes",
+      "module": "ComponentPass",
+      "state": "DRAFT",
+      "repository_path": "packages/passes",
+      "branch": "feature/tspec-p04-componentpass",
+      "parent_branch": "main",
+      "blocks": [],
+      "reviewers": [
+        "ROLE_ARCHITECT"
+      ],
+      "version": "1.0.0",
+      "created_at": "2026-06-27T00:00:00Z",
+      "updated_at": "2026-06-27T00:00:00Z",
+      "wave": 5,
+      "critical_path": false,
+      "parallel_group": "wave-5"
+    },
+    {
+      "priority": "P2",
+      "complexity": "MEDIUM",
+      "risk": "MEDIUM",
+      "estimated_effort": 3,
+      "depends_on": [
+        "TSPEC-A006",
+        "TSPEC-I006"
+      ],
+      "references": [
+        "https://llvm.org/docs/WritingAnLLVMNewPMPass.html"
+      ],
+      "architecture_documents": [
+        "repo_structure.md",
+        "requirement.md",
+        "decision1.md"
+      ],
+      "deliverables": [
+        "SQLPass: deterministic facts into IRDraft"
+      ],
+      "outputs": [],
+      "tests": [
+        "unit",
+        "integration",
+        "golden"
+      ],
+      "acceptance_criteria": [
+        "Builds",
+        "Typechecks",
+        "Lint clean",
+        "Tests pass",
+        "Coverage >= 95%"
+      ],
+      "forbidden_changes": [
+        "Repository IR schema",
+        "Requirement IR schema",
+        "Ontology ids / properties",
+        "Compiler pipeline / builder order",
+        "Closure / coverage / consistency rules"
+      ],
+      "labels": [
+        "implementation",
+        "passes"
+      ],
+      "id": "TSPEC-P05",
+      "title": "SQLPass",
+      "owner": "ROLE_IMPLEMENTER",
+      "package": "passes",
+      "module": "SQLPass",
+      "state": "DRAFT",
+      "repository_path": "packages/passes",
+      "branch": "feature/tspec-p05-sqlpass",
+      "parent_branch": "main",
+      "blocks": [],
+      "reviewers": [
+        "ROLE_ARCHITECT"
+      ],
+      "version": "1.0.0",
+      "created_at": "2026-06-27T00:00:00Z",
+      "updated_at": "2026-06-27T00:00:00Z",
+      "wave": 5,
+      "critical_path": false,
+      "parallel_group": "wave-5"
+    },
+    {
+      "priority": "P2",
+      "complexity": "MEDIUM",
+      "risk": "MEDIUM",
+      "estimated_effort": 3,
+      "depends_on": [
+        "TSPEC-A006",
+        "TSPEC-I006"
+      ],
+      "references": [
+        "https://llvm.org/docs/WritingAnLLVMNewPMPass.html"
+      ],
+      "architecture_documents": [
+        "repo_structure.md",
+        "requirement.md",
+        "decision1.md"
+      ],
+      "deliverables": [
+        "EventPass: deterministic facts into IRDraft"
+      ],
+      "outputs": [],
+      "tests": [
+        "unit",
+        "integration",
+        "golden"
+      ],
+      "acceptance_criteria": [
+        "Builds",
+        "Typechecks",
+        "Lint clean",
+        "Tests pass",
+        "Coverage >= 95%"
+      ],
+      "forbidden_changes": [
+        "Repository IR schema",
+        "Requirement IR schema",
+        "Ontology ids / properties",
+        "Compiler pipeline / builder order",
+        "Closure / coverage / consistency rules"
+      ],
+      "labels": [
+        "implementation",
+        "passes"
+      ],
+      "id": "TSPEC-P06",
+      "title": "EventPass",
+      "owner": "ROLE_IMPLEMENTER",
+      "package": "passes",
+      "module": "EventPass",
+      "state": "DRAFT",
+      "repository_path": "packages/passes",
+      "branch": "feature/tspec-p06-eventpass",
+      "parent_branch": "main",
+      "blocks": [],
+      "reviewers": [
+        "ROLE_ARCHITECT"
+      ],
+      "version": "1.0.0",
+      "created_at": "2026-06-27T00:00:00Z",
+      "updated_at": "2026-06-27T00:00:00Z",
+      "wave": 5,
+      "critical_path": false,
+      "parallel_group": "wave-5"
+    },
+    {
+      "priority": "P2",
+      "complexity": "MEDIUM",
+      "risk": "MEDIUM",
+      "estimated_effort": 3,
+      "depends_on": [
+        "TSPEC-A006",
+        "TSPEC-I006"
+      ],
+      "references": [
+        "https://llvm.org/docs/WritingAnLLVMNewPMPass.html"
+      ],
+      "architecture_documents": [
+        "repo_structure.md",
+        "requirement.md",
+        "decision1.md"
+      ],
+      "deliverables": [
+        "DependencyPass: deterministic facts into IRDraft"
+      ],
+      "outputs": [],
+      "tests": [
+        "unit",
+        "integration",
+        "golden"
+      ],
+      "acceptance_criteria": [
+        "Builds",
+        "Typechecks",
+        "Lint clean",
+        "Tests pass",
+        "Coverage >= 95%"
+      ],
+      "forbidden_changes": [
+        "Repository IR schema",
+        "Requirement IR schema",
+        "Ontology ids / properties",
+        "Compiler pipeline / builder order",
+        "Closure / coverage / consistency rules"
+      ],
+      "labels": [
+        "implementation",
+        "passes"
+      ],
+      "id": "TSPEC-P07",
+      "title": "DependencyPass",
+      "owner": "ROLE_IMPLEMENTER",
+      "package": "passes",
+      "module": "DependencyPass",
+      "state": "DRAFT",
+      "repository_path": "packages/passes",
+      "branch": "feature/tspec-p07-dependencypass",
+      "parent_branch": "main",
+      "blocks": [],
+      "reviewers": [
+        "ROLE_ARCHITECT"
+      ],
+      "version": "1.0.0",
+      "created_at": "2026-06-27T00:00:00Z",
+      "updated_at": "2026-06-27T00:00:00Z",
+      "wave": 5,
+      "critical_path": false,
+      "parallel_group": "wave-5"
+    },
+    {
+      "priority": "P2",
+      "complexity": "MEDIUM",
+      "risk": "MEDIUM",
+      "estimated_effort": 3,
+      "depends_on": [
+        "TSPEC-A006",
+        "TSPEC-I006"
+      ],
+      "references": [
+        "https://llvm.org/docs/WritingAnLLVMNewPMPass.html"
+      ],
+      "architecture_documents": [
+        "repo_structure.md",
+        "requirement.md",
+        "decision1.md"
+      ],
+      "deliverables": [
+        "OwnershipPass: deterministic facts into IRDraft"
+      ],
+      "outputs": [],
+      "tests": [
+        "unit",
+        "integration",
+        "golden"
+      ],
+      "acceptance_criteria": [
+        "Builds",
+        "Typechecks",
+        "Lint clean",
+        "Tests pass",
+        "Coverage >= 95%"
+      ],
+      "forbidden_changes": [
+        "Repository IR schema",
+        "Requirement IR schema",
+        "Ontology ids / properties",
+        "Compiler pipeline / builder order",
+        "Closure / coverage / consistency rules"
+      ],
+      "labels": [
+        "implementation",
+        "passes"
+      ],
+      "id": "TSPEC-P08",
+      "title": "OwnershipPass",
+      "owner": "ROLE_IMPLEMENTER",
+      "package": "passes",
+      "module": "OwnershipPass",
+      "state": "DRAFT",
+      "repository_path": "packages/passes",
+      "branch": "feature/tspec-p08-ownershippass",
+      "parent_branch": "main",
+      "blocks": [],
+      "reviewers": [
+        "ROLE_ARCHITECT"
+      ],
+      "version": "1.0.0",
+      "created_at": "2026-06-27T00:00:00Z",
+      "updated_at": "2026-06-27T00:00:00Z",
+      "wave": 5,
+      "critical_path": false,
+      "parallel_group": "wave-5"
+    },
+    {
+      "priority": "P2",
+      "complexity": "MEDIUM",
+      "risk": "MEDIUM",
+      "estimated_effort": 3,
+      "depends_on": [
+        "TSPEC-A006",
+        "TSPEC-I006"
+      ],
+      "references": [
+        "https://llvm.org/docs/WritingAnLLVMNewPMPass.html"
+      ],
+      "architecture_documents": [
+        "repo_structure.md",
+        "requirement.md",
+        "decision1.md"
+      ],
+      "deliverables": [
+        "CapabilityPass: deterministic facts into IRDraft"
+      ],
+      "outputs": [],
+      "tests": [
+        "unit",
+        "integration",
+        "golden"
+      ],
+      "acceptance_criteria": [
+        "Builds",
+        "Typechecks",
+        "Lint clean",
+        "Tests pass",
+        "Coverage >= 95%"
+      ],
+      "forbidden_changes": [
+        "Repository IR schema",
+        "Requirement IR schema",
+        "Ontology ids / properties",
+        "Compiler pipeline / builder order",
+        "Closure / coverage / consistency rules"
+      ],
+      "labels": [
+        "implementation",
+        "passes"
+      ],
+      "id": "TSPEC-P09",
+      "title": "CapabilityPass",
+      "owner": "ROLE_IMPLEMENTER",
+      "package": "passes",
+      "module": "CapabilityPass",
+      "state": "DRAFT",
+      "repository_path": "packages/passes",
+      "branch": "feature/tspec-p09-capabilitypass",
+      "parent_branch": "main",
+      "blocks": [
+        "TSPEC-E01"
+      ],
+      "reviewers": [
+        "ROLE_ARCHITECT"
+      ],
+      "version": "1.0.0",
+      "created_at": "2026-06-27T00:00:00Z",
+      "updated_at": "2026-06-27T00:00:00Z",
+      "wave": 5,
+      "critical_path": true,
+      "parallel_group": "wave-5"
+    },
+    {
+      "priority": "P2",
+      "complexity": "MEDIUM",
+      "risk": "MEDIUM",
+      "estimated_effort": 3,
+      "depends_on": [
+        "TSPEC-A006",
+        "TSPEC-I006"
+      ],
+      "references": [
+        "https://llvm.org/docs/WritingAnLLVMNewPMPass.html"
+      ],
+      "architecture_documents": [
+        "repo_structure.md",
+        "requirement.md",
+        "decision1.md"
+      ],
+      "deliverables": [
+        "ConstraintPass: deterministic facts into IRDraft"
+      ],
+      "outputs": [],
+      "tests": [
+        "unit",
+        "integration",
+        "golden"
+      ],
+      "acceptance_criteria": [
+        "Builds",
+        "Typechecks",
+        "Lint clean",
+        "Tests pass",
+        "Coverage >= 95%"
+      ],
+      "forbidden_changes": [
+        "Repository IR schema",
+        "Requirement IR schema",
+        "Ontology ids / properties",
+        "Compiler pipeline / builder order",
+        "Closure / coverage / consistency rules"
+      ],
+      "labels": [
+        "implementation",
+        "passes"
+      ],
+      "id": "TSPEC-P10",
+      "title": "ConstraintPass",
+      "owner": "ROLE_IMPLEMENTER",
+      "package": "passes",
+      "module": "ConstraintPass",
+      "state": "DRAFT",
+      "repository_path": "packages/passes",
+      "branch": "feature/tspec-p10-constraintpass",
+      "parent_branch": "main",
+      "blocks": [],
+      "reviewers": [
+        "ROLE_ARCHITECT"
+      ],
+      "version": "1.0.0",
+      "created_at": "2026-06-27T00:00:00Z",
+      "updated_at": "2026-06-27T00:00:00Z",
+      "wave": 5,
+      "critical_path": false,
+      "parallel_group": "wave-5"
+    },
+    {
+      "priority": "P2",
+      "complexity": "MEDIUM",
+      "risk": "MEDIUM",
+      "estimated_effort": 3,
+      "depends_on": [
+        "TSPEC-A006",
+        "TSPEC-I006"
+      ],
+      "references": [
+        "https://llvm.org/docs/WritingAnLLVMNewPMPass.html"
+      ],
+      "architecture_documents": [
+        "repo_structure.md",
+        "requirement.md",
+        "decision1.md"
+      ],
+      "deliverables": [
+        "FlowPass: deterministic facts into IRDraft"
+      ],
+      "outputs": [],
+      "tests": [
+        "unit",
+        "integration",
+        "golden"
+      ],
+      "acceptance_criteria": [
+        "Builds",
+        "Typechecks",
+        "Lint clean",
+        "Tests pass",
+        "Coverage >= 95%"
+      ],
+      "forbidden_changes": [
+        "Repository IR schema",
+        "Requirement IR schema",
+        "Ontology ids / properties",
+        "Compiler pipeline / builder order",
+        "Closure / coverage / consistency rules"
+      ],
+      "labels": [
+        "implementation",
+        "passes"
+      ],
+      "id": "TSPEC-P11",
+      "title": "FlowPass",
+      "owner": "ROLE_IMPLEMENTER",
+      "package": "passes",
+      "module": "FlowPass",
+      "state": "DRAFT",
+      "repository_path": "packages/passes",
+      "branch": "feature/tspec-p11-flowpass",
+      "parent_branch": "main",
+      "blocks": [],
+      "reviewers": [
+        "ROLE_ARCHITECT"
+      ],
+      "version": "1.0.0",
+      "created_at": "2026-06-27T00:00:00Z",
+      "updated_at": "2026-06-27T00:00:00Z",
+      "wave": 5,
+      "critical_path": false,
+      "parallel_group": "wave-5"
+    },
+    {
+      "priority": "P2",
+      "complexity": "MEDIUM",
+      "risk": "MEDIUM",
+      "estimated_effort": 3,
+      "depends_on": [
+        "TSPEC-A006",
+        "TSPEC-I006"
+      ],
+      "references": [
+        "https://llvm.org/docs/WritingAnLLVMNewPMPass.html"
+      ],
+      "architecture_documents": [
+        "repo_structure.md",
+        "requirement.md",
+        "decision1.md"
+      ],
+      "deliverables": [
+        "ReachabilityPass: deterministic facts into IRDraft"
+      ],
+      "outputs": [],
+      "tests": [
+        "unit",
+        "integration",
+        "golden"
+      ],
+      "acceptance_criteria": [
+        "Builds",
+        "Typechecks",
+        "Lint clean",
+        "Tests pass",
+        "Coverage >= 95%"
+      ],
+      "forbidden_changes": [
+        "Repository IR schema",
+        "Requirement IR schema",
+        "Ontology ids / properties",
+        "Compiler pipeline / builder order",
+        "Closure / coverage / consistency rules"
+      ],
+      "labels": [
+        "implementation",
+        "passes"
+      ],
+      "id": "TSPEC-P12",
+      "title": "ReachabilityPass",
+      "owner": "ROLE_IMPLEMENTER",
+      "package": "passes",
+      "module": "ReachabilityPass",
+      "state": "DRAFT",
+      "repository_path": "packages/passes",
+      "branch": "feature/tspec-p12-reachabilitypass",
+      "parent_branch": "main",
+      "blocks": [
+        "TSPEC-E01"
+      ],
+      "reviewers": [
+        "ROLE_ARCHITECT"
+      ],
+      "version": "1.0.0",
+      "created_at": "2026-06-27T00:00:00Z",
+      "updated_at": "2026-06-27T00:00:00Z",
+      "wave": 5,
+      "critical_path": false,
+      "parallel_group": "wave-5"
+    },
+    {
+      "priority": "P2",
+      "complexity": "MEDIUM",
+      "risk": "MEDIUM",
+      "estimated_effort": 3,
+      "depends_on": [
+        "TSPEC-A006",
+        "TSPEC-I006"
+      ],
+      "references": [
+        "https://llvm.org/docs/WritingAnLLVMNewPMPass.html"
+      ],
+      "architecture_documents": [
+        "repo_structure.md",
+        "requirement.md",
+        "decision1.md"
+      ],
+      "deliverables": [
+        "DocumentationPass: deterministic facts into IRDraft"
+      ],
+      "outputs": [],
+      "tests": [
+        "unit",
+        "integration",
+        "golden"
+      ],
+      "acceptance_criteria": [
+        "Builds",
+        "Typechecks",
+        "Lint clean",
+        "Tests pass",
+        "Coverage >= 95%"
+      ],
+      "forbidden_changes": [
+        "Repository IR schema",
+        "Requirement IR schema",
+        "Ontology ids / properties",
+        "Compiler pipeline / builder order",
+        "Closure / coverage / consistency rules"
+      ],
+      "labels": [
+        "implementation",
+        "passes"
+      ],
+      "id": "TSPEC-P13",
+      "title": "DocumentationPass",
+      "owner": "ROLE_IMPLEMENTER",
+      "package": "passes",
+      "module": "DocumentationPass",
+      "state": "DRAFT",
+      "repository_path": "packages/passes",
+      "branch": "feature/tspec-p13-documentationpass",
+      "parent_branch": "main",
+      "blocks": [],
+      "reviewers": [
+        "ROLE_ARCHITECT"
+      ],
+      "version": "1.0.0",
+      "created_at": "2026-06-27T00:00:00Z",
+      "updated_at": "2026-06-27T00:00:00Z",
+      "wave": 5,
+      "critical_path": false,
+      "parallel_group": "wave-5"
+    },
+    {
+      "priority": "P2",
+      "complexity": "MEDIUM",
+      "risk": "MEDIUM",
+      "estimated_effort": 3,
+      "depends_on": [
+        "TSPEC-A006",
+        "TSPEC-I006"
+      ],
+      "references": [
+        "https://llvm.org/docs/WritingAnLLVMNewPMPass.html"
+      ],
+      "architecture_documents": [
+        "repo_structure.md",
+        "requirement.md",
+        "decision1.md"
+      ],
+      "deliverables": [
+        "RuntimePass: deterministic facts into IRDraft"
+      ],
+      "outputs": [],
+      "tests": [
+        "unit",
+        "integration",
+        "golden"
+      ],
+      "acceptance_criteria": [
+        "Builds",
+        "Typechecks",
+        "Lint clean",
+        "Tests pass",
+        "Coverage >= 95%"
+      ],
+      "forbidden_changes": [
+        "Repository IR schema",
+        "Requirement IR schema",
+        "Ontology ids / properties",
+        "Compiler pipeline / builder order",
+        "Closure / coverage / consistency rules"
+      ],
+      "labels": [
+        "implementation",
+        "passes"
+      ],
+      "id": "TSPEC-P14",
+      "title": "RuntimePass",
+      "owner": "ROLE_IMPLEMENTER",
+      "package": "passes",
+      "module": "RuntimePass",
+      "state": "DRAFT",
+      "repository_path": "packages/passes",
+      "branch": "feature/tspec-p14-runtimepass",
+      "parent_branch": "main",
+      "blocks": [],
+      "reviewers": [
+        "ROLE_ARCHITECT"
+      ],
+      "version": "1.0.0",
+      "created_at": "2026-06-27T00:00:00Z",
+      "updated_at": "2026-06-27T00:00:00Z",
+      "wave": 5,
+      "critical_path": false,
+      "parallel_group": "wave-5"
+    },
+    {
+      "priority": "P2",
+      "complexity": "MEDIUM",
+      "risk": "MEDIUM",
+      "estimated_effort": 3,
+      "depends_on": [
+        "TSPEC-A006",
+        "TSPEC-I006"
+      ],
+      "references": [
+        "https://llvm.org/docs/WritingAnLLVMNewPMPass.html"
+      ],
+      "architecture_documents": [
+        "repo_structure.md",
+        "requirement.md",
+        "decision1.md"
+      ],
+      "deliverables": [
+        "GitPass: deterministic facts into IRDraft"
+      ],
+      "outputs": [],
+      "tests": [
+        "unit",
+        "integration",
+        "golden"
+      ],
+      "acceptance_criteria": [
+        "Builds",
+        "Typechecks",
+        "Lint clean",
+        "Tests pass",
+        "Coverage >= 95%"
+      ],
+      "forbidden_changes": [
+        "Repository IR schema",
+        "Requirement IR schema",
+        "Ontology ids / properties",
+        "Compiler pipeline / builder order",
+        "Closure / coverage / consistency rules"
+      ],
+      "labels": [
+        "implementation",
+        "passes"
+      ],
+      "id": "TSPEC-P15",
+      "title": "GitPass",
+      "owner": "ROLE_IMPLEMENTER",
+      "package": "passes",
+      "module": "GitPass",
+      "state": "DRAFT",
+      "repository_path": "packages/passes",
+      "branch": "feature/tspec-p15-gitpass",
+      "parent_branch": "main",
+      "blocks": [],
+      "reviewers": [
+        "ROLE_ARCHITECT"
+      ],
+      "version": "1.0.0",
+      "created_at": "2026-06-27T00:00:00Z",
+      "updated_at": "2026-06-27T00:00:00Z",
+      "wave": 5,
+      "critical_path": false,
+      "parallel_group": "wave-5"
+    },
+    {
+      "priority": "P1",
+      "complexity": "MEDIUM",
+      "risk": "HIGH",
+      "estimated_effort": 4,
+      "depends_on": [
+        "TSPEC-A009",
+        "TSPEC-I003",
+        "TSPEC-P09",
+        "TSPEC-P12"
+      ],
+      "references": [],
+      "architecture_documents": [
+        "repo_structure.md",
+        "requirement.md",
+        "decision1.md"
+      ],
+      "deliverables": [
+        "DefaultClosureEngine over RIR"
+      ],
+      "outputs": [],
+      "tests": [
+        "unit",
+        "integration",
+        "golden"
+      ],
+      "acceptance_criteria": [
+        "Builds",
+        "Typechecks",
+        "Lint clean",
+        "Tests pass",
+        "Coverage >= 95%"
+      ],
+      "forbidden_changes": [
+        "Repository IR schema",
+        "Requirement IR schema",
+        "Ontology ids / properties",
+        "Compiler pipeline / builder order",
+        "Closure / coverage / consistency rules"
+      ],
+      "labels": [
+        "implementation",
+        "closure"
+      ],
+      "id": "TSPEC-E01",
+      "title": "Closure engine impl",
+      "owner": "ROLE_IMPLEMENTER",
+      "package": "closure",
+      "module": "engine",
+      "state": "DRAFT",
+      "repository_path": "packages/closure",
+      "branch": "feature/tspec-e01-closure-engine-impl",
+      "parent_branch": "main",
+      "blocks": [
+        "TSPEC-APP1",
+        "TSPEC-APP2"
+      ],
+      "reviewers": [
+        "ROLE_ARCHITECT"
+      ],
+      "version": "1.0.0",
+      "created_at": "2026-06-27T00:00:00Z",
+      "updated_at": "2026-06-27T00:00:00Z",
+      "wave": 6,
+      "critical_path": true,
+      "parallel_group": "wave-6"
+    },
+    {
+      "priority": "P2",
+      "complexity": "LOW",
+      "risk": "LOW",
+      "estimated_effort": 1,
+      "depends_on": [
+        "TSPEC-AD01"
+      ],
+      "references": [],
+      "architecture_documents": [
+        "repo_structure.md",
+        "requirement.md",
+        "decision1.md"
+      ],
+      "deliverables": [
+        "Tiny express-auth repository + expected Repository IR golden"
+      ],
+      "outputs": [],
+      "tests": [
+        "golden"
+      ],
+      "acceptance_criteria": [
+        "Builds",
+        "Typechecks",
+        "Lint clean",
+        "Tests pass",
+        "Coverage >= 95%"
+      ],
+      "forbidden_changes": [
+        "Repository IR schema",
+        "Requirement IR schema",
+        "Ontology ids / properties",
+        "Compiler pipeline / builder order",
+        "Closure / coverage / consistency rules"
+      ],
+      "labels": [
+        "implementation",
+        "fixtures"
+      ],
+      "id": "TSPEC-FX01",
+      "title": "Fixture: express-auth",
+      "owner": "ROLE_IMPLEMENTER",
+      "package": "fixtures",
+      "module": "express-auth",
+      "state": "DRAFT",
+      "repository_path": "fixtures/express-auth",
+      "branch": "feature/tspec-fx01-fixture-express-auth",
+      "parent_branch": "main",
+      "blocks": [],
+      "reviewers": [
+        "ROLE_ARCHITECT"
+      ],
+      "version": "1.0.0",
+      "created_at": "2026-06-27T00:00:00Z",
+      "updated_at": "2026-06-27T00:00:00Z",
+      "wave": 6,
+      "critical_path": false,
+      "parallel_group": "wave-6"
+    },
+    {
+      "priority": "P2",
+      "complexity": "LOW",
+      "risk": "LOW",
+      "estimated_effort": 1,
+      "depends_on": [
+        "TSPEC-AD01"
+      ],
+      "references": [],
+      "architecture_documents": [
+        "repo_structure.md",
+        "requirement.md",
+        "decision1.md"
+      ],
+      "deliverables": [
+        "Tiny nestjs repository + expected Repository IR golden"
+      ],
+      "outputs": [],
+      "tests": [
+        "golden"
+      ],
+      "acceptance_criteria": [
+        "Builds",
+        "Typechecks",
+        "Lint clean",
+        "Tests pass",
+        "Coverage >= 95%"
+      ],
+      "forbidden_changes": [
+        "Repository IR schema",
+        "Requirement IR schema",
+        "Ontology ids / properties",
+        "Compiler pipeline / builder order",
+        "Closure / coverage / consistency rules"
+      ],
+      "labels": [
+        "implementation",
+        "fixtures"
+      ],
+      "id": "TSPEC-FX02",
+      "title": "Fixture: nestjs",
+      "owner": "ROLE_IMPLEMENTER",
+      "package": "fixtures",
+      "module": "nestjs",
+      "state": "DRAFT",
+      "repository_path": "fixtures/nestjs",
+      "branch": "feature/tspec-fx02-fixture-nestjs",
+      "parent_branch": "main",
+      "blocks": [],
+      "reviewers": [
+        "ROLE_ARCHITECT"
+      ],
+      "version": "1.0.0",
+      "created_at": "2026-06-27T00:00:00Z",
+      "updated_at": "2026-06-27T00:00:00Z",
+      "wave": 6,
+      "critical_path": false,
+      "parallel_group": "wave-6"
+    },
+    {
+      "priority": "P2",
+      "complexity": "LOW",
+      "risk": "LOW",
+      "estimated_effort": 1,
+      "depends_on": [
+        "TSPEC-AD01"
+      ],
+      "references": [],
+      "architecture_documents": [
+        "repo_structure.md",
+        "requirement.md",
+        "decision1.md"
+      ],
+      "deliverables": [
+        "Tiny react repository + expected Repository IR golden"
+      ],
+      "outputs": [],
+      "tests": [
+        "golden"
+      ],
+      "acceptance_criteria": [
+        "Builds",
+        "Typechecks",
+        "Lint clean",
+        "Tests pass",
+        "Coverage >= 95%"
+      ],
+      "forbidden_changes": [
+        "Repository IR schema",
+        "Requirement IR schema",
+        "Ontology ids / properties",
+        "Compiler pipeline / builder order",
+        "Closure / coverage / consistency rules"
+      ],
+      "labels": [
+        "implementation",
+        "fixtures"
+      ],
+      "id": "TSPEC-FX03",
+      "title": "Fixture: react",
+      "owner": "ROLE_IMPLEMENTER",
+      "package": "fixtures",
+      "module": "react",
+      "state": "DRAFT",
+      "repository_path": "fixtures/react",
+      "branch": "feature/tspec-fx03-fixture-react",
+      "parent_branch": "main",
+      "blocks": [],
+      "reviewers": [
+        "ROLE_ARCHITECT"
+      ],
+      "version": "1.0.0",
+      "created_at": "2026-06-27T00:00:00Z",
+      "updated_at": "2026-06-27T00:00:00Z",
+      "wave": 6,
+      "critical_path": false,
+      "parallel_group": "wave-6"
+    },
+    {
+      "priority": "P2",
+      "complexity": "LOW",
+      "risk": "LOW",
+      "estimated_effort": 1,
+      "depends_on": [
+        "TSPEC-AD01"
+      ],
+      "references": [],
+      "architecture_documents": [
+        "repo_structure.md",
+        "requirement.md",
+        "decision1.md"
+      ],
+      "deliverables": [
+        "Tiny next repository + expected Repository IR golden"
+      ],
+      "outputs": [],
+      "tests": [
+        "golden"
+      ],
+      "acceptance_criteria": [
+        "Builds",
+        "Typechecks",
+        "Lint clean",
+        "Tests pass",
+        "Coverage >= 95%"
+      ],
+      "forbidden_changes": [
+        "Repository IR schema",
+        "Requirement IR schema",
+        "Ontology ids / properties",
+        "Compiler pipeline / builder order",
+        "Closure / coverage / consistency rules"
+      ],
+      "labels": [
+        "implementation",
+        "fixtures"
+      ],
+      "id": "TSPEC-FX04",
+      "title": "Fixture: next",
+      "owner": "ROLE_IMPLEMENTER",
+      "package": "fixtures",
+      "module": "next",
+      "state": "DRAFT",
+      "repository_path": "fixtures/next",
+      "branch": "feature/tspec-fx04-fixture-next",
+      "parent_branch": "main",
+      "blocks": [],
+      "reviewers": [
+        "ROLE_ARCHITECT"
+      ],
+      "version": "1.0.0",
+      "created_at": "2026-06-27T00:00:00Z",
+      "updated_at": "2026-06-27T00:00:00Z",
+      "wave": 6,
+      "critical_path": false,
+      "parallel_group": "wave-6"
+    },
+    {
+      "priority": "P2",
+      "complexity": "LOW",
+      "risk": "LOW",
+      "estimated_effort": 1,
+      "depends_on": [
+        "TSPEC-AD01"
+      ],
+      "references": [],
+      "architecture_documents": [
+        "repo_structure.md",
+        "requirement.md",
+        "decision1.md"
+      ],
+      "deliverables": [
+        "Tiny vue repository + expected Repository IR golden"
+      ],
+      "outputs": [],
+      "tests": [
+        "golden"
+      ],
+      "acceptance_criteria": [
+        "Builds",
+        "Typechecks",
+        "Lint clean",
+        "Tests pass",
+        "Coverage >= 95%"
+      ],
+      "forbidden_changes": [
+        "Repository IR schema",
+        "Requirement IR schema",
+        "Ontology ids / properties",
+        "Compiler pipeline / builder order",
+        "Closure / coverage / consistency rules"
+      ],
+      "labels": [
+        "implementation",
+        "fixtures"
+      ],
+      "id": "TSPEC-FX05",
+      "title": "Fixture: vue",
+      "owner": "ROLE_IMPLEMENTER",
+      "package": "fixtures",
+      "module": "vue",
+      "state": "DRAFT",
+      "repository_path": "fixtures/vue",
+      "branch": "feature/tspec-fx05-fixture-vue",
+      "parent_branch": "main",
+      "blocks": [],
+      "reviewers": [
+        "ROLE_ARCHITECT"
+      ],
+      "version": "1.0.0",
+      "created_at": "2026-06-27T00:00:00Z",
+      "updated_at": "2026-06-27T00:00:00Z",
+      "wave": 6,
+      "critical_path": false,
+      "parallel_group": "wave-6"
+    },
+    {
+      "priority": "P2",
+      "complexity": "LOW",
+      "risk": "LOW",
+      "estimated_effort": 1,
+      "depends_on": [
+        "TSPEC-AD01"
+      ],
+      "references": [],
+      "architecture_documents": [
+        "repo_structure.md",
+        "requirement.md",
+        "decision1.md"
+      ],
+      "deliverables": [
+        "Tiny java repository + expected Repository IR golden"
+      ],
+      "outputs": [],
+      "tests": [
+        "golden"
+      ],
+      "acceptance_criteria": [
+        "Builds",
+        "Typechecks",
+        "Lint clean",
+        "Tests pass",
+        "Coverage >= 95%"
+      ],
+      "forbidden_changes": [
+        "Repository IR schema",
+        "Requirement IR schema",
+        "Ontology ids / properties",
+        "Compiler pipeline / builder order",
+        "Closure / coverage / consistency rules"
+      ],
+      "labels": [
+        "implementation",
+        "fixtures"
+      ],
+      "id": "TSPEC-FX06",
+      "title": "Fixture: java",
+      "owner": "ROLE_IMPLEMENTER",
+      "package": "fixtures",
+      "module": "java",
+      "state": "DRAFT",
+      "repository_path": "fixtures/java",
+      "branch": "feature/tspec-fx06-fixture-java",
+      "parent_branch": "main",
+      "blocks": [],
+      "reviewers": [
+        "ROLE_ARCHITECT"
+      ],
+      "version": "1.0.0",
+      "created_at": "2026-06-27T00:00:00Z",
+      "updated_at": "2026-06-27T00:00:00Z",
+      "wave": 6,
+      "critical_path": false,
+      "parallel_group": "wave-6"
+    },
+    {
+      "priority": "P2",
+      "complexity": "LOW",
+      "risk": "LOW",
+      "estimated_effort": 1,
+      "depends_on": [
+        "TSPEC-AD01"
+      ],
+      "references": [],
+      "architecture_documents": [
+        "repo_structure.md",
+        "requirement.md",
+        "decision1.md"
+      ],
+      "deliverables": [
+        "Tiny go repository + expected Repository IR golden"
+      ],
+      "outputs": [],
+      "tests": [
+        "golden"
+      ],
+      "acceptance_criteria": [
+        "Builds",
+        "Typechecks",
+        "Lint clean",
+        "Tests pass",
+        "Coverage >= 95%"
+      ],
+      "forbidden_changes": [
+        "Repository IR schema",
+        "Requirement IR schema",
+        "Ontology ids / properties",
+        "Compiler pipeline / builder order",
+        "Closure / coverage / consistency rules"
+      ],
+      "labels": [
+        "implementation",
+        "fixtures"
+      ],
+      "id": "TSPEC-FX07",
+      "title": "Fixture: go",
+      "owner": "ROLE_IMPLEMENTER",
+      "package": "fixtures",
+      "module": "go",
+      "state": "DRAFT",
+      "repository_path": "fixtures/go",
+      "branch": "feature/tspec-fx07-fixture-go",
+      "parent_branch": "main",
+      "blocks": [],
+      "reviewers": [
+        "ROLE_ARCHITECT"
+      ],
+      "version": "1.0.0",
+      "created_at": "2026-06-27T00:00:00Z",
+      "updated_at": "2026-06-27T00:00:00Z",
+      "wave": 6,
+      "critical_path": false,
+      "parallel_group": "wave-6"
+    },
+    {
+      "priority": "P2",
+      "complexity": "LOW",
+      "risk": "LOW",
+      "estimated_effort": 1,
+      "depends_on": [
+        "TSPEC-AD01"
+      ],
+      "references": [],
+      "architecture_documents": [
+        "repo_structure.md",
+        "requirement.md",
+        "decision1.md"
+      ],
+      "deliverables": [
+        "Tiny microservices repository + expected Repository IR golden"
+      ],
+      "outputs": [],
+      "tests": [
+        "golden"
+      ],
+      "acceptance_criteria": [
+        "Builds",
+        "Typechecks",
+        "Lint clean",
+        "Tests pass",
+        "Coverage >= 95%"
+      ],
+      "forbidden_changes": [
+        "Repository IR schema",
+        "Requirement IR schema",
+        "Ontology ids / properties",
+        "Compiler pipeline / builder order",
+        "Closure / coverage / consistency rules"
+      ],
+      "labels": [
+        "implementation",
+        "fixtures"
+      ],
+      "id": "TSPEC-FX08",
+      "title": "Fixture: microservices",
+      "owner": "ROLE_IMPLEMENTER",
+      "package": "fixtures",
+      "module": "microservices",
+      "state": "DRAFT",
+      "repository_path": "fixtures/microservices",
+      "branch": "feature/tspec-fx08-fixture-microservices",
+      "parent_branch": "main",
+      "blocks": [],
+      "reviewers": [
+        "ROLE_ARCHITECT"
+      ],
+      "version": "1.0.0",
+      "created_at": "2026-06-27T00:00:00Z",
+      "updated_at": "2026-06-27T00:00:00Z",
+      "wave": 6,
+      "critical_path": false,
+      "parallel_group": "wave-6"
+    },
+    {
+      "priority": "P2",
+      "complexity": "LOW",
+      "risk": "LOW",
+      "estimated_effort": 1,
+      "depends_on": [
+        "TSPEC-AD01"
+      ],
+      "references": [],
+      "architecture_documents": [
+        "repo_structure.md",
+        "requirement.md",
+        "decision1.md"
+      ],
+      "deliverables": [
+        "Tiny broken-repository repository + expected Repository IR golden"
+      ],
+      "outputs": [],
+      "tests": [
+        "golden"
+      ],
+      "acceptance_criteria": [
+        "Builds",
+        "Typechecks",
+        "Lint clean",
+        "Tests pass",
+        "Coverage >= 95%"
+      ],
+      "forbidden_changes": [
+        "Repository IR schema",
+        "Requirement IR schema",
+        "Ontology ids / properties",
+        "Compiler pipeline / builder order",
+        "Closure / coverage / consistency rules"
+      ],
+      "labels": [
+        "implementation",
+        "fixtures"
+      ],
+      "id": "TSPEC-FX09",
+      "title": "Fixture: broken-repository",
+      "owner": "ROLE_IMPLEMENTER",
+      "package": "fixtures",
+      "module": "broken-repository",
+      "state": "DRAFT",
+      "repository_path": "fixtures/broken-repository",
+      "branch": "feature/tspec-fx09-fixture-broken-repository",
+      "parent_branch": "main",
+      "blocks": [],
+      "reviewers": [
+        "ROLE_ARCHITECT"
+      ],
+      "version": "1.0.0",
+      "created_at": "2026-06-27T00:00:00Z",
+      "updated_at": "2026-06-27T00:00:00Z",
+      "wave": 6,
+      "critical_path": false,
+      "parallel_group": "wave-6"
+    },
+    {
+      "priority": "P2",
+      "complexity": "MEDIUM",
+      "risk": "MEDIUM",
+      "estimated_effort": 3,
+      "depends_on": [
+        "TSPEC-E01",
+        "TSPEC-E02",
+        "TSPEC-E04",
+        "TSPEC-I004"
+      ],
+      "references": [],
+      "architecture_documents": [
+        "repo_structure.md",
+        "requirement.md",
+        "decision1.md"
+      ],
+      "deliverables": [
+        "rir compile/diff/query/graph/validate/snapshot"
+      ],
+      "outputs": [],
+      "tests": [
+        "unit",
+        "integration",
+        "golden"
+      ],
+      "acceptance_criteria": [
+        "Builds",
+        "Typechecks",
+        "Lint clean",
+        "Tests pass",
+        "Coverage >= 95%"
+      ],
+      "forbidden_changes": [
+        "Repository IR schema",
+        "Requirement IR schema",
+        "Ontology ids / properties",
+        "Compiler pipeline / builder order",
+        "Closure / coverage / consistency rules"
+      ],
+      "labels": [
+        "implementation",
+        "cli"
+      ],
+      "id": "TSPEC-APP1",
+      "title": "CLI",
+      "owner": "ROLE_IMPLEMENTER",
+      "package": "cli",
+      "module": "app",
+      "state": "DRAFT",
+      "repository_path": "apps/cli",
+      "branch": "feature/tspec-app1-cli",
+      "parent_branch": "main",
+      "blocks": [
+        "TSPEC-SC01",
+        "TSPEC-SC03"
+      ],
+      "reviewers": [
+        "ROLE_ARCHITECT"
+      ],
+      "version": "1.0.0",
+      "created_at": "2026-06-27T00:00:00Z",
+      "updated_at": "2026-06-27T00:00:00Z",
+      "wave": 7,
+      "critical_path": true,
+      "parallel_group": "wave-7"
+    },
+    {
+      "priority": "P2",
+      "complexity": "MEDIUM",
+      "risk": "MEDIUM",
+      "estimated_effort": 3,
+      "depends_on": [
+        "TSPEC-E01",
+        "TSPEC-E02",
+        "TSPEC-E03",
+        "TSPEC-E04"
+      ],
+      "references": [
+        "https://fastify.dev/docs/latest/",
+        "https://zod.dev/"
+      ],
+      "architecture_documents": [
+        "repo_structure.md",
+        "requirement.md",
+        "decision1.md"
+      ],
+      "deliverables": [
+        "REST endpoints wired to engines"
+      ],
+      "outputs": [],
+      "tests": [
+        "unit",
+        "integration",
+        "golden"
+      ],
+      "acceptance_criteria": [
+        "Builds",
+        "Typechecks",
+        "Lint clean",
+        "Tests pass",
+        "Coverage >= 95%"
+      ],
+      "forbidden_changes": [
+        "Repository IR schema",
+        "Requirement IR schema",
+        "Ontology ids / properties",
+        "Compiler pipeline / builder order",
+        "Closure / coverage / consistency rules"
+      ],
+      "labels": [
+        "implementation",
+        "compiler-api"
+      ],
+      "id": "TSPEC-APP2",
+      "title": "Compiler API",
+      "owner": "ROLE_IMPLEMENTER",
+      "package": "compiler-api",
+      "module": "app",
+      "state": "DRAFT",
+      "repository_path": "apps/compiler-api",
+      "branch": "feature/tspec-app2-compiler-api",
+      "parent_branch": "main",
+      "blocks": [],
+      "reviewers": [
+        "ROLE_ARCHITECT"
+      ],
+      "version": "1.0.0",
+      "created_at": "2026-06-27T00:00:00Z",
+      "updated_at": "2026-06-27T00:00:00Z",
+      "wave": 7,
+      "critical_path": false,
+      "parallel_group": "wave-7"
+    },
+    {
+      "priority": "P2",
+      "complexity": "MEDIUM",
+      "risk": "MEDIUM",
+      "estimated_effort": 2,
+      "depends_on": [
+        "TSPEC-APP1"
+      ],
+      "references": [],
+      "architecture_documents": [
+        "repo_structure.md",
+        "requirement.md",
+        "decision1.md"
+      ],
+      "deliverables": [
+        "compile all fixtures to golden IR"
+      ],
+      "outputs": [],
+      "tests": [
+        "unit",
+        "integration",
+        "golden"
+      ],
+      "acceptance_criteria": [
+        "Builds",
+        "Typechecks",
+        "Lint clean",
+        "Tests pass",
+        "Coverage >= 95%"
+      ],
+      "forbidden_changes": [
+        "Repository IR schema",
+        "Requirement IR schema",
+        "Ontology ids / properties",
+        "Compiler pipeline / builder order",
+        "Closure / coverage / consistency rules"
+      ],
+      "labels": [
+        "implementation",
+        "scripts"
+      ],
+      "id": "TSPEC-SC01",
+      "title": "Script: compile-fixtures",
+      "owner": "ROLE_IMPLEMENTER",
+      "package": "scripts",
+      "module": "compile-fixtures",
+      "state": "DRAFT",
+      "repository_path": "scripts/compile-fixtures",
+      "branch": "feature/tspec-sc01-script-compile-fixtures",
+      "parent_branch": "main",
+      "blocks": [],
+      "reviewers": [
+        "ROLE_ARCHITECT"
+      ],
+      "version": "1.0.0",
+      "created_at": "2026-06-27T00:00:00Z",
+      "updated_at": "2026-06-27T00:00:00Z",
+      "wave": 8,
+      "critical_path": true,
+      "parallel_group": "wave-8"
+    },
+    {
+      "priority": "P3",
+      "complexity": "MEDIUM",
+      "risk": "MEDIUM",
+      "estimated_effort": 2,
+      "depends_on": [
+        "TSPEC-APP1"
+      ],
+      "references": [
+        "https://github.com/tinylibs/tinybench"
+      ],
+      "architecture_documents": [
+        "repo_structure.md",
+        "requirement.md",
+        "decision1.md"
+      ],
+      "deliverables": [
+        "compile-time / memory / graph-size benchmarks"
+      ],
+      "outputs": [],
+      "tests": [
+        "performance"
+      ],
+      "acceptance_criteria": [
+        "Builds",
+        "Typechecks",
+        "Lint clean",
+        "Tests pass",
+        "Coverage >= 95%"
+      ],
+      "forbidden_changes": [
+        "Repository IR schema",
+        "Requirement IR schema",
+        "Ontology ids / properties",
+        "Compiler pipeline / builder order",
+        "Closure / coverage / consistency rules"
+      ],
+      "labels": [
+        "implementation",
+        "scripts"
+      ],
+      "id": "TSPEC-SC03",
+      "title": "Benchmark suite",
+      "owner": "ROLE_IMPLEMENTER",
+      "package": "scripts",
+      "module": "benchmark",
+      "state": "DRAFT",
+      "repository_path": "scripts/benchmark",
+      "branch": "feature/tspec-sc03-benchmark-suite",
+      "parent_branch": "main",
+      "blocks": [],
+      "reviewers": [
+        "ROLE_ARCHITECT"
+      ],
+      "version": "1.0.0",
+      "created_at": "2026-06-27T00:00:00Z",
+      "updated_at": "2026-06-27T00:00:00Z",
+      "wave": 8,
+      "critical_path": false,
+      "parallel_group": "wave-8"
+    }
+  ]
+}

@@ -1,0 +1,35 @@
+# TSPEC template (authoring reference).
+# In practice TSPECs are authored as entries in eos/compiler/dataset.ts and the
+# Project Compiler emits the per-TSPEC YAML. This template documents every field.
+# No field is optional.
+
+id: "TSPEC-XXXX"                 # unique id (A=architect, I=foundation, P=pass, AD=adapter, DF=doc frontend, E=engine, APP=app, FX=fixture, SC=script, CI=ci)
+title: "Human readable title"
+owner: "ROLE_ARCHITECT"          # or ROLE_IMPLEMENTER — exactly one, never both
+state: "DRAFT"                   # managed by the state machine
+package: "ir"                    # package or app name
+module: "schema"                 # sub-module within the package
+repository_path: "packages/ir"   # derived
+branch: "feature/tspec-xxxx-..." # derived
+parent_branch: "main"            # always main; no stacked branches
+priority: "P0"                   # P0..P3
+complexity: "HIGH"               # LOW | MEDIUM | HIGH
+risk: "HIGH"                     # LOW | MEDIUM | HIGH
+estimated_effort: 5              # story points; also weights critical path
+depends_on: []                   # upstream TSPEC ids
+blocks: []                       # derived: downstream TSPEC ids
+references: []                   # official docs / repos / papers — implementer never searches
+architecture_documents: []       # ADRs and decision docs governing this unit
+deliverables: []                 # concrete outputs
+outputs: []                      # produced packages/artifacts
+tests: []                        # unit | integration | golden | property | performance | regression
+reviewers: ["ROLE_ARCHITECT"]
+acceptance_criteria: []          # objective completion conditions
+forbidden_changes: []            # what this TSPEC must NOT touch
+labels: []
+version: "1.0.0"
+created_at: "2026-06-27T00:00:00Z"
+updated_at: "2026-06-27T00:00:00Z"
+wave: 0                          # derived: longest dependency depth
+critical_path: false             # derived
+parallel_group: "wave-0"         # derived
