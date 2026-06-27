@@ -1,0 +1,116 @@
+================================================================================
+RIR IMPLEMENTER PROMPT 1 — TSPEC-I002: IR serializer & validator
+Branch: feature/tspec-i002-ir-serializer-validator
+Depends on: TSPEC-A001, TSPEC-A002 (already satisfied by the scaffold)
+Paste this ENTIRE file into a fresh session with your implementer model.
+================================================================================
+
+You are ROLE_IMPLEMENTER for the RIR repository. You implement exactly one TSPEC.
+
+Hard rules (from decision1.md):
+- Implement ONLY what the work order specifies. Make NO architectural decisions.
+- Do NOT change the Repository IR, Requirement IR, ontology, the compiler pipeline,
+  builder order, or any item in the work order's "Forbidden changes".
+- No TODOs, no placeholder code, no dead code. Deterministic output only.
+- If anything is ambiguous or the work order seems wrong, STOP and report — do not guess.
+
+Workflow:
+1. Create the branch named in the header below (from `main`).
+2. Implement the deliverables in the listed files only.
+3. Write the tests from section 7 (acceptance criteria) and make them pass.
+4. Run: pnpm install && pnpm build && pnpm typecheck && pnpm test  — all must be green.
+5. Open a PR using .github/pull_request_template.md with commit message
+   `<type>(<tspec-id>): <summary>` (e.g. feat(tspec-i002): ir serializer and validator).
+
+Definition of done: build + typecheck + lint + the section-7 tests + coverage >= 95%.
+
+----- WORK ORDER -----------------------------------------------------------------
+
+# TSPEC-I002 — IR serializer & validator (Work Order)
+
+> Authored by ROLE_ARCHITECT. Implement using ONLY this document. No architectural
+> decisions; if ambiguous, STOP and escalate.
+
+- **TSPEC:** TSPEC-I002 · **Owner:** ROLE_IMPLEMENTER · **Header:** `eos/tspecs/TSPEC-I002.yaml`
+- **Depends on:** TSPEC-A001, TSPEC-A002 — COMPLETE · **Wave:** 2
+
+## 1. Objective
+
+Provide a deterministic canonical serializer for `RepositoryIR` and a runtime validator
+that asserts an unknown value conforms to the IR schema. Round-tripping must be lossless.
+
+## 2. Contract (fixed — do not change)
+
+Types come from `@rir/ir` (`RepositoryIR`, `NodeIR`, `EdgeIR`, `ArtifactIR`,
+`CapabilityIR`, `RIR_VERSION`, and the guards `isNodeKind`, `isEdgeKind`,
+`isClosureState`). Use `InvariantError` from `@rir/common` for validation failures. Add:
+
+```ts
+export function serializeRepositoryIR(ir: RepositoryIR): string;
+export function parseRepositoryIR(json: string): RepositoryIR; // validates, then returns
+export function validateRepositoryIR(value: unknown): asserts value is RepositoryIR;
+```
+
+## 3. Files
+
+| Action | Path | Purpose |
+| --- | --- | --- |
+| create | `packages/ir/src/serializer.ts` | `serializeRepositoryIR` / `parseRepositoryIR` |
+| create | `packages/ir/src/validator.ts` | `validateRepositoryIR` |
+| modify | `packages/ir/src/index.ts` | export the three functions |
+| create | `tests/unit/ir-serializer.test.ts` | tests from §7 |
+
+## 4. Behavior / Algorithm
+
+1. **serializeRepositoryIR**: emit JSON with a STABLE key order. Implement a recursive
+   replacer that, for every object, writes keys in sorted (`localeCompare`) order; arrays
+   keep their element order. Two equal IRs must produce byte-identical strings.
+2. **parseRepositoryIR**: `JSON.parse`, then `validateRepositoryIR`, then return typed.
+3. **validateRepositoryIR**: throw `InvariantError` unless ALL hold:
+   - `value.version === RIR_VERSION`.
+   - `nodes`, `edges`, `artifacts`, `capabilities` are arrays.
+   - each node: non-empty string `id`, `isNodeKind(kind)`, `execution` object with boolean
+     `reachable`, `entryDistance` number-or-null, `evidence` a non-empty array.
+   - each edge: `isEdgeKind(kind)`, `from`/`to` non-empty strings, `evidence` non-empty.
+   - each capability: non-empty `capability`, `isClosureState(closure)`, `nodes` array.
+   - every edge `from`/`to` and every capability member id exists in `nodes`.
+
+## 5. Input → Output examples (golden)
+
+- `parseRepositoryIR(serializeRepositoryIR(ir))` deep-equals `ir` for any valid `ir`
+  (use `emptyRepositoryIR()` and the `fixtures/broken-repository/repository-ir.json`).
+- `serializeRepositoryIR` of two structurally-equal IRs returns identical strings.
+- `validateRepositoryIR({ version: "0.0.0", ... })` throws `InvariantError`.
+
+## 6. Edge cases
+
+- Empty IR (`emptyRepositoryIR()`) serializes and validates successfully.
+- A node with an unknown `kind` → `InvariantError`.
+- An edge referencing a missing node id → `InvariantError`.
+
+## 7. Acceptance criteria (each is a test)
+
+1. round-trip lossless for `emptyRepositoryIR()` and the broken-repository fixture.
+2. serialization is deterministic (equal IRs → identical strings; key order stable).
+3. invalid version throws `InvariantError`.
+4. unknown node kind throws.
+5. dangling edge reference throws.
+6. valid fixture passes `validateRepositoryIR` without throwing.
+7. coverage for both new files ≥ 95%.
+
+## 8. Forbidden changes
+
+- Do NOT modify any IR type, enum, or guard (TSPEC-A001/A002).
+- Do NOT add fields to the IR.
+- Do NOT touch packages other than `ir`.
+
+## 9. References
+
+- `JSON.stringify` replacer/space: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify
+- Existing guards and types: `packages/ir/src/index.ts`.
+
+## 10. Definition of done
+
+build · typecheck · lint · the §7 tests · coverage ≥ 95% · PR `feat(tspec-i002): ir serializer and validator`.
+
+----------------------------------------------------------------------------------

@@ -16,7 +16,8 @@
     "test:watch": "vitest",
     "lint": "eslint .",
     "rir": "node --import tsx apps/cli/src/index.ts",
-    "eos:compile": "tsx eos/compiler/compile.ts"
+    "eos:compile": "tsx eos/compiler/compile.ts",
+    "eos:prompts": "tsx eos/compiler/make-prompts.ts"
   },
   "devDependencies": {
     "@types/node": "^22.10.0",
