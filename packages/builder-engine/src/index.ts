@@ -44,6 +44,19 @@ export class DefaultIRDraft implements IRDraft {
     this.capabilities.set(capability.id, capability);
   }
 
+  getNodes(): readonly NodeIR[] {
+    return [...this.nodes.values()];
+  }
+  getEdges(): readonly EdgeIR[] {
+    return [...this.edges.values()];
+  }
+  getNode(id: string): NodeIR | undefined {
+    return this.nodes.get(id);
+  }
+  getCapabilities(): readonly CapabilityIR[] {
+    return [...this.capabilities.values()];
+  }
+
   seal(): RepositoryIR {
     return {
       version: RIR_VERSION,

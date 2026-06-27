@@ -89,10 +89,12 @@ OpenTelemetry, Tarjan SCC. Implementers never search — references are provided
 - New ADRs follow [eos/templates/adr-template.md](../eos/templates/adr-template.md) and
   reference their TSPEC.
 
-### Pending architect decisions (block the pass/frontend layer)
-- IRDraft read contract (`getNodes/getEdges`) — see ADR-0006 open item — blocks TSPEC-P*.
-- Symbol→node creation model + capability discovery rules — blocks CallPass/CapabilityPass.
-- Requirement normalization ruleset — see ADR-0009 — blocks TSPEC-DF*.
+- [ADR-0016 — Pass Pipeline (data flow, node creation, discovery)](ADR-0016-pass-pipeline.md) — amends A005/A006
+
+### Pending architect decisions
+- ~~IRDraft read contract~~ — RESOLVED in ADR-0016.
+- ~~Symbol→node creation model + capability discovery rules~~ — RESOLVED in ADR-0016. TSPEC-P* unblocked.
+- Requirement normalization ruleset — see ADR-0009 — still blocks TSPEC-DF*.
 
 ## Research Index
 

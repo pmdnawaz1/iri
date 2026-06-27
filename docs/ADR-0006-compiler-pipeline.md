@@ -15,8 +15,8 @@ responsibility, are deterministic and idempotent, and communicate ONLY through t
 2. Plugins register builders; no language-specific hacks in the core.
 3. No hidden shared state between passes.
 
-## Open item (deferred — blocks the pass layer)
-`IRDraft` is currently write-only (`addNode/addEdge/seal`). Passes that must consume
-earlier passes' output (e.g. ReachabilityPass reading nodes+edges) require read access.
-A read contract (`getNodes()/getEdges()`) is a pending architect decision (future ADR)
-that must land before TSPEC-P* can be handed off.
+## Resolved (ADR-0016)
+The `IRDraft` read contract is now defined: `getNodes()`, `getEdges()`, `getNode(id)`,
+`getCapabilities()`, with idempotent writes by id. The frontend→pass data flow
+(`CompilationContext.parseResults`) and node-creation/classification model are also
+decided in ADR-0016. The pass layer (TSPEC-P*) is unblocked.

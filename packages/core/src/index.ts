@@ -8,12 +8,65 @@
  * must not be changed by implementers.
  */
 
-import type { ArtifactIR, RepositoryIR } from "@rir/ir";
+import type { ArtifactIR, CapabilityIR, EdgeIR, NodeIR, RepositoryIR, Span } from "@rir/ir";
+
+// ---------------------------------------------------------------------------
+// Frontend facts — the canonical, NON-semantic output of a language adapter.
+// Defined here (not in @rir/code-compiler) so both adapters AND passes can share
+// the contract without a circular dependency. Adapters produce these; the early
+// passes lift them into IR nodes/edges. See ADR-0016.
+// ---------------------------------------------------------------------------
+
+/** A raw symbol declared in a source file (syntactic; no role classification). */
+export interface SymbolFact {
+  readonly name: string;
+  readonly kind: "function" | "class" | "method" | "variable" | "type" | "interface";
+  readonly exported: boolean;
+  readonly span: Span;
+}
+
+/** A raw import as written in source (unresolved). */
+export interface ImportFact {
+  readonly specifier: string;
+  readonly imported: readonly string[];
+  readonly span: Span;
+}
+
+/** A raw call site (callee text as written, unresolved). */
+export interface CallFact {
+  readonly callee: string;
+  readonly span: Span;
+}
+
+/** A route declaration discovered syntactically (no semantic mapping). */
+export interface RouteFact {
+  readonly method: string;
+  readonly path: string;
+  readonly handler: string;
+  readonly span: Span;
+}
+
+/** The canonical, non-semantic result of parsing one file. */
+export interface ParseResult {
+  readonly artifact: ArtifactIR;
+  readonly symbols: readonly SymbolFact[];
+  readonly imports: readonly ImportFact[];
+  readonly exports: readonly string[];
+  readonly calls: readonly CallFact[];
+  readonly routes: readonly RouteFact[];
+}
 
 /** Immutable inputs handed to every pass during one compilation. */
 export interface CompilationContext {
   readonly repositoryRoot: string;
   readonly artifacts: readonly ArtifactIR[];
+  /**
+   * Frontend parse results for the repository, produced by the language adapters
+   * before any pass runs. The early passes (Import/Call/Route…) lift these facts
+   * into IR nodes and edges. Optional because it is absent during the frontend
+   * (adapter) phase and populated for the pass phase; passes read `?? []`.
+   */
+  readonly parseResults?: readonly ParseResult[];
   /** Structured logger; passes log but never alter outputs through logging. */
   readonly logger: Logger;
 }
@@ -49,12 +102,27 @@ export interface Builder {
   passes(): readonly Pass[];
 }
 
-/** Mutable accumulator used while compiling; sealed into an immutable RepositoryIR. */
+/**
+ * Mutable accumulator used while compiling; sealed into an immutable RepositoryIR.
+ *
+ * Writes are idempotent by id (re-adding a node/edge with the same id replaces it),
+ * so multiple passes may contribute the same vertex without conflict. READ access is
+ * required so a later pass can consume an earlier pass's output (e.g. ReachabilityPass
+ * reading the nodes/edges produced by Call/Route passes). See ADR-0006 / ADR-0016.
+ */
 export interface IRDraft {
-  addNode(node: RepositoryIR["nodes"][number]): void;
-  addEdge(edge: RepositoryIR["edges"][number]): void;
+  addNode(node: NodeIR): void;
+  addEdge(edge: EdgeIR): void;
   addArtifact(artifact: ArtifactIR): void;
-  addCapability(capability: RepositoryIR["capabilities"][number]): void;
+  addCapability(capability: CapabilityIR): void;
+  /** Snapshot of nodes added so far (read access for later passes). */
+  getNodes(): readonly NodeIR[];
+  /** Snapshot of edges added so far. */
+  getEdges(): readonly EdgeIR[];
+  /** A single node by id, or undefined. */
+  getNode(id: string): NodeIR | undefined;
+  /** Snapshot of capabilities added so far. */
+  getCapabilities(): readonly CapabilityIR[];
   seal(): RepositoryIR;
 }
 
