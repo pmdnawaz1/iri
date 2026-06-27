@@ -37,7 +37,7 @@ export class CapabilityPass extends AbstractPass {
         if (!path) continue;
         const segments = path.split("/").filter(Boolean);
         if (segments.length === 0) continue;
-        
+
         const lastSegment = segments[segments.length - 1];
         if (!lastSegment) continue;
         const key = lastSegment.toLowerCase();
