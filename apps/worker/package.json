@@ -3,6 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "type": "module",
+  "main": "src/index.ts",
   "description": "Background jobs: compile repository/documents, rebuild graph, ontology update, snapshots, git history.",
   "scripts": {
     "build": "tsc -b",

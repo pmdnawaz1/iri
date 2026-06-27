@@ -13,6 +13,9 @@ import { DefaultCoverageEngine } from "@rir/coverage";
 import { DefaultConsistencyEngine } from "@rir/consistency";
 import { QueryEngine } from "@rir/query-engine";
 import { emptyRequirementSet, type RepositoryIR } from "@rir/ir";
+import { Worker } from "@rir/worker";
+import { CompileRepository } from "../../worker/src/jobs/compile-repository.js";
+import * as fs from "fs";
 
 const irBody = z.object({ ir: z.unknown() });
 
@@ -46,10 +49,33 @@ export function buildServer() {
     return { subgraph: engine.capabilitySubgraph(capability) };
   });
 
+  app.post("/compile/repository", async (req, reply) => {
+    const schema = z.object({ dir: z.string() });
+    const parsed = schema.safeParse(req.body);
+    if (!parsed.success) {
+      reply.code(400);
+      return { error: "bad request" };
+    }
+    const dir = parsed.data.dir;
+    if (!fs.existsSync(dir)) {
+      reply.code(400);
+      return { error: "bad request" };
+    }
+
+    // Instead of a global queue for now, we instantiate a local worker and dispatch.
+    // The dispatch runs in the background (we don't await it to return 202 immediately).
+    const worker = new Worker().register(new CompileRepository(dir));
+    worker.dispatch("CompileRepository").catch((err) => {
+      app.log.error(err, "background job failed");
+    });
+
+    reply.code(202);
+    return { status: "queued", dir };
+  });
+
   for (const route of [
     "/compile/code",
     "/compile/document",
-    "/compile/repository",
     "/diff",
     "/graph",
     "/snapshot",
