@@ -20,21 +20,14 @@ const ctx: CompilationContext = {
 
 const fixtureDir = join(import.meta.dirname, "../../fixtures/rust");
 
-const repositorySource = readFileSync(
-  join(fixtureDir, "repository.rs"),
-  "utf-8",
-);
+const repositorySource = readFileSync(join(fixtureDir, "repository.rs"), "utf-8");
 const serviceSource = readFileSync(join(fixtureDir, "service.rs"), "utf-8");
 
 describe("TSPEC-FX11: Rust fixture", () => {
   it("symbols include pub struct UserRepository (kind class) and an impl method (kind method)", () => {
     const adapter = new RustAdapter();
     const result = adapter.parse("repository.rs", repositorySource, ctx);
-    expect(
-      result.symbols.some(
-        (s) => s.name === "UserRepository" && s.kind === "class",
-      ),
-    ).toBe(true);
+    expect(result.symbols.some((s) => s.name === "UserRepository" && s.kind === "class")).toBe(true);
     expect(result.symbols.some((s) => s.kind === "method")).toBe(true);
   });
 
@@ -42,11 +35,7 @@ describe("TSPEC-FX11: Rust fixture", () => {
     const adapter = new RustAdapter();
     const result = adapter.parse("repository.rs", repositorySource, ctx);
     expect(result.imports.length).toBeGreaterThan(0);
-    expect(
-      result.imports.some((i) =>
-        i.specifier.includes("std::collections::HashMap"),
-      ),
-    ).toBe(true);
+    expect(result.imports.some((i) => i.specifier.includes("std::collections::HashMap"))).toBe(true);
   });
 
   it("calls include a call_expression callee", () => {
@@ -58,11 +47,7 @@ describe("TSPEC-FX11: Rust fixture", () => {
   it("AuthService extracted from its file", () => {
     const adapter = new RustAdapter();
     const result = adapter.parse("service.rs", serviceSource, ctx);
-    expect(
-      result.symbols.some(
-        (s) => s.name === "AuthService" && s.kind === "class",
-      ),
-    ).toBe(true);
+    expect(result.symbols.some((s) => s.name === "AuthService" && s.kind === "class")).toBe(true);
   });
 
   it("determinism: two parses of repository.rs are deep-equal", () => {
