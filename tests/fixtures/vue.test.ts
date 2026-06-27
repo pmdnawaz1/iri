@@ -28,11 +28,7 @@ describe("TSPEC-FX05: Vue fixture", () => {
     const adapter = new JavaScriptAdapter();
     const result = adapter.parse("useAuth.js", useAuthSource, ctx);
     expect(
-      result.symbols.some(
-        (s) =>
-          s.name === "useAuth" &&
-          (s.kind === "function" || s.kind === "variable"),
-      ),
+      result.symbols.some((s) => s.name === "useAuth" && (s.kind === "function" || s.kind === "variable")),
     ).toBe(true);
   });
 
@@ -41,9 +37,7 @@ describe("TSPEC-FX05: Vue fixture", () => {
     const result = adapter.parse("useAuth.js", useAuthSource, ctx);
     expect(
       result.imports.some(
-        (i) =>
-          (i.specifier === "./api" || i.specifier === "./api.js") &&
-          i.imported.includes("login"),
+        (i) => (i.specifier === "./api" || i.specifier === "./api.js") && i.imported.includes("login"),
       ),
     ).toBe(true);
   });
@@ -51,22 +45,14 @@ describe("TSPEC-FX05: Vue fixture", () => {
   it("calls from useAuth.js include the login call or fetch", () => {
     const adapter = new JavaScriptAdapter();
     const result = adapter.parse("useAuth.js", useAuthSource, ctx);
-    expect(
-      result.calls.some(
-        (c) => c.callee.includes("login") || c.callee.includes("fetch"),
-      ),
-    ).toBe(true);
+    expect(result.calls.some((c) => c.callee.includes("login") || c.callee.includes("fetch"))).toBe(true);
   });
 
   it("api.js login function is extracted", () => {
     const adapter = new JavaScriptAdapter();
     const result = adapter.parse("api.js", apiSource, ctx);
     expect(
-      result.symbols.some(
-        (s) =>
-          s.name === "login" &&
-          (s.kind === "function" || s.kind === "variable"),
-      ),
+      result.symbols.some((s) => s.name === "login" && (s.kind === "function" || s.kind === "variable")),
     ).toBe(true);
   });
 
