@@ -14,7 +14,7 @@ docs phrase the same concept many ways — so **aliases** are your main product.
 
 ---
 
-## 1. Embedded ontology (v1.2.0) — the ONLY capabilities that currently exist
+## 1. Embedded ontology (v1.3.0) — the ONLY capabilities that currently exist
 
 `FEATURE.CAPABILITY  [aliases]` (an alias = one lowercase token that maps to the capability):
 
@@ -22,8 +22,7 @@ docs phrase the same concept many ways — so **aliases** are your main product.
 AUTH.LOGIN            [signin, sign_in, log_in]
 AUTH.REGISTER         [signup, sign_up]
 AUTH.LOGOUT           [signout, sign_out]
-AUTH.VERIFY_EMAIL     []
-AUTH.VERIFY_OTP       []
+AUTH.VERIFY_EMAIL/VERIFY_OTP     []
 AUTH.RESET_PASSWORD   [forgot_password]
 AUTH.REFRESH_TOKEN    [refresh]
 PAYMENT.CREATE_PAYMENT[pay, payment, charge]
@@ -31,8 +30,7 @@ PAYMENT.CAPTURE       [capture]
 PAYMENT.REFUND        [refund]
 PAYMENT.CANCEL        [void]
 ORDER.CREATE          [order, orders, place_order]
-ORDER.UPDATE          []
-ORDER.CANCEL          []
+ORDER.UPDATE/CANCEL   []
 CART.ADD_ITEM         [cart, add_to_cart]
 CART.REMOVE_ITEM      [remove_from_cart]
 CART.VIEW             []
@@ -61,19 +59,53 @@ FILE.DOWNLOAD         [download]
 FILE.DELETE/LIST                 []
 FILE.GET_URL          [presigned]
 SEARCH.QUERY          [search, query, find]
+SCHEDULE.CREATE       [schedule, booking]
+SCHEDULE.CANCEL       [cancel_booking]
+SCHEDULE.RESCHEDULE   [reschedule]
+SCHEDULE.GET_AVAILABILITY [slots, availability]
+SCHEDULE.LIST         [schedules, bookings]
+WORKFLOW.CREATE       [workflow, workflows, automation]
+WORKFLOW.UPDATE/DELETE/LIST      []
+WORKFLOW.TRIGGER      [execute]
+WORKFLOW.PAUSE        [pause]
+WORKFLOW.GET_RUNS     [runs, executions]
+SUBSCRIPTION.CREATE   [subscribe, subscription, subscriptions]
+SUBSCRIPTION.CANCEL   [unsubscribe]
+SUBSCRIPTION.UPDATE/LIST/GET      []
+OAUTH.AUTHORIZE       [oauth, authorize]
+OAUTH.EXCHANGE_TOKEN/REFRESH     []
+INTEGRATION.CREATE    [integration, integrations]
+INTEGRATION.LIST/DELETE          []
+PRODUCT.CREATE        [product, products]
+PRODUCT.UPDATE/DELETE/LIST/GET   []
+PRODUCT.CREATE_VARIANT  [variant, variants]
+PRODUCT.CREATE_CATEGORY [category, categories]
+DISCOUNT.CREATE       [discount, promotion, promotions, promo]
+DISCOUNT.UPDATE/DELETE/LIST      []
+DISCOUNT.APPLY        [redeem]
+DISCOUNT.CREATE_CAMPAIGN [campaign, campaigns]
+SHIPPING.CREATE_OPTION [shipping]
+SHIPPING.GET_RATES    [rates]
+SHIPPING.FULFILL      [fulfill, fulfillment, fulfillments]
+SHIPPING.RETURN       []
+SHIPPING.EXCHANGE     [exchange, exchanges]
+CALENDAR.CONNECT      [calendar, calendars]
+CALENDAR.GET_BUSY_TIMES [busy_times, freebusy]
+CALENDAR.LIST_CONNECTIONS [connections]
+CALENDAR.SYNC         [ics_feed]
 ```
 
 ## 2. Graduation state — covered vs open
 
-**COVERED (in the ontology above):** AUTH, PAYMENT, ORDER, CART, CHECKOUT, INVENTORY, PROFILE,
-NOTIFICATION, WEBHOOK, TEAM, API_KEY, FILE, SEARCH.
+**COVERED (22 features above — the queue is empty):** AUTH, PAYMENT, ORDER, CART, CHECKOUT,
+INVENTORY, PROFILE, NOTIFICATION, WEBHOOK, TEAM, API_KEY, FILE, SEARCH, SCHEDULE, WORKFLOW,
+SUBSCRIPTION, OAUTH, INTEGRATION, PRODUCT, DISCOUNT, SHIPPING, CALENDAR.
 
-**HELD (proposed, not graduated — confirm from docs, don't duplicate):** `SCHEDULE`, `WORKFLOW`,
-`SUBSCRIPTION`, `OAUTH`+`INTEGRATION`, `PRODUCT` (split OAUTH/INTEGRATION; SUBSCRIPTION ≠ booking);
-`CALENDAR`/`DISCOUNT`/`SHIPPING` (need a 2nd independent source).
+**NEEDS-BACKFILL (single strong repo — add a 2nd source's evidence, don't re-propose):** PRODUCT,
+DISCOUNT, SHIPPING, CALENDAR.
 
-**EXPECTED-NEXT:** MESSAGE/CHAT, COMMENT, TAG/LABEL, REVIEW/RATING, SCHEDULE/BOOKING, AUDIT/
-ACTIVITY_LOG, EXPORT/IMPORT, FEATURE_FLAG.
+**EXPECTED-NEXT:** MESSAGE/CHAT, COMMENT, TAG/LABEL, REVIEW/RATING, AUDIT/ACTIVITY_LOG,
+EXPORT/IMPORT, FEATURE_FLAG, ANALYTICS/REPORTING.
 
 ## 3. The deterministic normalizer (apply BY HAND to each statement)
 

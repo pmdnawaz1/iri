@@ -10,7 +10,7 @@ them mechanically — same input must give the same output. No vibes, no guessin
 
 ---
 
-## 1. Embedded ontology (v1.2.0) — the ONLY capabilities that currently exist
+## 1. Embedded ontology (v1.3.0) — the ONLY capabilities that currently exist
 
 Format: `FEATURE.CAPABILITY  [aliases]`. An alias is a single lowercase token that maps to the cap.
 
@@ -27,8 +27,7 @@ PAYMENT.CAPTURE       [capture]
 PAYMENT.REFUND        [refund]
 PAYMENT.CANCEL        [void]
 ORDER.CREATE          [order, orders, place_order]
-ORDER.UPDATE          []
-ORDER.CANCEL          []
+ORDER.UPDATE/CANCEL   []
 CART.ADD_ITEM         [cart, add_to_cart]
 CART.REMOVE_ITEM      [remove_from_cart]
 CART.VIEW             []
@@ -41,15 +40,10 @@ PROFILE.VIEW          [profile, me]
 PROFILE.UPDATE        []
 NOTIFICATION.SEND     [notify, notification, notifications]
 WEBHOOK.CREATE        [webhook, webhooks]
-WEBHOOK.LIST          []
-WEBHOOK.GET           []
-WEBHOOK.UPDATE        []
-WEBHOOK.DELETE        []
+WEBHOOK.LIST/GET/UPDATE/DELETE   []
 WEBHOOK.TRIGGER       [trigger, broadcast]
 TEAM.CREATE           [team, teams, organization, organizations]
-TEAM.UPDATE           []
-TEAM.DELETE           []
-TEAM.LIST             []
+TEAM.UPDATE/DELETE/LIST          []
 TEAM.INVITE_MEMBER    [invite, invites]
 TEAM.REMOVE_MEMBER    []
 TEAM.LIST_MEMBERS     [members]
@@ -59,30 +53,60 @@ API_KEY.REVOKE        [revoke]
 API_KEY.ROTATE        [rotate]
 FILE.UPLOAD           [upload, uploads, files, file]
 FILE.DOWNLOAD         [download]
-FILE.DELETE           []
-FILE.LIST             []
+FILE.DELETE/LIST                 []
 FILE.GET_URL          [presigned]
 SEARCH.QUERY          [search, query, find]
+SCHEDULE.CREATE       [schedule, booking]
+SCHEDULE.CANCEL       [cancel_booking]
+SCHEDULE.RESCHEDULE   [reschedule]
+SCHEDULE.GET_AVAILABILITY [slots, availability]
+SCHEDULE.LIST         [schedules, bookings]
+WORKFLOW.CREATE       [workflow, workflows, automation]
+WORKFLOW.UPDATE/DELETE/LIST/PAUSE [pause on PAUSE]
+WORKFLOW.TRIGGER      [execute]
+WORKFLOW.GET_RUNS     [runs, executions]
+SUBSCRIPTION.CREATE   [subscribe, subscription, subscriptions]
+SUBSCRIPTION.CANCEL   [unsubscribe]
+SUBSCRIPTION.UPDATE/LIST/GET      []
+OAUTH.AUTHORIZE       [oauth, authorize]
+OAUTH.EXCHANGE_TOKEN  []
+OAUTH.REFRESH         []
+INTEGRATION.CREATE    [integration, integrations]
+INTEGRATION.LIST/DELETE          []
+PRODUCT.CREATE        [product, products]
+PRODUCT.UPDATE/DELETE/LIST/GET   []
+PRODUCT.CREATE_VARIANT  [variant, variants]
+PRODUCT.CREATE_CATEGORY [category, categories]
+DISCOUNT.CREATE       [discount, promotion, promotions, promo]
+DISCOUNT.UPDATE/DELETE/LIST      []
+DISCOUNT.APPLY        [redeem]
+DISCOUNT.CREATE_CAMPAIGN [campaign, campaigns]
+SHIPPING.CREATE_OPTION [shipping]
+SHIPPING.GET_RATES    [rates]
+SHIPPING.FULFILL      [fulfill, fulfillment, fulfillments]
+SHIPPING.RETURN       []
+SHIPPING.EXCHANGE     [exchange, exchanges]
+CALENDAR.CONNECT      [calendar, calendars]
+CALENDAR.GET_BUSY_TIMES [busy_times, freebusy]
+CALENDAR.LIST_CONNECTIONS [connections]
+CALENDAR.SYNC         [ics_feed]
 ```
 
 ## 2. Graduation state — what is covered vs what is still open
 
 **COVERED (already in the ontology above — do NOT re-propose these as new):**
 AUTH, PAYMENT, ORDER, CART, CHECKOUT, INVENTORY, PROFILE, NOTIFICATION, WEBHOOK, TEAM, API_KEY,
-FILE, SEARCH.
+FILE, SEARCH, SCHEDULE, WORKFLOW, SUBSCRIPTION, OAUTH, INTEGRATION, PRODUCT, DISCOUNT, SHIPPING,
+CALENDAR. (22 features — the review queue is empty.)
 
-**HELD — proposed once, NOT yet graduated. Strengthen the evidence; don't duplicate:**
-- `SCHEDULE`, `WORKFLOW`, `SUBSCRIPTION`, `OAUTH` + `INTEGRATION`, `PRODUCT` — evidence was biased
-  by routes the old adapter couldn't see (NestJS decorators, file-based `route.ts`). Re-confirm them
-  by reading the code directly (you can — see §4). `OAUTH` must split into `OAUTH` (authorize/
-  exchange/refresh) and `INTEGRATION` (third-party connect/list/delete). `SUBSCRIPTION` must drop
-  any `/reservations` evidence (that is booking → `SCHEDULE`).
-- `CALENDAR` (only seen in 1 repo, and overlaps `SCHEDULE` — prefer folding into `SCHEDULE`),
-  `DISCOUNT` (1 repo), `SHIPPING` (1 repo) — need a SECOND independent repo before graduating.
+**NEEDS-BACKFILL (graduated on a single strong repo — your job is to add a 2nd repo's evidence, NOT
+re-propose):** `PRODUCT`, `DISCOUNT`, `SHIPPING` (confirm against vendure), `CALENDAR` (confirm
+against a 2nd scheduling repo). If a 2nd repo confirms, just note it; if not, flag for possible
+demotion.
 
-**EXPECTED-NEXT (likely real, propose with cross-repo evidence):**
-MESSAGE / CHAT, COMMENT, TAG / LABEL, REVIEW / RATING, SCHEDULE / BOOKING, DISCOUNT / PROMOTION,
-SHIPPING / FULFILLMENT, AUDIT / ACTIVITY_LOG, FEATURE_FLAG, EXPORT / IMPORT.
+**EXPECTED-NEXT (likely real, propose with ≥2-repo evidence):**
+MESSAGE / CHAT, COMMENT, TAG / LABEL, REVIEW / RATING, AUDIT / ACTIVITY_LOG, FEATURE_FLAG,
+EXPORT / IMPORT, ANALYTICS / REPORTING.
 
 ## 3. The deterministic resolver (apply BY HAND to each route)
 
