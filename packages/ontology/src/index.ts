@@ -9,7 +9,7 @@
  * is only valid because it is listed in `aliases`).
  */
 
-export const ONTOLOGY_VERSION = "1.1.0" as const;
+export const ONTOLOGY_VERSION = "1.2.0" as const;
 
 /**
  * Canonical execution stages. A capability's `expectedChain` is an ordered list of
@@ -340,6 +340,70 @@ const NOTIFICATION: FeatureDefinition = {
   capabilities: [cap("NOTIFICATION.SEND", "SEND", ["notify", "notification", "notifications"])],
 };
 
+// ---------------------------------------------------------------------------
+// Self-evolution graduation #1 (ADR-0021). Five features accepted from the
+// ontology-candidates review queue — each evidenced across 2+ independent repos
+// via route patterns the adapter reliably detects. Discovery-sensitive candidates
+// (SCHEDULE/WORKFLOW/SUBSCRIPTION/OAUTH) are held until the adapter route-detection
+// gaps (TSPEC-A021) are closed and the corpus re-compiled.
+// ---------------------------------------------------------------------------
+
+const WEBHOOK: FeatureDefinition = {
+  id: "WEBHOOK",
+  name: "Webhook",
+  capabilities: [
+    cap("WEBHOOK.CREATE", "CREATE", ["webhook", "webhooks"]),
+    cap("WEBHOOK.LIST", "LIST", []),
+    cap("WEBHOOK.GET", "GET", []),
+    cap("WEBHOOK.UPDATE", "UPDATE", []),
+    cap("WEBHOOK.DELETE", "DELETE", []),
+    cap("WEBHOOK.TRIGGER", "TRIGGER", ["trigger", "broadcast"]),
+  ],
+};
+
+const TEAM: FeatureDefinition = {
+  id: "TEAM",
+  name: "Team",
+  capabilities: [
+    cap("TEAM.CREATE", "CREATE", ["team", "teams", "organization", "organizations"]),
+    cap("TEAM.UPDATE", "UPDATE", []),
+    cap("TEAM.DELETE", "DELETE", []),
+    cap("TEAM.LIST", "LIST", []),
+    cap("TEAM.INVITE_MEMBER", "INVITE_MEMBER", ["invite", "invites"]),
+    cap("TEAM.REMOVE_MEMBER", "REMOVE_MEMBER", []),
+    cap("TEAM.LIST_MEMBERS", "LIST_MEMBERS", ["members"]),
+  ],
+};
+
+const API_KEY: FeatureDefinition = {
+  id: "API_KEY",
+  name: "ApiKey",
+  capabilities: [
+    cap("API_KEY.CREATE", "CREATE", ["api_key", "apikey", "api_keys"]),
+    cap("API_KEY.LIST", "LIST", []),
+    cap("API_KEY.REVOKE", "REVOKE", ["revoke"]),
+    cap("API_KEY.ROTATE", "ROTATE", ["rotate"]),
+  ],
+};
+
+const FILE: FeatureDefinition = {
+  id: "FILE",
+  name: "File",
+  capabilities: [
+    cap("FILE.UPLOAD", "UPLOAD", ["upload", "uploads", "files", "file"]),
+    cap("FILE.DOWNLOAD", "DOWNLOAD", ["download"]),
+    cap("FILE.DELETE", "DELETE", []),
+    cap("FILE.LIST", "LIST", []),
+    cap("FILE.GET_URL", "GET_URL", ["presigned"]),
+  ],
+};
+
+const SEARCH: FeatureDefinition = {
+  id: "SEARCH",
+  name: "Search",
+  capabilities: [cap("SEARCH.QUERY", "QUERY", ["search", "query", "find"])],
+};
+
 /** The complete ontology, keyed by feature id. Extend additively, never in place. */
 export const ONTOLOGY: readonly FeatureDefinition[] = [
   AUTH,
@@ -350,6 +414,11 @@ export const ONTOLOGY: readonly FeatureDefinition[] = [
   INVENTORY,
   PROFILE,
   NOTIFICATION,
+  WEBHOOK,
+  TEAM,
+  API_KEY,
+  FILE,
+  SEARCH,
 ];
 
 // ---------------------------------------------------------------------------

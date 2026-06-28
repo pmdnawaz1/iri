@@ -10,6 +10,22 @@ import { allCapabilities, resolveAlias, type CapabilityDefinition } from "@rir/o
 import { makeId } from "@rir/common";
 import type { DocumentStructure, ExtractedStatement, RequirementNormalizer } from "./index.js";
 
+// Generic CRUD/HTTP verbs are capability *names* on many features (WEBHOOK.LIST, TEAM.LIST…),
+// so a bare verb cannot disambiguate — it must be paired with a domain alias. Matching them
+// alone would map "list audit logs" to a random LIST capability.
+const GENERIC_VERB_NAMES = new Set([
+  "create",
+  "read",
+  "list",
+  "get",
+  "update",
+  "delete",
+  "remove",
+  "post",
+  "put",
+  "patch",
+]);
+
 export function resolveCapability(
   section: readonly string[],
   text: string,
@@ -17,13 +33,14 @@ export function resolveCapability(
   const tokens = [...[...section].reverse(), ...text.toLowerCase().split(/[^a-z0-9]+/)].filter(Boolean);
   const caps = allCapabilities();
 
-  // Pass 1 — exact single-token match on capability name or declared alias.
+  // Pass 1 — exact single-token match on a declared alias or a non-generic capability name.
   for (const token of tokens) {
     const t = token.toLowerCase();
-    const byName = caps.find((c) => c.name.toLowerCase() === t);
-    if (byName) return byName;
     const byAlias = resolveAlias(t);
     if (byAlias) return byAlias;
+    if (GENERIC_VERB_NAMES.has(t)) continue;
+    const byName = caps.find((c) => c.name.toLowerCase() === t);
+    if (byName) return byName;
   }
 
   // Pass 2 — multi-word capability names (RESET_PASSWORD, VERIFY_EMAIL): match when

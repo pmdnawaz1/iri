@@ -16,7 +16,8 @@ estimated_effort: 3
 depends_on:
   - "TSPEC-A006"
   - "TSPEC-I006"
-blocks: []
+blocks:
+  - "TSPEC-A021"
 references:
   - "https://llvm.org/docs/WritingAnLLVMNewPMPass.html"
 architecture_documents:

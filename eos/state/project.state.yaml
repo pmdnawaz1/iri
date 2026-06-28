@@ -146,6 +146,8 @@ states:
     state: "DRAFT"
   - id: "TSPEC-P15"
     state: "COMPLETE"
+  - id: "TSPEC-A021"
+    state: "DRAFT"
   - id: "TSPEC-CE01"
     state: "COMPLETE"
   - id: "TSPEC-CE02"

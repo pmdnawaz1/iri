@@ -1,7 +1,7 @@
 {
   "version": "1.0.0",
   "generated_at": "2026-06-27T00:00:00Z",
-  "count": 89,
+  "count": 90,
   "tspecs": [
     {
       "priority": "P0",
@@ -3540,7 +3540,9 @@
       "repository_path": "packages/passes",
       "branch": "feature/tspec-p03-routepass",
       "parent_branch": "main",
-      "blocks": [],
+      "blocks": [
+        "TSPEC-A021"
+      ],
       "reviewers": [
         "ROLE_ARCHITECT"
       ],
@@ -4361,6 +4363,71 @@
       "spec_path": "eos/specs/TSPEC-P15.spec.md",
       "spec_required": true,
       "spec_status": "WRITTEN"
+    },
+    {
+      "priority": "P1",
+      "complexity": "MEDIUM",
+      "risk": "HIGH",
+      "estimated_effort": 5,
+      "depends_on": [
+        "TSPEC-P03"
+      ],
+      "references": [],
+      "architecture_documents": [
+        "docs/ADR-0022-adapter-route-detection.md",
+        "docs/GAPS.md"
+      ],
+      "deliverables": [
+        "@Controller/@Get/@Post decorator route extraction",
+        "file-based route.ts exported-verb extraction ([id] -> :id)",
+        "NestJS + file-based fixtures resolving to existing capabilities"
+      ],
+      "outputs": [],
+      "tests": [
+        "unit",
+        "integration",
+        "golden"
+      ],
+      "acceptance_criteria": [
+        "Builds",
+        "Typechecks",
+        "Lint clean",
+        "Tests pass",
+        "Coverage >= 95%"
+      ],
+      "forbidden_changes": [
+        "Repository IR schema",
+        "Requirement IR schema",
+        "Ontology ids / properties",
+        "Compiler pipeline / builder order",
+        "Closure / coverage / consistency rules"
+      ],
+      "labels": [
+        "implementation",
+        "code-compiler"
+      ],
+      "id": "TSPEC-A021",
+      "title": "Adapter route detection: NestJS decorators + file-based route.ts",
+      "owner": "ROLE_IMPLEMENTER",
+      "package": "code-compiler",
+      "module": "typescript-adapter",
+      "state": "DRAFT",
+      "repository_path": "packages/code-compiler",
+      "branch": "feature/tspec-a021-adapter-route-detection-nestjs-decorators-file-based-route-ts",
+      "parent_branch": "main",
+      "blocks": [],
+      "reviewers": [
+        "ROLE_ARCHITECT"
+      ],
+      "version": "1.0.0",
+      "created_at": "2026-06-27T00:00:00Z",
+      "updated_at": "2026-06-27T00:00:00Z",
+      "wave": 6,
+      "critical_path": false,
+      "parallel_group": "wave-6",
+      "spec_path": "eos/specs/TSPEC-A021.spec.md",
+      "spec_required": true,
+      "spec_status": "MISSING"
     },
     {
       "priority": "P2",

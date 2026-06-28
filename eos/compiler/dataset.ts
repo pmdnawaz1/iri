@@ -685,6 +685,8 @@ const GAP_ADR = {
   onto: "docs/ADR-0018-ontology-evolution-and-discovery.md",
   closure: "docs/ADR-0019-full-execution-closure.md",
   consistency: "docs/ADR-0020-requirement-repository-consistency.md",
+  graduation1: "docs/ADR-0021-ontology-graduation-1.md",
+  adapterRoutes: "docs/ADR-0022-adapter-route-detection.md",
   gaps: "docs/GAPS.md",
 } as const;
 
@@ -781,6 +783,23 @@ const GAPS: TspecSource[] = [
     depends_on: ["TSPEC-A020"],
     architecture_documents: [GAP_ADR.consistency],
     deliverables: ["CrossConsistencyEngine joining Requirement IR + Repository IR"],
+  }),
+  T({
+    id: "TSPEC-A021",
+    title: "Adapter route detection: NestJS decorators + file-based route.ts",
+    owner: Role.Implementer,
+    package: "code-compiler",
+    module: "typescript-adapter",
+    priority: Priority.P1,
+    risk: Risk.High,
+    estimated_effort: 5,
+    depends_on: ["TSPEC-P03"],
+    architecture_documents: [GAP_ADR.adapterRoutes, GAP_ADR.gaps],
+    deliverables: [
+      "@Controller/@Get/@Post decorator route extraction",
+      "file-based route.ts exported-verb extraction ([id] -> :id)",
+      "NestJS + file-based fixtures resolving to existing capabilities",
+    ],
   }),
 ];
 
