@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { AdapterRegistry, TypeScriptAdapter } from "@rir/code-compiler";
-import { compileDocuments, compileWithDocuments } from "@rir/compiler";
+import { compileDocuments, compileWithDocuments, suggestDocumentAliases } from "@rir/compiler";
 
 // The Document Compiler axis (ADR-0019/0020): markdown -> Requirement IR, then doc<->code
 // consistency. This proves the tool can say "documented vs implemented vs consistent".
@@ -19,6 +19,44 @@ describe("Document Compiler — requirements.md -> Requirement IR", () => {
     expect(login.constraints.find((c) => c.key === "LOGIN_IDENTIFIER")?.value).toBe("EMAIL");
     // Provenance points back to the document.
     expect(login.evidence.every((e) => e.source === "DOCUMENTATION")).toBe(true);
+  });
+});
+
+describe("Document Compiler — OpenAPI spec -> Requirement IR (DF02)", () => {
+  it("treats each operation as a requirement and maps it to the ontology", () => {
+    const reqs = compileDocuments("fixtures/openapi-auth");
+    const ids = reqs.requirements.map((r) => r.capability).sort();
+
+    // operationId/summary/tags resolve POST /login and POST /register.
+    expect(ids).toContain("AUTH.LOGIN");
+    expect(ids).toContain("AUTH.REGISTER");
+    // An operation with no ontology home is tracked, never dropped.
+    expect(ids.some((id) => id.startsWith("UNMAPPED."))).toBe(true);
+  });
+});
+
+describe("Alias suggester — deterministic BM25 (proposal-only)", () => {
+  it("ranks capabilities for UNMAPPED statements and exposes the matched terms", () => {
+    const suggestions = suggestDocumentAliases("fixtures/fullstack-auth-docs");
+
+    // The "authentication" statement matches no capability profile token -> NEW candidate.
+    const auth = suggestions.find((s) => s.statement.includes("authentication"));
+    expect(auth).toBeDefined();
+    expect(auth!.candidates).toHaveLength(0);
+
+    // Determinism: identical inputs -> identical ranking.
+    const again = suggestDocumentAliases("fixtures/fullstack-auth-docs");
+    expect(again).toEqual(suggestions);
+  });
+
+  it("never returns a capability it could not justify with matched terms", () => {
+    const suggestions = suggestDocumentAliases("fixtures/fullstack-auth-docs");
+    for (const s of suggestions) {
+      for (const c of s.candidates) {
+        expect(c.matched.length).toBeGreaterThan(0);
+        expect(c.score).toBeGreaterThan(0);
+      }
+    }
   });
 });
 

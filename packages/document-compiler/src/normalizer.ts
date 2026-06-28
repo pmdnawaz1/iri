@@ -10,7 +10,10 @@ import { allCapabilities, resolveAlias, type CapabilityDefinition } from "@rir/o
 import { makeId } from "@rir/common";
 import type { DocumentStructure, ExtractedStatement, RequirementNormalizer } from "./index.js";
 
-function resolveCapability(section: readonly string[], text: string): CapabilityDefinition | undefined {
+export function resolveCapability(
+  section: readonly string[],
+  text: string,
+): CapabilityDefinition | undefined {
   const tokens = [...[...section].reverse(), ...text.toLowerCase().split(/[^a-z0-9]+/)].filter(Boolean);
   const caps = allCapabilities();
 
@@ -48,7 +51,7 @@ function detectPriority(text: string): Priority {
  */
 const REQUIREMENT_CUE =
   /\b(must|shall|should|will|can|able to|allows?|supports?|enables?|requires?|provides?|returns?|enforces?|validates?)\b/i;
-function isRequirementLike(text: string): boolean {
+export function isRequirementLike(text: string): boolean {
   return REQUIREMENT_CUE.test(text);
 }
 
@@ -103,13 +106,15 @@ export class DefaultRequirementNormalizer implements RequirementNormalizer {
     const byCap = new Map<string, Acc>();
 
     for (const struct of structures) {
+      // Every operation in an API spec IS a requirement; prose needs a modal cue.
+      const alwaysRequirement = struct.artifact.kind === "API_SPEC";
       for (const stmt of struct.statements) {
         const cap = resolveCapability(stmt.section, stmt.text);
         if (!cap) {
           // A documented requirement the ontology does not cover yet: track it as
           // UNMAPPED (never silently drop) so the evolution seam can propose an
           // ontology addition. Narrative (non-requirement) sentences are ignored.
-          if (isRequirementLike(stmt.text)) {
+          if (alwaysRequirement || isRequirementLike(stmt.text)) {
             const id = unmappedId(stmt.section, stmt.text);
             const acc = this.acc(byCap, id, "UNMAPPED", id);
             acc.priority = detectPriority(stmt.text);

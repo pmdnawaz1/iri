@@ -12,6 +12,7 @@
     "@rir/ir": "workspace:*",
     "@rir/core": "workspace:*",
     "@rir/ontology": "workspace:*",
-    "@rir/common": "workspace:*"
+    "@rir/common": "workspace:*",
+    "yaml": "^2.9.0"
   }
 }
