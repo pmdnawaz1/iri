@@ -17,7 +17,7 @@ import { ONTOLOGY_VERSION, allCapabilities } from "@rir/ontology";
 import { DefaultClosureEngine } from "@rir/closure";
 import { DefaultCoverageEngine } from "@rir/coverage";
 import { emptyRequirementSet } from "@rir/ir";
-import { compileRepository, compileWithDocuments } from "@rir/compiler";
+import { compileRepository, compileWithDocuments, suggestDocumentAliases } from "@rir/compiler";
 import { prove } from "./prove.js";
 
 const log = new ConsoleLogger("info");
@@ -32,6 +32,7 @@ Usage:
   rir prove <dir>             Parse a TS backend dir and report AUTH.LOGIN closure (legacy slice)
   rir compile <dir>           Compile a repo (adapters -> passes -> IR -> closure)
   rir compile <dir> --docs <d>  Also compile docs and report doc<->code consistency
+  rir suggest-aliases <docs>  BM25-rank ontology for UNMAPPED doc statements (proposal-only)
   rir diff <a> <b>            (pipeline not yet assembled)
   rir query <capability>      (pipeline not yet assembled)
   rir graph                   (pipeline not yet assembled)
@@ -129,6 +130,43 @@ async function main(rawArgv: readonly string[]): Promise<number> {
       process.stdout.write(`  present stages:  ${result.present.join(", ") || "(none)"}\n`);
       process.stdout.write(`  missing stages:  ${result.missing.join(", ") || "(none)"}\n`);
       return result.state === ClosureState.Closed ? 0 : 1;
+    }
+    case "suggest-aliases": {
+      const docsDir = rest.find((a) => !a.startsWith("--"));
+      if (!docsDir) {
+        process.stderr.write("usage: rir suggest-aliases <docsDir> [--min <score>] [--top <k>] [--json]\n");
+        return 64;
+      }
+      const minIdx = rest.indexOf("--min");
+      const topIdx = rest.indexOf("--top");
+      const minScore = minIdx === -1 ? undefined : Number(rest[minIdx + 1]);
+      const top = topIdx === -1 ? undefined : Number(rest[topIdx + 1]);
+      const suggestions = suggestDocumentAliases(docsDir, { minScore, top });
+
+      if (rest.includes("--json")) {
+        process.stdout.write(JSON.stringify({ docsDir, suggestions }, null, 2) + "\n");
+        return 0;
+      }
+      if (suggestions.length === 0) {
+        process.stdout.write("No UNMAPPED requirement-like statements found.\n");
+        return 0;
+      }
+      process.stdout.write(
+        `${suggestions.length} UNMAPPED statement(s) — BM25 candidates (proposal-only, edit nothing):\n`,
+      );
+      for (const s of suggestions) {
+        process.stdout.write(`\n  "${s.statement}"  (${s.locator})\n`);
+        if (s.candidates.length === 0) {
+          process.stdout.write("    (no capability above threshold — likely a NEW capability)\n");
+          continue;
+        }
+        for (const c of s.candidates) {
+          process.stdout.write(
+            `    -> ${c.capability}\t(bm25 ${c.score}, matched: ${c.matched.join(" ")})\n`,
+          );
+        }
+      }
+      return 0;
     }
     case "compile": {
       const positionals = rest.filter(

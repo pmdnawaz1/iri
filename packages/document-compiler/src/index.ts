@@ -58,4 +58,6 @@ export class FrontendRegistry {
 }
 
 export { MarkdownFrontend } from "./markdown.js";
+export { OpenApiFrontend } from "./openapi.js";
 export { DefaultRequirementNormalizer } from "./normalizer.js";
+export { suggestAliases, type AliasSuggestion, type SuggestOptions } from "./suggest.js";

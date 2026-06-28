@@ -1,0 +1,20 @@
+openapi: 3.0.0
+info:
+  title: Auth API
+  version: 1.0.0
+paths:
+  /login:
+    post:
+      operationId: loginUser
+      summary: Log in a user and return a token
+      tags: [Auth]
+  /register:
+    post:
+      operationId: registerUser
+      summary: Register a new user account
+      tags: [Auth]
+  /audit-logs:
+    get:
+      operationId: listAuditLogs
+      summary: List audit log entries for administrative actions
+      tags: [Audit]

@@ -135,6 +135,8 @@ tspecs:
     version: "1.0.0"
   - id: "TSPEC-P15"
     version: "1.0.0"
+  - id: "TSPEC-A021"
+    version: "1.0.0"
   - id: "TSPEC-CE01"
     version: "1.0.0"
   - id: "TSPEC-CE02"

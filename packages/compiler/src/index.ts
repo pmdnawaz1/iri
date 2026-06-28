@@ -40,7 +40,11 @@ import {
   DefaultRequirementNormalizer,
   FrontendRegistry,
   MarkdownFrontend,
+  OpenApiFrontend,
+  suggestAliases,
+  type AliasSuggestion,
   type DocumentStructure,
+  type SuggestOptions,
 } from "@rir/document-compiler";
 import { CrossConsistencyEngine, type CrossFinding } from "@rir/consistency";
 import type { Builder, CompilationContext, Pass } from "@rir/core";
@@ -60,11 +64,11 @@ const SOURCE_EXTENSIONS = new Set([
   ".cs",
 ]);
 
-const DOC_EXTENSIONS = new Set([".md", ".markdown"]);
+const DOC_EXTENSIONS = new Set([".md", ".markdown", ".yaml", ".yml", ".json"]);
 
 /** A registry with every built document frontend. */
 export function defaultDocumentFrontends(): FrontendRegistry {
-  return new FrontendRegistry().register(new MarkdownFrontend());
+  return new FrontendRegistry().register(new MarkdownFrontend()).register(new OpenApiFrontend());
 }
 
 /** A registry with every built language adapter. */
@@ -155,21 +159,42 @@ export async function compileRepository(
   return { ir, closure };
 }
 
-/**
- * Compile a documentation directory into the Requirement IR (ADR-0019). Each markdown
- * file is parsed by a structure-only frontend, then normalized against the ontology.
- */
-export function compileDocuments(
+/** Extract structure (headings + statements) from every supported document in a directory. */
+export function extractDocumentStructures(
   docsDir: string,
   registry: FrontendRegistry = defaultDocumentFrontends(),
-): RequirementSet {
+): DocumentStructure[] {
   const structures: DocumentStructure[] = [];
   for (const file of listFiles(docsDir, DOC_EXTENSIONS)) {
     const frontend = registry.select(file);
     if (!frontend) continue;
     structures.push(frontend.extract(file, readFileSync(file, "utf8")));
   }
-  return new DefaultRequirementNormalizer().normalize(structures);
+  return structures;
+}
+
+/**
+ * Compile a documentation directory into the Requirement IR (ADR-0019). Markdown and OpenAPI
+ * files are parsed by structure-only frontends, then normalized against the ontology.
+ */
+export function compileDocuments(
+  docsDir: string,
+  registry: FrontendRegistry = defaultDocumentFrontends(),
+): RequirementSet {
+  return new DefaultRequirementNormalizer().normalize(extractDocumentStructures(docsDir, registry));
+}
+
+/**
+ * Deterministic, proposal-only alias suggestions (document-evolution seam, first tier). For
+ * each UNMAPPED requirement-like statement, BM25-rank the existing ontology capabilities. This
+ * never maps a statement and never edits the ontology — see evolution/document-ontology-evolution.md.
+ */
+export function suggestDocumentAliases(
+  docsDir: string,
+  opts?: SuggestOptions,
+  registry: FrontendRegistry = defaultDocumentFrontends(),
+): AliasSuggestion[] {
+  return suggestAliases(extractDocumentStructures(docsDir, registry), opts);
 }
 
 export interface ConsistencyResult extends CompileResult {

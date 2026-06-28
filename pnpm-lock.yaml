@@ -265,6 +265,9 @@ importers:
       '@rir/ontology':
         specifier: workspace:*
         version: link:../ontology
+      yaml:
+        specifier: ^2.9.0
+        version: 2.9.0
 
   packages/graph: {}
 

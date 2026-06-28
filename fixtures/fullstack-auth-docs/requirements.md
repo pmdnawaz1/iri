@@ -1,6 +1,6 @@
 # Authentication
 
-The product MUST support authentication for all users.
+The platform MUST support authentication for all users.
 
 ## Login
 

@@ -85,6 +85,7 @@ topological_order:
   - "TSPEC-FX11"
   - "TSPEC-CE06"
   - "TSPEC-FX12"
+  - "TSPEC-A021"
   - "TSPEC-E01"
   - "TSPEC-APP1"
   - "TSPEC-APP2"
@@ -170,6 +171,7 @@ waves:
       - "TSPEC-P15"
   - wave: 6
     tspecs:
+      - "TSPEC-A021"
       - "TSPEC-CE01"
       - "TSPEC-CE02"
       - "TSPEC-CE03"

@@ -362,7 +362,8 @@ dependencies:
     depends_on:
       - "TSPEC-A006"
       - "TSPEC-I006"
-    blocks: []
+    blocks:
+      - "TSPEC-A021"
   - id: "TSPEC-P04"
     depends_on:
       - "TSPEC-A006"
@@ -424,6 +425,10 @@ dependencies:
     depends_on:
       - "TSPEC-A006"
       - "TSPEC-I006"
+    blocks: []
+  - id: "TSPEC-A021"
+    depends_on:
+      - "TSPEC-P03"
     blocks: []
   - id: "TSPEC-CE01"
     depends_on:
