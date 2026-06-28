@@ -24,6 +24,12 @@ const GENERIC_VERB_NAMES = new Set([
   "post",
   "put",
   "patch",
+  "return",
+  "connect",
+  "sync",
+  "run",
+  "book",
+  "available",
 ]);
 
 export function resolveCapability(

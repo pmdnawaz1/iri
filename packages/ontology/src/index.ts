@@ -9,7 +9,7 @@
  * is only valid because it is listed in `aliases`).
  */
 
-export const ONTOLOGY_VERSION = "1.2.0" as const;
+export const ONTOLOGY_VERSION = "1.3.0" as const;
 
 /**
  * Canonical execution stages. A capability's `expectedChain` is an ordered list of
@@ -404,6 +404,123 @@ const SEARCH: FeatureDefinition = {
   capabilities: [cap("SEARCH.QUERY", "QUERY", ["search", "query", "find"])],
 };
 
+// ---------------------------------------------------------------------------
+// Self-evolution graduation #2 (ADR-0023). The held discovery-sensitive + single-repo
+// candidates, accepted by architect directive with cleanups: OAUTH split from INTEGRATION;
+// SUBSCRIPTION trimmed of booking evidence; CONFERENCING dropped (niche); and aliases
+// de-collided (an alias is globally unique, so e.g. `trigger`/`reserve`/`exchange`/`connect`/
+// `availability` stay with their first owner). PRODUCT/DISCOUNT/SHIPPING/CALENDAR rest on a
+// single strong repo — backfill a 2nd repo's evidence once TSPEC-A021 lands (see ADR-0023).
+// ---------------------------------------------------------------------------
+
+const SCHEDULE: FeatureDefinition = {
+  id: "SCHEDULE",
+  name: "Schedule",
+  capabilities: [
+    cap("SCHEDULE.CREATE", "CREATE", ["schedule", "booking"]),
+    cap("SCHEDULE.CANCEL", "CANCEL", ["cancel_booking"]),
+    cap("SCHEDULE.RESCHEDULE", "RESCHEDULE", ["reschedule"]),
+    cap("SCHEDULE.GET_AVAILABILITY", "GET_AVAILABILITY", ["slots", "availability"]),
+    cap("SCHEDULE.LIST", "LIST", ["schedules", "bookings"]),
+  ],
+};
+
+const WORKFLOW: FeatureDefinition = {
+  id: "WORKFLOW",
+  name: "Workflow",
+  capabilities: [
+    cap("WORKFLOW.CREATE", "CREATE", ["workflow", "workflows", "automation"]),
+    cap("WORKFLOW.UPDATE", "UPDATE", []),
+    cap("WORKFLOW.DELETE", "DELETE", []),
+    cap("WORKFLOW.TRIGGER", "TRIGGER", ["execute"]),
+    cap("WORKFLOW.PAUSE", "PAUSE", ["pause"]),
+    cap("WORKFLOW.LIST", "LIST", []),
+    cap("WORKFLOW.GET_RUNS", "GET_RUNS", ["runs", "executions"]),
+  ],
+};
+
+const SUBSCRIPTION: FeatureDefinition = {
+  id: "SUBSCRIPTION",
+  name: "Subscription",
+  capabilities: [
+    cap("SUBSCRIPTION.CREATE", "CREATE", ["subscribe", "subscription", "subscriptions"]),
+    cap("SUBSCRIPTION.CANCEL", "CANCEL", ["unsubscribe"]),
+    cap("SUBSCRIPTION.UPDATE", "UPDATE", []),
+    cap("SUBSCRIPTION.LIST", "LIST", []),
+    cap("SUBSCRIPTION.GET", "GET", []),
+  ],
+};
+
+const OAUTH: FeatureDefinition = {
+  id: "OAUTH",
+  name: "OAuth",
+  capabilities: [
+    cap("OAUTH.AUTHORIZE", "AUTHORIZE", ["oauth", "authorize"]),
+    cap("OAUTH.EXCHANGE_TOKEN", "EXCHANGE_TOKEN", []),
+    cap("OAUTH.REFRESH", "REFRESH", []),
+  ],
+};
+
+const INTEGRATION: FeatureDefinition = {
+  id: "INTEGRATION",
+  name: "Integration",
+  capabilities: [
+    cap("INTEGRATION.CREATE", "CREATE", ["integration", "integrations"]),
+    cap("INTEGRATION.LIST", "LIST", []),
+    cap("INTEGRATION.DELETE", "DELETE", []),
+  ],
+};
+
+const PRODUCT: FeatureDefinition = {
+  id: "PRODUCT",
+  name: "Product",
+  capabilities: [
+    cap("PRODUCT.CREATE", "CREATE", ["product", "products"]),
+    cap("PRODUCT.UPDATE", "UPDATE", []),
+    cap("PRODUCT.DELETE", "DELETE", []),
+    cap("PRODUCT.LIST", "LIST", []),
+    cap("PRODUCT.GET", "GET", []),
+    cap("PRODUCT.CREATE_VARIANT", "CREATE_VARIANT", ["variant", "variants"]),
+    cap("PRODUCT.CREATE_CATEGORY", "CREATE_CATEGORY", ["category", "categories"]),
+  ],
+};
+
+const DISCOUNT: FeatureDefinition = {
+  id: "DISCOUNT",
+  name: "Discount",
+  capabilities: [
+    cap("DISCOUNT.CREATE", "CREATE", ["discount", "promotion", "promotions", "promo"]),
+    cap("DISCOUNT.UPDATE", "UPDATE", []),
+    cap("DISCOUNT.DELETE", "DELETE", []),
+    cap("DISCOUNT.LIST", "LIST", []),
+    cap("DISCOUNT.APPLY", "APPLY", ["redeem"]),
+    cap("DISCOUNT.CREATE_CAMPAIGN", "CREATE_CAMPAIGN", ["campaign", "campaigns"]),
+  ],
+};
+
+const SHIPPING: FeatureDefinition = {
+  id: "SHIPPING",
+  name: "Shipping",
+  capabilities: [
+    cap("SHIPPING.CREATE_OPTION", "CREATE_OPTION", ["shipping"]),
+    cap("SHIPPING.GET_RATES", "GET_RATES", ["rates"]),
+    cap("SHIPPING.FULFILL", "FULFILL", ["fulfill", "fulfillment", "fulfillments"]),
+    cap("SHIPPING.RETURN", "RETURN", []),
+    cap("SHIPPING.EXCHANGE", "EXCHANGE", ["exchange", "exchanges"]),
+  ],
+};
+
+const CALENDAR: FeatureDefinition = {
+  id: "CALENDAR",
+  name: "Calendar",
+  capabilities: [
+    cap("CALENDAR.CONNECT", "CONNECT", ["calendar", "calendars"]),
+    cap("CALENDAR.GET_BUSY_TIMES", "GET_BUSY_TIMES", ["busy_times", "freebusy"]),
+    cap("CALENDAR.LIST_CONNECTIONS", "LIST_CONNECTIONS", ["connections"]),
+    cap("CALENDAR.SYNC", "SYNC", ["ics_feed"]),
+  ],
+};
+
 /** The complete ontology, keyed by feature id. Extend additively, never in place. */
 export const ONTOLOGY: readonly FeatureDefinition[] = [
   AUTH,
@@ -419,6 +536,15 @@ export const ONTOLOGY: readonly FeatureDefinition[] = [
   API_KEY,
   FILE,
   SEARCH,
+  SCHEDULE,
+  WORKFLOW,
+  SUBSCRIPTION,
+  OAUTH,
+  INTEGRATION,
+  PRODUCT,
+  DISCOUNT,
+  SHIPPING,
+  CALENDAR,
 ];
 
 // ---------------------------------------------------------------------------
