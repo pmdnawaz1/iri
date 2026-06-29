@@ -23,14 +23,21 @@ function classify(sym: SymbolFact): NodeKind {
   if (sym.kind === "function") return "FUNCTION";
   if (sym.kind === "method") return "METHOD";
   if (sym.kind === "interface") return "INTERFACE";
-  if (sym.kind === "type") return "TYPE";
+  if (sym.kind === "type" || sym.kind === "type_alias") return "TYPE_ALIAS";
   if (sym.kind === "variable") return "VARIABLE";
   if (sym.kind === "property") return "PROPERTY";
   if (sym.kind === "enum") return "ENUM";
   if (sym.kind === "constant") return "CONSTANT";
+  if (sym.kind === "field") return "FIELD";
+  if (sym.kind === "enum_member") return "ENUM_MEMBER";
+  if (sym.kind === "import") return "IMPORT";
   return "CLASS";
 }
 
+/**
+ * CallPass orchestrates all non-import syntax-driven relationships (calls, hierarchy, control flow, etc).
+ * It was expanded in PR1 to construct the full 15+ edge taxonomy from AST facts (including decorates, contains, instantiates, and control flows).
+ */
 export class CallPass extends AbstractPass {
   readonly name = "CallPass" as const;
 
@@ -48,8 +55,13 @@ export class CallPass extends AbstractPass {
       draft.addArtifact(pr.artifact);
 
       for (const sym of pr.symbols) {
+        const nodeId =
+          sym.kind === "import"
+            ? makeId("import", pr.artifact.id, sym.qualifiedName ?? sym.name)
+            : makeId("decl", sym.qualifiedName ?? sym.name);
+
         draft.addNode({
-          id: makeId("decl", sym.qualifiedName ?? sym.name),
+          id: nodeId,
           kind: classify(sym),
           name: sym.name,
           language: pr.artifact.language,
@@ -129,7 +141,7 @@ export class CallPass extends AbstractPass {
           if (fromNode && toNode) {
             if (fromNode.kind === "CONTROLLER" && toNode.kind === "SERVICE") edgeKind = "ROUTES_TO";
             if (fromNode.kind === "SERVICE" && toNode.kind === "REPOSITORY") edgeKind = "ROUTES_TO";
-            if (fromNode.kind === "MIDDLEWARE" && toNode.kind === "CONTROLLER") edgeKind = "HANDLES";
+            if (fromNode.kind === "MIDDLEWARE" && toNode.kind === "CONTROLLER") edgeKind = "WRAPS";
           }
 
           draft.addEdge({
@@ -179,7 +191,7 @@ export class CallPass extends AbstractPass {
       }
     }
 
-    // Phase 4 — INHERITS and IMPLEMENTS edges
+    // Phase 4 — EXTENDS and IMPLEMENTS edges
     for (const pr of ctx.parseResults ?? []) {
       for (const sym of pr.symbols) {
         if (!sym.extends && !sym.implements) continue;
@@ -192,8 +204,8 @@ export class CallPass extends AbstractPass {
             const to = makeId("decl", targetClass);
             if (draft.getNode(to)) {
               draft.addEdge({
-                id: makeId("edge", "inherits", from, to),
-                kind: "INHERITS",
+                id: makeId("edge", "extends", from, to),
+                kind: "EXTENDS",
                 from,
                 to,
                 evidence: [{ source: "AST", locator: pr.artifact.path, confidence: 1 }],
@@ -277,6 +289,29 @@ export class CallPass extends AbstractPass {
             });
           }
         }
+      }
+    }
+
+    // Phase 7 — Control Flow (CATCHES and THROWS edges)
+    for (const pr of ctx.parseResults ?? []) {
+      if (!pr.controlFlows) continue;
+      for (const flow of pr.controlFlows) {
+        if (!flow.enclosing || !flow.typeName) continue;
+        const from = makeId("decl", flow.enclosing);
+        if (!draft.getNode(from)) continue;
+
+        // Find the node representing the error type (e.g. "SomeError")
+        const to = nameToId.get(flow.typeName);
+        if (!to) continue;
+
+        const edgeKind = flow.kind === "THROW" ? "THROWS" : "CATCHES";
+        draft.addEdge({
+          id: makeId("edge", edgeKind.toLowerCase(), from, to),
+          kind: edgeKind,
+          from,
+          to,
+          evidence: [{ source: "AST", locator: pr.artifact.path, confidence: 1 }],
+        });
       }
     }
   }

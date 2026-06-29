@@ -185,8 +185,9 @@ function extractRoutes(root: Parser.SyntaxNode): RouteFact[] {
           method = expr.childForFieldName("attribute")?.text;
         }
         if (method && PY_HTTP_VERBS.has(method.toLowerCase())) {
+          const verb = method.toUpperCase();
           routes.push({
-            method: method.toUpperCase(),
+            method: verb as RouteFact["method"],
             path: path || "/",
             handler,
             span: getSpan(fn ?? node),
@@ -230,6 +231,7 @@ export class PythonAdapter implements LanguageAdapter {
       exports: extractExports(tree.rootNode),
       calls: extractCalls(tree.rootNode),
       routes: extractRoutes(tree.rootNode),
+      controlFlows: [],
     };
   }
 }

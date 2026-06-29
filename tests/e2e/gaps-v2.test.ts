@@ -42,7 +42,15 @@ function cap(id: string, capability: string, nodes: string[]): CapabilityIR {
   };
 }
 function ir(nodes: NodeIR[], caps: CapabilityIR[]): RepositoryIR {
-  return { version: RIR_VERSION, nodes, edges: [], artifacts: [], files: [], capabilities: caps };
+  return {
+    version: RIR_VERSION,
+    schemaVersion: RIR_VERSION,
+    nodes,
+    edges: [],
+    artifacts: [],
+    files: [],
+    capabilities: caps,
+  };
 }
 function req(capability: string, priority: RequirementIR["priority"] = "MUST"): RequirementIR {
   return {

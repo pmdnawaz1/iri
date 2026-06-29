@@ -203,6 +203,7 @@ export function prove(dir: string): ProveResult {
 
   const ir: RepositoryIR = {
     version: RIR_VERSION,
+    schemaVersion: RIR_VERSION,
     nodes,
     edges: irEdges,
     artifacts: [],

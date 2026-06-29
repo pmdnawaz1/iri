@@ -13,7 +13,12 @@ export function validateRepositoryIR(value: unknown): asserts value is Repositor
   if (!Array.isArray(ir.files)) throw new InvariantError("IR files must be an array");
 
   for (const f of ir.files) {
-    if (typeof f !== "string") throw new InvariantError("IR files must contain only strings");
+    if (typeof f !== "object" || f === null) throw new InvariantError("IR files must contain objects");
+    const file = f as any;
+    if (typeof file.path !== "string") throw new InvariantError("IR files must have path");
+    if (typeof file.language !== "string" && file.language !== null)
+      throw new InvariantError("IR files must have language string or null");
+    if (typeof file.size !== "number") throw new InvariantError("IR files must have size");
   }
 
   const nodeIds = new Set<string>();

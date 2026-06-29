@@ -29,12 +29,16 @@ export interface SymbolFact {
     | "interface"
     | "property"
     | "enum"
-    | "constant";
+    | "constant"
+    | "field"
+    | "enum_member"
+    | "type_alias"
+    | "import";
   readonly exported: boolean;
   readonly span: Span;
   readonly signature?: string;
   readonly returnType?: string;
-  readonly typeParameters?: string;
+  readonly typeParameters?: string[];
   readonly visibility?: "public" | "private" | "protected" | "internal";
   readonly isAsync?: boolean;
   readonly isStatic?: boolean;
@@ -68,9 +72,17 @@ export interface CallFact {
 
 /** A route declaration discovered syntactically (no semantic mapping). */
 export interface RouteFact {
-  readonly method: string;
+  readonly method: "GET" | "POST" | "PUT" | "DELETE" | "PATCH" | "ALL" | "HEAD" | "OPTIONS";
   readonly path: string;
   readonly handler: string;
+  readonly span: Span;
+}
+
+/** Error propagation and middleware wrapping control flow. */
+export interface ControlFlowFact {
+  readonly kind: "THROW" | "CATCH";
+  readonly enclosing?: string;
+  readonly typeName?: string;
   readonly span: Span;
 }
 
@@ -82,6 +94,7 @@ export interface ParseResult {
   readonly exports: readonly string[];
   readonly calls: readonly CallFact[];
   readonly routes: readonly RouteFact[];
+  readonly controlFlows: readonly ControlFlowFact[];
 }
 
 /** Immutable inputs handed to every pass during one compilation. */

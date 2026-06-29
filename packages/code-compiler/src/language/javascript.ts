@@ -171,8 +171,10 @@ function extractRoutes(sf: import("typescript").SourceFile): RouteFact[] {
       node.arguments[1] !== undefined &&
       ts.isStringLiteral(node.arguments[0])
     ) {
+      const verb = node.expression.name.text.toUpperCase();
+      const method = verb as RouteFact["method"];
       routes.push({
-        method: node.expression.name.text.toUpperCase(),
+        method,
         path: (node.arguments[0] as import("typescript").StringLiteral).text,
         handler: node.arguments[1].getText(sf),
         span: getSpan(sf, node),
@@ -208,6 +210,7 @@ export class JavaScriptAdapter implements LanguageAdapter {
       exports: extractExports(sf),
       calls: extractCalls(sf),
       routes: extractRoutes(sf),
+      controlFlows: [],
     };
   }
 }

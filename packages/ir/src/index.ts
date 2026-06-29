@@ -35,6 +35,10 @@ export const NodeKind = {
   Service: "SERVICE",
   Repository: "REPOSITORY",
   Middleware: "MIDDLEWARE",
+  Field: "FIELD",
+  EnumMember: "ENUM_MEMBER",
+  TypeAlias: "TYPE_ALIAS",
+  Import: "IMPORT",
   Component: "COMPONENT",
   Handler: "HANDLER",
   ApiCall: "API_CALL",
@@ -71,7 +75,10 @@ export const EdgeKind = {
   Reads: "READS",
   Writes: "WRITES",
   RoutesTo: "ROUTES_TO",
-  Handles: "HANDLES",
+  Extends: "EXTENDS",
+  Catches: "CATCHES",
+  Throws: "THROWS",
+  Wraps: "WRAPS",
   Tests: "TESTS",
   Documents: "DOCUMENTS",
 } as const;
@@ -169,14 +176,14 @@ export interface NodeIR {
   readonly evidence: readonly EvidenceIR[];
   readonly signature?: string;
   readonly returnType?: string;
-  readonly typeParameters?: string;
+  readonly typeParameters?: string[];
   readonly visibility?: "public" | "private" | "protected" | "internal";
   readonly isExported?: boolean;
   readonly isAsync?: boolean;
   readonly isStatic?: boolean;
   readonly isAbstract?: boolean;
   readonly qualifiedName?: string;
-  readonly filePath: string;
+  readonly filePath?: string;
   readonly decorators?: { readonly name: string; readonly args: readonly string[] }[];
   readonly docstring?: string;
 }
@@ -231,10 +238,17 @@ export interface CapabilityIR {
 /** The full Repository IR for one compilation of one repository. */
 export interface RepositoryIR {
   readonly version: typeof RIR_VERSION;
+  readonly schemaVersion?: string;
   readonly nodes: readonly NodeIR[];
   readonly edges: readonly EdgeIR[];
   readonly artifacts: readonly ArtifactIR[];
-  readonly files: readonly string[];
+  readonly files: readonly {
+    readonly path: string;
+    readonly language: string | null;
+    readonly size: number;
+    readonly contentHash?: string;
+    readonly nodeCount?: number;
+  }[];
   readonly capabilities: readonly CapabilityIR[];
 }
 
@@ -300,7 +314,15 @@ export function isClosureState(value: string): value is ClosureState {
 }
 
 export function emptyRepositoryIR(): RepositoryIR {
-  return { version: RIR_VERSION, nodes: [], edges: [], artifacts: [], files: [], capabilities: [] };
+  return {
+    version: RIR_VERSION,
+    schemaVersion: RIR_VERSION,
+    nodes: [],
+    edges: [],
+    artifacts: [],
+    files: [],
+    capabilities: [],
+  };
 }
 
 export function emptyRequirementSet(): RequirementSet {

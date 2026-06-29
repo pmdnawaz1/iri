@@ -37,6 +37,7 @@
     }
   ],
   "files": [],
+  "schemaVersion": "1.1.0",
   "capabilities": [
     {
       "id": "cap|AUTH.LOGIN|1",
