@@ -32,18 +32,33 @@ timeline:
     end_unit: 260
     tspecs: 24
   - wave: 6
-    effort: 35
+    effort: 46
     start_unit: 260
-    end_unit: 295
-    tspecs: 21
+    end_unit: 306
+    tspecs: 25
   - wave: 7
-    effort: 6
-    start_unit: 295
-    end_unit: 301
-    tspecs: 2
+    effort: 35
+    start_unit: 306
+    end_unit: 341
+    tspecs: 12
   - wave: 8
-    effort: 4
-    start_unit: 301
-    end_unit: 305
-    tspecs: 2
-total_effort: 305
+    effort: 38
+    start_unit: 341
+    end_unit: 379
+    tspecs: 9
+  - wave: 9
+    effort: 34
+    start_unit: 379
+    end_unit: 413
+    tspecs: 4
+  - wave: 10
+    effort: 24
+    start_unit: 413
+    end_unit: 437
+    tspecs: 3
+  - wave: 11
+    effort: 5
+    start_unit: 437
+    end_unit: 442
+    tspecs: 1
+total_effort: 442

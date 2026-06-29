@@ -68,5 +68,41 @@ high_risk:
   - id: "TSPEC-E01"
     title: "Closure engine impl"
     risk: "HIGH"
+    critical_path: false
+  - id: "TSPEC-F03"
+    title: "NodeIR decorators[] as data (critical for NestJS routes/DI)"
+    risk: "HIGH"
+    critical_path: false
+  - id: "TSPEC-F13"
+    title: "ReferenceResolver: import resolution + name matching (deep call graph)"
+    risk: "HIGH"
     critical_path: true
-risk_score: 0.168
+  - id: "TSPEC-F14"
+    title: "Framework route + DI resolution (NestJS/Express/Spring/FastAPI/Gin)"
+    risk: "HIGH"
+    critical_path: true
+  - id: "TSPEC-F16"
+    title: "Dynamic-dispatch synthesizers (callback/observer/event edges)"
+    risk: "HIGH"
+    critical_path: false
+  - id: "TSPEC-F17"
+    title: "Entry-point reachability tracing (bootstrap/main -> call graph)"
+    risk: "HIGH"
+    critical_path: false
+  - id: "TSPEC-F29"
+    title: "Performance annotations: N+1 query + hot-path / slow-operation detection"
+    risk: "HIGH"
+    critical_path: false
+  - id: "TSPEC-F15"
+    title: "DI/provider mapping: PROVIDES edges (NestJS @Module + constructor injection)"
+    risk: "HIGH"
+    critical_path: true
+  - id: "TSPEC-F27"
+    title: "Runtime-trace ingestion (execution.runtimeObserved via OTel)"
+    risk: "HIGH"
+    critical_path: false
+  - id: "TSPEC-F18"
+    title: "Closure populates on the resolved DI graph (the headline fix)"
+    risk: "HIGH"
+    critical_path: true
+risk_score: 0.2

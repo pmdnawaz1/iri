@@ -49,7 +49,7 @@ version: "1.0.0"
 created_at: "2026-06-27T00:00:00Z"
 updated_at: "2026-06-27T00:00:00Z"
 wave: 8
-critical_path: true
+critical_path: false
 parallel_group: "wave-8"
 spec_path: "eos/specs/TSPEC-SC01.spec.md"
 spec_required: true

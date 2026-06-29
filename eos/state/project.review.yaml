@@ -261,6 +261,18 @@ reviews:
   - id: "TSPEC-E01"
     reviewers:
       - "ROLE_ARCHITECT"
+  - id: "TSPEC-F01"
+    reviewers:
+      - "ROLE_ARCHITECT"
+  - id: "TSPEC-F21"
+    reviewers:
+      - "ROLE_ARCHITECT"
+  - id: "TSPEC-F22"
+    reviewers:
+      - "ROLE_ARCHITECT"
+  - id: "TSPEC-F28"
+    reviewers:
+      - "ROLE_ARCHITECT"
   - id: "TSPEC-FX01"
     reviewers:
       - "ROLE_ARCHITECT"
@@ -303,9 +315,84 @@ reviews:
   - id: "TSPEC-APP2"
     reviewers:
       - "ROLE_ARCHITECT"
+  - id: "TSPEC-F02"
+    reviewers:
+      - "ROLE_ARCHITECT"
+  - id: "TSPEC-F03"
+    reviewers:
+      - "ROLE_ARCHITECT"
+  - id: "TSPEC-F04"
+    reviewers:
+      - "ROLE_ARCHITECT"
+  - id: "TSPEC-F05"
+    reviewers:
+      - "ROLE_ARCHITECT"
+  - id: "TSPEC-F06"
+    reviewers:
+      - "ROLE_ARCHITECT"
+  - id: "TSPEC-F07"
+    reviewers:
+      - "ROLE_ARCHITECT"
+  - id: "TSPEC-F08"
+    reviewers:
+      - "ROLE_ARCHITECT"
+  - id: "TSPEC-F09"
+    reviewers:
+      - "ROLE_ARCHITECT"
+  - id: "TSPEC-F10"
+    reviewers:
+      - "ROLE_ARCHITECT"
+  - id: "TSPEC-F20"
+    reviewers:
+      - "ROLE_ARCHITECT"
+  - id: "TSPEC-F11"
+    reviewers:
+      - "ROLE_ARCHITECT"
+  - id: "TSPEC-F12"
+    reviewers:
+      - "ROLE_ARCHITECT"
+  - id: "TSPEC-F13"
+    reviewers:
+      - "ROLE_ARCHITECT"
+  - id: "TSPEC-F19"
+    reviewers:
+      - "ROLE_ARCHITECT"
+  - id: "TSPEC-F23"
+    reviewers:
+      - "ROLE_ARCHITECT"
+  - id: "TSPEC-F24"
+    reviewers:
+      - "ROLE_ARCHITECT"
+  - id: "TSPEC-F25"
+    reviewers:
+      - "ROLE_ARCHITECT"
   - id: "TSPEC-SC01"
     reviewers:
       - "ROLE_ARCHITECT"
   - id: "TSPEC-SC03"
+    reviewers:
+      - "ROLE_ARCHITECT"
+  - id: "TSPEC-F14"
+    reviewers:
+      - "ROLE_ARCHITECT"
+  - id: "TSPEC-F16"
+    reviewers:
+      - "ROLE_ARCHITECT"
+  - id: "TSPEC-F17"
+    reviewers:
+      - "ROLE_ARCHITECT"
+  - id: "TSPEC-F29"
+    reviewers:
+      - "ROLE_ARCHITECT"
+  - id: "TSPEC-F15"
+    reviewers:
+      - "ROLE_ARCHITECT"
+  - id: "TSPEC-F26"
+    reviewers:
+      - "ROLE_ARCHITECT"
+  - id: "TSPEC-F27"
+    reviewers:
+      - "ROLE_ARCHITECT"
+  - id: "TSPEC-F18"
     reviewers:
       - "ROLE_ARCHITECT"

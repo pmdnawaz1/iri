@@ -15,7 +15,8 @@ risk: "HIGH"
 estimated_effort: 5
 depends_on:
   - "TSPEC-P03"
-blocks: []
+blocks:
+  - "TSPEC-F20"
 references: []
 architecture_documents:
   - "docs/ADR-0022-adapter-route-detection.md"

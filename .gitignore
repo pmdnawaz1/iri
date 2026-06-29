@@ -25,3 +25,5 @@ lint_output.txt
 
 # Claude Code worktrees (never commit)
 .claude/worktrees/
+
+inspirations/

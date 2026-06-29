@@ -107,6 +107,10 @@ waves:
       - "TSPEC-CE06"
       - "TSPEC-CE07"
       - "TSPEC-E01"
+      - "TSPEC-F01"
+      - "TSPEC-F21"
+      - "TSPEC-F22"
+      - "TSPEC-F28"
       - "TSPEC-FX01"
       - "TSPEC-FX02"
       - "TSPEC-FX03"
@@ -124,8 +128,42 @@ waves:
     tspecs:
       - "TSPEC-APP1"
       - "TSPEC-APP2"
+      - "TSPEC-F02"
+      - "TSPEC-F03"
+      - "TSPEC-F04"
+      - "TSPEC-F05"
+      - "TSPEC-F06"
+      - "TSPEC-F07"
+      - "TSPEC-F08"
+      - "TSPEC-F09"
+      - "TSPEC-F10"
+      - "TSPEC-F20"
   - wave: 8
     parallel_group: "wave-8"
     tspecs:
+      - "TSPEC-F11"
+      - "TSPEC-F12"
+      - "TSPEC-F13"
+      - "TSPEC-F19"
+      - "TSPEC-F23"
+      - "TSPEC-F24"
+      - "TSPEC-F25"
       - "TSPEC-SC01"
       - "TSPEC-SC03"
+  - wave: 9
+    parallel_group: "wave-9"
+    tspecs:
+      - "TSPEC-F14"
+      - "TSPEC-F16"
+      - "TSPEC-F17"
+      - "TSPEC-F29"
+  - wave: 10
+    parallel_group: "wave-10"
+    tspecs:
+      - "TSPEC-F15"
+      - "TSPEC-F26"
+      - "TSPEC-F27"
+  - wave: 11
+    parallel_group: "wave-11"
+    tspecs:
+      - "TSPEC-F18"

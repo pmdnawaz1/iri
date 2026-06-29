@@ -248,7 +248,7 @@ nodes:
   - id: "TSPEC-P01"
     owner: "ROLE_IMPLEMENTER"
     wave: 5
-    critical_path: false
+    critical_path: true
   - id: "TSPEC-P02"
     owner: "ROLE_IMPLEMENTER"
     wave: 5
@@ -280,7 +280,7 @@ nodes:
   - id: "TSPEC-P09"
     owner: "ROLE_IMPLEMENTER"
     wave: 5
-    critical_path: true
+    critical_path: false
   - id: "TSPEC-P10"
     owner: "ROLE_IMPLEMENTER"
     wave: 5
@@ -340,7 +340,23 @@ nodes:
   - id: "TSPEC-E01"
     owner: "ROLE_IMPLEMENTER"
     wave: 6
+    critical_path: false
+  - id: "TSPEC-F01"
+    owner: "ROLE_IMPLEMENTER"
+    wave: 6
     critical_path: true
+  - id: "TSPEC-F21"
+    owner: "ROLE_IMPLEMENTER"
+    wave: 6
+    critical_path: false
+  - id: "TSPEC-F22"
+    owner: "ROLE_ARCHITECT"
+    wave: 6
+    critical_path: false
+  - id: "TSPEC-F28"
+    owner: "ROLE_IMPLEMENTER"
+    wave: 6
+    critical_path: false
   - id: "TSPEC-FX01"
     owner: "ROLE_IMPLEMENTER"
     wave: 6
@@ -392,19 +408,119 @@ nodes:
   - id: "TSPEC-APP1"
     owner: "ROLE_IMPLEMENTER"
     wave: 7
-    critical_path: true
+    critical_path: false
   - id: "TSPEC-APP2"
     owner: "ROLE_IMPLEMENTER"
     wave: 7
     critical_path: false
-  - id: "TSPEC-SC01"
+  - id: "TSPEC-F02"
+    owner: "ROLE_IMPLEMENTER"
+    wave: 7
+    critical_path: true
+  - id: "TSPEC-F03"
+    owner: "ROLE_IMPLEMENTER"
+    wave: 7
+    critical_path: false
+  - id: "TSPEC-F04"
+    owner: "ROLE_IMPLEMENTER"
+    wave: 7
+    critical_path: false
+  - id: "TSPEC-F05"
+    owner: "ROLE_IMPLEMENTER"
+    wave: 7
+    critical_path: false
+  - id: "TSPEC-F06"
+    owner: "ROLE_IMPLEMENTER"
+    wave: 7
+    critical_path: false
+  - id: "TSPEC-F07"
+    owner: "ROLE_IMPLEMENTER"
+    wave: 7
+    critical_path: false
+  - id: "TSPEC-F08"
+    owner: "ROLE_IMPLEMENTER"
+    wave: 7
+    critical_path: false
+  - id: "TSPEC-F09"
+    owner: "ROLE_IMPLEMENTER"
+    wave: 7
+    critical_path: false
+  - id: "TSPEC-F10"
+    owner: "ROLE_IMPLEMENTER"
+    wave: 7
+    critical_path: false
+  - id: "TSPEC-F20"
+    owner: "ROLE_IMPLEMENTER"
+    wave: 7
+    critical_path: false
+  - id: "TSPEC-F11"
+    owner: "ROLE_IMPLEMENTER"
+    wave: 8
+    critical_path: false
+  - id: "TSPEC-F12"
+    owner: "ROLE_IMPLEMENTER"
+    wave: 8
+    critical_path: false
+  - id: "TSPEC-F13"
     owner: "ROLE_IMPLEMENTER"
     wave: 8
     critical_path: true
+  - id: "TSPEC-F19"
+    owner: "ROLE_IMPLEMENTER"
+    wave: 8
+    critical_path: false
+  - id: "TSPEC-F23"
+    owner: "ROLE_IMPLEMENTER"
+    wave: 8
+    critical_path: false
+  - id: "TSPEC-F24"
+    owner: "ROLE_IMPLEMENTER"
+    wave: 8
+    critical_path: false
+  - id: "TSPEC-F25"
+    owner: "ROLE_IMPLEMENTER"
+    wave: 8
+    critical_path: false
+  - id: "TSPEC-SC01"
+    owner: "ROLE_IMPLEMENTER"
+    wave: 8
+    critical_path: false
   - id: "TSPEC-SC03"
     owner: "ROLE_IMPLEMENTER"
     wave: 8
     critical_path: false
+  - id: "TSPEC-F14"
+    owner: "ROLE_IMPLEMENTER"
+    wave: 9
+    critical_path: true
+  - id: "TSPEC-F16"
+    owner: "ROLE_IMPLEMENTER"
+    wave: 9
+    critical_path: false
+  - id: "TSPEC-F17"
+    owner: "ROLE_IMPLEMENTER"
+    wave: 9
+    critical_path: false
+  - id: "TSPEC-F29"
+    owner: "ROLE_IMPLEMENTER"
+    wave: 9
+    critical_path: false
+  - id: "TSPEC-F15"
+    owner: "ROLE_IMPLEMENTER"
+    wave: 10
+    critical_path: true
+  - id: "TSPEC-F26"
+    owner: "ROLE_IMPLEMENTER"
+    wave: 10
+    critical_path: false
+  - id: "TSPEC-F27"
+    owner: "ROLE_ARCHITECT"
+    wave: 10
+    critical_path: false
+  - id: "TSPEC-F18"
+    owner: "ROLE_ARCHITECT"
+    wave: 11
+    critical_path: true
 edges:
   - from: "TSPEC-A001"
     to: "TSPEC-A002"
@@ -652,6 +768,14 @@ edges:
     to: "TSPEC-E01"
   - from: "TSPEC-P12"
     to: "TSPEC-E01"
+  - from: "TSPEC-P01"
+    to: "TSPEC-F01"
+  - from: "TSPEC-P01"
+    to: "TSPEC-F21"
+  - from: "TSPEC-P01"
+    to: "TSPEC-F22"
+  - from: "TSPEC-P01"
+    to: "TSPEC-F28"
   - from: "TSPEC-AD01"
     to: "TSPEC-FX01"
   - from: "TSPEC-AD01"
@@ -692,7 +816,71 @@ edges:
     to: "TSPEC-APP2"
   - from: "TSPEC-E04"
     to: "TSPEC-APP2"
+  - from: "TSPEC-F01"
+    to: "TSPEC-F02"
+  - from: "TSPEC-F01"
+    to: "TSPEC-F03"
+  - from: "TSPEC-F01"
+    to: "TSPEC-F04"
+  - from: "TSPEC-F01"
+    to: "TSPEC-F05"
+  - from: "TSPEC-F01"
+    to: "TSPEC-F06"
+  - from: "TSPEC-F01"
+    to: "TSPEC-F07"
+  - from: "TSPEC-F01"
+    to: "TSPEC-F08"
+  - from: "TSPEC-F01"
+    to: "TSPEC-F09"
+  - from: "TSPEC-F01"
+    to: "TSPEC-F10"
+  - from: "TSPEC-A021"
+    to: "TSPEC-F20"
+  - from: "TSPEC-F06"
+    to: "TSPEC-F11"
+  - from: "TSPEC-F03"
+    to: "TSPEC-F12"
+  - from: "TSPEC-F02"
+    to: "TSPEC-F13"
+  - from: "TSPEC-F08"
+    to: "TSPEC-F13"
+  - from: "TSPEC-F08"
+    to: "TSPEC-F19"
+  - from: "TSPEC-F02"
+    to: "TSPEC-F23"
+  - from: "TSPEC-F04"
+    to: "TSPEC-F23"
+  - from: "TSPEC-F02"
+    to: "TSPEC-F24"
+  - from: "TSPEC-F02"
+    to: "TSPEC-F25"
   - from: "TSPEC-APP1"
     to: "TSPEC-SC01"
   - from: "TSPEC-APP1"
     to: "TSPEC-SC03"
+  - from: "TSPEC-F03"
+    to: "TSPEC-F14"
+  - from: "TSPEC-F13"
+    to: "TSPEC-F14"
+  - from: "TSPEC-F13"
+    to: "TSPEC-F16"
+  - from: "TSPEC-F13"
+    to: "TSPEC-F17"
+  - from: "TSPEC-F13"
+    to: "TSPEC-F29"
+  - from: "TSPEC-F05"
+    to: "TSPEC-F15"
+  - from: "TSPEC-F10"
+    to: "TSPEC-F15"
+  - from: "TSPEC-F14"
+    to: "TSPEC-F15"
+  - from: "TSPEC-F17"
+    to: "TSPEC-F26"
+  - from: "TSPEC-F17"
+    to: "TSPEC-F27"
+  - from: "TSPEC-F14"
+    to: "TSPEC-F18"
+  - from: "TSPEC-F15"
+    to: "TSPEC-F18"
+  - from: "TSPEC-F17"
+    to: "TSPEC-F18"

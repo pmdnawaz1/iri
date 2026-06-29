@@ -52,7 +52,7 @@ version: "1.0.0"
 created_at: "2026-06-27T00:00:00Z"
 updated_at: "2026-06-27T00:00:00Z"
 wave: 5
-critical_path: true
+critical_path: false
 parallel_group: "wave-5"
 spec_path: "eos/specs/TSPEC-P09.spec.md"
 spec_required: true

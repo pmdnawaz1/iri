@@ -1,7 +1,7 @@
 {
   "version": "1.0.0",
   "generated_at": "2026-06-27T00:00:00Z",
-  "count": 101,
+  "count": 130,
   "tspecs": [
     {
       "priority": "P0",
@@ -4053,7 +4053,12 @@
       "repository_path": "packages/passes",
       "branch": "feature/tspec-p01-importpass",
       "parent_branch": "main",
-      "blocks": [],
+      "blocks": [
+        "TSPEC-F01",
+        "TSPEC-F21",
+        "TSPEC-F22",
+        "TSPEC-F28"
+      ],
       "reviewers": [
         "ROLE_ARCHITECT"
       ],
@@ -4061,7 +4066,7 @@
       "created_at": "2026-06-27T00:00:00Z",
       "updated_at": "2026-06-27T00:00:00Z",
       "wave": 5,
-      "critical_path": false,
+      "critical_path": true,
       "parallel_group": "wave-5",
       "spec_path": "eos/specs/TSPEC-P01.spec.md",
       "spec_required": true,
@@ -4601,7 +4606,7 @@
       "created_at": "2026-06-27T00:00:00Z",
       "updated_at": "2026-06-27T00:00:00Z",
       "wave": 5,
-      "critical_path": true,
+      "critical_path": false,
       "parallel_group": "wave-5",
       "spec_path": "eos/specs/TSPEC-P09.spec.md",
       "spec_required": true,
@@ -5062,7 +5067,9 @@
       "repository_path": "packages/code-compiler",
       "branch": "feature/tspec-a021-adapter-route-detection-nestjs-decorators-file-based-route-ts",
       "parent_branch": "main",
-      "blocks": [],
+      "blocks": [
+        "TSPEC-F20"
+      ],
       "reviewers": [
         "ROLE_ARCHITECT"
       ],
@@ -5588,9 +5595,269 @@
       "created_at": "2026-06-27T00:00:00Z",
       "updated_at": "2026-06-27T00:00:00Z",
       "wave": 6,
-      "critical_path": true,
+      "critical_path": false,
       "parallel_group": "wave-6",
       "spec_path": "eos/specs/TSPEC-E01.spec.md",
+      "spec_required": true,
+      "spec_status": "MISSING"
+    },
+    {
+      "priority": "P1",
+      "complexity": "MEDIUM",
+      "risk": "MEDIUM",
+      "estimated_effort": 5,
+      "depends_on": [
+        "TSPEC-P01"
+      ],
+      "references": [],
+      "architecture_documents": [
+        "docs/ADR-0025-ir-fidelity-steal-from-codegraph.md"
+      ],
+      "deliverables": [
+        "NodeIR += signature, returnType, typeParameters, visibility, isExported, isAsync, isStatic, isAbstract (RIR_VERSION bump)",
+        "TS adapter populates them",
+        "copy: inspirations/codegraph/src/extraction/index.ts",
+        "copy: inspirations/codegraph/src/extraction/languages/typescript.ts",
+        "copy: inspirations/codegraph/src/types.ts"
+      ],
+      "outputs": [],
+      "tests": [
+        "unit",
+        "integration",
+        "golden"
+      ],
+      "acceptance_criteria": [
+        "Builds",
+        "Typechecks",
+        "Lint clean",
+        "Tests pass",
+        "Coverage >= 95%"
+      ],
+      "forbidden_changes": [
+        "Repository IR schema",
+        "Requirement IR schema",
+        "Ontology ids / properties",
+        "Compiler pipeline / builder order",
+        "Closure / coverage / consistency rules"
+      ],
+      "labels": [
+        "implementation",
+        "ir"
+      ],
+      "id": "TSPEC-F01",
+      "title": "NodeIR rich fields: signature/returnType/typeParameters/visibility/modifiers",
+      "owner": "ROLE_IMPLEMENTER",
+      "package": "ir",
+      "module": "node-fields",
+      "state": "DRAFT",
+      "repository_path": "packages/ir",
+      "branch": "feature/tspec-f01-nodeir-rich-fields-signature-returntype-typeparameters-visibility-modifiers",
+      "parent_branch": "main",
+      "blocks": [
+        "TSPEC-F02",
+        "TSPEC-F03",
+        "TSPEC-F04",
+        "TSPEC-F05",
+        "TSPEC-F06",
+        "TSPEC-F07",
+        "TSPEC-F08",
+        "TSPEC-F09",
+        "TSPEC-F10"
+      ],
+      "reviewers": [
+        "ROLE_ARCHITECT"
+      ],
+      "version": "1.0.0",
+      "created_at": "2026-06-27T00:00:00Z",
+      "updated_at": "2026-06-27T00:00:00Z",
+      "wave": 6,
+      "critical_path": true,
+      "parallel_group": "wave-6",
+      "spec_path": "eos/specs/TSPEC-F01.spec.md",
+      "spec_required": true,
+      "spec_status": "MISSING"
+    },
+    {
+      "priority": "P2",
+      "complexity": "MEDIUM",
+      "risk": "MEDIUM",
+      "estimated_effort": 2,
+      "depends_on": [
+        "TSPEC-P01"
+      ],
+      "references": [],
+      "architecture_documents": [
+        "docs/ADR-0025-ir-fidelity-steal-from-codegraph.md"
+      ],
+      "deliverables": [
+        "RepositoryIR.files[]",
+        "file-level impact analysis",
+        "copy: inspirations/codegraph/src/db/schema.sql"
+      ],
+      "outputs": [],
+      "tests": [
+        "unit",
+        "integration",
+        "golden"
+      ],
+      "acceptance_criteria": [
+        "Builds",
+        "Typechecks",
+        "Lint clean",
+        "Tests pass",
+        "Coverage >= 95%"
+      ],
+      "forbidden_changes": [
+        "Repository IR schema",
+        "Requirement IR schema",
+        "Ontology ids / properties",
+        "Compiler pipeline / builder order",
+        "Closure / coverage / consistency rules"
+      ],
+      "labels": [
+        "implementation",
+        "ir"
+      ],
+      "id": "TSPEC-F21",
+      "title": "IR files[] metadata (language/size/hash/nodeCount)",
+      "owner": "ROLE_IMPLEMENTER",
+      "package": "ir",
+      "module": "files-section",
+      "state": "DRAFT",
+      "repository_path": "packages/ir",
+      "branch": "feature/tspec-f21-ir-files-metadata-language-size-hash-nodecount",
+      "parent_branch": "main",
+      "blocks": [],
+      "reviewers": [
+        "ROLE_ARCHITECT"
+      ],
+      "version": "1.0.0",
+      "created_at": "2026-06-27T00:00:00Z",
+      "updated_at": "2026-06-27T00:00:00Z",
+      "wave": 6,
+      "critical_path": false,
+      "parallel_group": "wave-6",
+      "spec_path": "eos/specs/TSPEC-F21.spec.md",
+      "spec_required": true,
+      "spec_status": "MISSING"
+    },
+    {
+      "priority": "P2",
+      "complexity": "MEDIUM",
+      "risk": "MEDIUM",
+      "estimated_effort": 2,
+      "depends_on": [
+        "TSPEC-P01"
+      ],
+      "references": [],
+      "architecture_documents": [
+        "docs/ADR-0025-ir-fidelity-steal-from-codegraph.md"
+      ],
+      "deliverables": [
+        "schemaVersion in IR header",
+        "documented additive-migration rule",
+        "copy: inspirations/codegraph/src/db/migrations.ts"
+      ],
+      "outputs": [],
+      "tests": [
+        "ADR review",
+        "schema golden test"
+      ],
+      "acceptance_criteria": [
+        "ADR accepted",
+        "No ambiguity remains",
+        "Versioned"
+      ],
+      "forbidden_changes": [
+        "Implementation code beyond reference snippets",
+        "CRUD / boilerplate"
+      ],
+      "labels": [
+        "architecture",
+        "ir"
+      ],
+      "id": "TSPEC-F22",
+      "title": "IR schemaVersion header + migration discipline",
+      "owner": "ROLE_ARCHITECT",
+      "package": "ir",
+      "module": "schema-version",
+      "state": "DRAFT",
+      "repository_path": "packages/ir",
+      "branch": "feature/tspec-f22-ir-schemaversion-header-migration-discipline",
+      "parent_branch": "main",
+      "blocks": [],
+      "reviewers": [
+        "ROLE_ARCHITECT"
+      ],
+      "version": "1.0.0",
+      "created_at": "2026-06-27T00:00:00Z",
+      "updated_at": "2026-06-27T00:00:00Z",
+      "wave": 6,
+      "critical_path": false,
+      "parallel_group": "wave-6",
+      "spec_path": "eos/specs/TSPEC-F22.spec.md",
+      "spec_required": false,
+      "spec_status": "MISSING"
+    },
+    {
+      "priority": "P3",
+      "complexity": "MEDIUM",
+      "risk": "MEDIUM",
+      "estimated_effort": 2,
+      "depends_on": [
+        "TSPEC-P01"
+      ],
+      "references": [],
+      "architecture_documents": [
+        "docs/ADR-0025-ir-fidelity-steal-from-codegraph.md"
+      ],
+      "deliverables": [
+        "attach resolved npm/pip/go versions to external DEPENDS_ON edges"
+      ],
+      "outputs": [],
+      "tests": [
+        "unit",
+        "integration",
+        "golden"
+      ],
+      "acceptance_criteria": [
+        "Builds",
+        "Typechecks",
+        "Lint clean",
+        "Tests pass",
+        "Coverage >= 95%"
+      ],
+      "forbidden_changes": [
+        "Repository IR schema",
+        "Requirement IR schema",
+        "Ontology ids / properties",
+        "Compiler pipeline / builder order",
+        "Closure / coverage / consistency rules"
+      ],
+      "labels": [
+        "implementation",
+        "passes"
+      ],
+      "id": "TSPEC-F28",
+      "title": "Dependency version tracking (package.json/lockfile -> DEPENDS_ON metadata)",
+      "owner": "ROLE_IMPLEMENTER",
+      "package": "passes",
+      "module": "dep-versions",
+      "state": "DRAFT",
+      "repository_path": "packages/passes",
+      "branch": "feature/tspec-f28-dependency-version-tracking-package-json-lockfile-depends-on-metadata",
+      "parent_branch": "main",
+      "blocks": [],
+      "reviewers": [
+        "ROLE_ARCHITECT"
+      ],
+      "version": "1.0.0",
+      "created_at": "2026-06-27T00:00:00Z",
+      "updated_at": "2026-06-27T00:00:00Z",
+      "wave": 6,
+      "critical_path": false,
+      "parallel_group": "wave-6",
+      "spec_path": "eos/specs/TSPEC-F28.spec.md",
       "spec_required": true,
       "spec_status": "MISSING"
     },
@@ -6402,7 +6669,7 @@
       "created_at": "2026-06-27T00:00:00Z",
       "updated_at": "2026-06-27T00:00:00Z",
       "wave": 7,
-      "critical_path": true,
+      "critical_path": false,
       "parallel_group": "wave-7",
       "spec_path": "eos/specs/TSPEC-APP1.spec.md",
       "spec_required": true,
@@ -6479,6 +6746,1116 @@
       "spec_status": "WRITTEN"
     },
     {
+      "priority": "P1",
+      "complexity": "MEDIUM",
+      "risk": "MEDIUM",
+      "estimated_effort": 3,
+      "depends_on": [
+        "TSPEC-F01"
+      ],
+      "references": [],
+      "architecture_documents": [
+        "docs/ADR-0025-ir-fidelity-steal-from-codegraph.md"
+      ],
+      "deliverables": [
+        "NodeIR.qualifiedName (Class::method)",
+        "NodeIR.filePath",
+        "node span start/end line+col",
+        "copy: inspirations/codegraph/src/types.ts"
+      ],
+      "outputs": [],
+      "tests": [
+        "unit",
+        "integration",
+        "golden"
+      ],
+      "acceptance_criteria": [
+        "Builds",
+        "Typechecks",
+        "Lint clean",
+        "Tests pass",
+        "Coverage >= 95%"
+      ],
+      "forbidden_changes": [
+        "Repository IR schema",
+        "Requirement IR schema",
+        "Ontology ids / properties",
+        "Compiler pipeline / builder order",
+        "Closure / coverage / consistency rules"
+      ],
+      "labels": [
+        "implementation",
+        "ir"
+      ],
+      "id": "TSPEC-F02",
+      "title": "NodeIR qualifiedName + promoted filePath + node-level line/col span",
+      "owner": "ROLE_IMPLEMENTER",
+      "package": "ir",
+      "module": "node-identity",
+      "state": "DRAFT",
+      "repository_path": "packages/ir",
+      "branch": "feature/tspec-f02-nodeir-qualifiedname-promoted-filepath-node-level-line-col-span",
+      "parent_branch": "main",
+      "blocks": [
+        "TSPEC-F13",
+        "TSPEC-F23",
+        "TSPEC-F24",
+        "TSPEC-F25"
+      ],
+      "reviewers": [
+        "ROLE_ARCHITECT"
+      ],
+      "version": "1.0.0",
+      "created_at": "2026-06-27T00:00:00Z",
+      "updated_at": "2026-06-27T00:00:00Z",
+      "wave": 7,
+      "critical_path": true,
+      "parallel_group": "wave-7",
+      "spec_path": "eos/specs/TSPEC-F02.spec.md",
+      "spec_required": true,
+      "spec_status": "MISSING"
+    },
+    {
+      "priority": "P1",
+      "complexity": "MEDIUM",
+      "risk": "HIGH",
+      "estimated_effort": 3,
+      "depends_on": [
+        "TSPEC-F01"
+      ],
+      "references": [],
+      "architecture_documents": [
+        "docs/ADR-0025-ir-fidelity-steal-from-codegraph.md"
+      ],
+      "deliverables": [
+        "NodeIR.decorators[]",
+        "extract @Controller/@Get/@Injectable/@Module args",
+        "copy: inspirations/codegraph/src/extraction/languages/typescript.ts"
+      ],
+      "outputs": [],
+      "tests": [
+        "unit",
+        "integration",
+        "golden"
+      ],
+      "acceptance_criteria": [
+        "Builds",
+        "Typechecks",
+        "Lint clean",
+        "Tests pass",
+        "Coverage >= 95%"
+      ],
+      "forbidden_changes": [
+        "Repository IR schema",
+        "Requirement IR schema",
+        "Ontology ids / properties",
+        "Compiler pipeline / builder order",
+        "Closure / coverage / consistency rules"
+      ],
+      "labels": [
+        "implementation",
+        "code-compiler"
+      ],
+      "id": "TSPEC-F03",
+      "title": "NodeIR decorators[] as data (critical for NestJS routes/DI)",
+      "owner": "ROLE_IMPLEMENTER",
+      "package": "code-compiler",
+      "module": "decorators",
+      "state": "DRAFT",
+      "repository_path": "packages/code-compiler",
+      "branch": "feature/tspec-f03-nodeir-decorators-as-data-critical-for-nestjs-routes-di",
+      "parent_branch": "main",
+      "blocks": [
+        "TSPEC-F12",
+        "TSPEC-F14"
+      ],
+      "reviewers": [
+        "ROLE_ARCHITECT"
+      ],
+      "version": "1.0.0",
+      "created_at": "2026-06-27T00:00:00Z",
+      "updated_at": "2026-06-27T00:00:00Z",
+      "wave": 7,
+      "critical_path": false,
+      "parallel_group": "wave-7",
+      "spec_path": "eos/specs/TSPEC-F03.spec.md",
+      "spec_required": true,
+      "spec_status": "MISSING"
+    },
+    {
+      "priority": "P3",
+      "complexity": "MEDIUM",
+      "risk": "MEDIUM",
+      "estimated_effort": 2,
+      "depends_on": [
+        "TSPEC-F01"
+      ],
+      "references": [],
+      "architecture_documents": [
+        "docs/ADR-0025-ir-fidelity-steal-from-codegraph.md"
+      ],
+      "deliverables": [
+        "NodeIR.docstring",
+        "copy: inspirations/codegraph/src/extraction/index.ts"
+      ],
+      "outputs": [],
+      "tests": [
+        "unit",
+        "integration",
+        "golden"
+      ],
+      "acceptance_criteria": [
+        "Builds",
+        "Typechecks",
+        "Lint clean",
+        "Tests pass",
+        "Coverage >= 95%"
+      ],
+      "forbidden_changes": [
+        "Repository IR schema",
+        "Requirement IR schema",
+        "Ontology ids / properties",
+        "Compiler pipeline / builder order",
+        "Closure / coverage / consistency rules"
+      ],
+      "labels": [
+        "implementation",
+        "code-compiler"
+      ],
+      "id": "TSPEC-F04",
+      "title": "NodeIR docstring (JSDoc/TSDoc) extraction",
+      "owner": "ROLE_IMPLEMENTER",
+      "package": "code-compiler",
+      "module": "docstring",
+      "state": "DRAFT",
+      "repository_path": "packages/code-compiler",
+      "branch": "feature/tspec-f04-nodeir-docstring-jsdoc-tsdoc-extraction",
+      "parent_branch": "main",
+      "blocks": [
+        "TSPEC-F23"
+      ],
+      "reviewers": [
+        "ROLE_ARCHITECT"
+      ],
+      "version": "1.0.0",
+      "created_at": "2026-06-27T00:00:00Z",
+      "updated_at": "2026-06-27T00:00:00Z",
+      "wave": 7,
+      "critical_path": false,
+      "parallel_group": "wave-7",
+      "spec_path": "eos/specs/TSPEC-F04.spec.md",
+      "spec_required": true,
+      "spec_status": "MISSING"
+    },
+    {
+      "priority": "P2",
+      "complexity": "MEDIUM",
+      "risk": "MEDIUM",
+      "estimated_effort": 3,
+      "depends_on": [
+        "TSPEC-F01"
+      ],
+      "references": [],
+      "architecture_documents": [
+        "docs/ADR-0025-ir-fidelity-steal-from-codegraph.md"
+      ],
+      "deliverables": [
+        "NodeKind PROPERTY/FIELD",
+        "adapters emit class fields + constructor-injected params",
+        "copy: inspirations/codegraph/src/types.ts",
+        "copy: inspirations/codegraph/src/extraction/index.ts"
+      ],
+      "outputs": [],
+      "tests": [
+        "unit",
+        "integration",
+        "golden"
+      ],
+      "acceptance_criteria": [
+        "Builds",
+        "Typechecks",
+        "Lint clean",
+        "Tests pass",
+        "Coverage >= 95%"
+      ],
+      "forbidden_changes": [
+        "Repository IR schema",
+        "Requirement IR schema",
+        "Ontology ids / properties",
+        "Compiler pipeline / builder order",
+        "Closure / coverage / consistency rules"
+      ],
+      "labels": [
+        "implementation",
+        "ir"
+      ],
+      "id": "TSPEC-F05",
+      "title": "PROPERTY/FIELD nodes (class fields, DI tokens)",
+      "owner": "ROLE_IMPLEMENTER",
+      "package": "ir",
+      "module": "property-nodes",
+      "state": "DRAFT",
+      "repository_path": "packages/ir",
+      "branch": "feature/tspec-f05-property-field-nodes-class-fields-di-tokens",
+      "parent_branch": "main",
+      "blocks": [
+        "TSPEC-F15"
+      ],
+      "reviewers": [
+        "ROLE_ARCHITECT"
+      ],
+      "version": "1.0.0",
+      "created_at": "2026-06-27T00:00:00Z",
+      "updated_at": "2026-06-27T00:00:00Z",
+      "wave": 7,
+      "critical_path": false,
+      "parallel_group": "wave-7",
+      "spec_path": "eos/specs/TSPEC-F05.spec.md",
+      "spec_required": true,
+      "spec_status": "MISSING"
+    },
+    {
+      "priority": "P2",
+      "complexity": "MEDIUM",
+      "risk": "MEDIUM",
+      "estimated_effort": 3,
+      "depends_on": [
+        "TSPEC-F01"
+      ],
+      "references": [],
+      "architecture_documents": [
+        "docs/ADR-0025-ir-fidelity-steal-from-codegraph.md"
+      ],
+      "deliverables": [
+        "NodeKind CONSTANT/ENUM/ENUM_MEMBER",
+        "feeds code-side constraint extraction (P10)",
+        "copy: inspirations/codegraph/src/extraction/index.ts"
+      ],
+      "outputs": [],
+      "tests": [
+        "unit",
+        "integration",
+        "golden"
+      ],
+      "acceptance_criteria": [
+        "Builds",
+        "Typechecks",
+        "Lint clean",
+        "Tests pass",
+        "Coverage >= 95%"
+      ],
+      "forbidden_changes": [
+        "Repository IR schema",
+        "Requirement IR schema",
+        "Ontology ids / properties",
+        "Compiler pipeline / builder order",
+        "Closure / coverage / consistency rules"
+      ],
+      "labels": [
+        "implementation",
+        "ir"
+      ],
+      "id": "TSPEC-F06",
+      "title": "CONSTANT/ENUM/ENUM_MEMBER nodes (config + type constants)",
+      "owner": "ROLE_IMPLEMENTER",
+      "package": "ir",
+      "module": "constant-nodes",
+      "state": "DRAFT",
+      "repository_path": "packages/ir",
+      "branch": "feature/tspec-f06-constant-enum-enum-member-nodes-config-type-constants",
+      "parent_branch": "main",
+      "blocks": [
+        "TSPEC-F11"
+      ],
+      "reviewers": [
+        "ROLE_ARCHITECT"
+      ],
+      "version": "1.0.0",
+      "created_at": "2026-06-27T00:00:00Z",
+      "updated_at": "2026-06-27T00:00:00Z",
+      "wave": 7,
+      "critical_path": false,
+      "parallel_group": "wave-7",
+      "spec_path": "eos/specs/TSPEC-F06.spec.md",
+      "spec_required": true,
+      "spec_status": "MISSING"
+    },
+    {
+      "priority": "P3",
+      "complexity": "MEDIUM",
+      "risk": "MEDIUM",
+      "estimated_effort": 3,
+      "depends_on": [
+        "TSPEC-F01"
+      ],
+      "references": [],
+      "architecture_documents": [
+        "docs/ADR-0025-ir-fidelity-steal-from-codegraph.md"
+      ],
+      "deliverables": [
+        "NodeKind TYPE_ALIAS",
+        "per-symbol IMPORT nodes (not collapsed to DEPENDS_ON)",
+        "copy: inspirations/codegraph/src/extraction/index.ts"
+      ],
+      "outputs": [],
+      "tests": [
+        "unit",
+        "integration",
+        "golden"
+      ],
+      "acceptance_criteria": [
+        "Builds",
+        "Typechecks",
+        "Lint clean",
+        "Tests pass",
+        "Coverage >= 95%"
+      ],
+      "forbidden_changes": [
+        "Repository IR schema",
+        "Requirement IR schema",
+        "Ontology ids / properties",
+        "Compiler pipeline / builder order",
+        "Closure / coverage / consistency rules"
+      ],
+      "labels": [
+        "implementation",
+        "ir"
+      ],
+      "id": "TSPEC-F07",
+      "title": "TYPE_ALIAS nodes + granular IMPORT nodes",
+      "owner": "ROLE_IMPLEMENTER",
+      "package": "ir",
+      "module": "type-import-nodes",
+      "state": "DRAFT",
+      "repository_path": "packages/ir",
+      "branch": "feature/tspec-f07-type-alias-nodes-granular-import-nodes",
+      "parent_branch": "main",
+      "blocks": [],
+      "reviewers": [
+        "ROLE_ARCHITECT"
+      ],
+      "version": "1.0.0",
+      "created_at": "2026-06-27T00:00:00Z",
+      "updated_at": "2026-06-27T00:00:00Z",
+      "wave": 7,
+      "critical_path": false,
+      "parallel_group": "wave-7",
+      "spec_path": "eos/specs/TSPEC-F07.spec.md",
+      "spec_required": true,
+      "spec_status": "MISSING"
+    },
+    {
+      "priority": "P1",
+      "complexity": "MEDIUM",
+      "risk": "MEDIUM",
+      "estimated_effort": 3,
+      "depends_on": [
+        "TSPEC-F01"
+      ],
+      "references": [],
+      "architecture_documents": [
+        "docs/ADR-0025-ir-fidelity-steal-from-codegraph.md"
+      ],
+      "deliverables": [
+        "EdgeKind CONTAINS",
+        "adapters emit containment",
+        "copy: inspirations/codegraph/src/extraction/index.ts",
+        "copy: inspirations/codegraph/src/types.ts"
+      ],
+      "outputs": [],
+      "tests": [
+        "unit",
+        "integration",
+        "golden"
+      ],
+      "acceptance_criteria": [
+        "Builds",
+        "Typechecks",
+        "Lint clean",
+        "Tests pass",
+        "Coverage >= 95%"
+      ],
+      "forbidden_changes": [
+        "Repository IR schema",
+        "Requirement IR schema",
+        "Ontology ids / properties",
+        "Compiler pipeline / builder order",
+        "Closure / coverage / consistency rules"
+      ],
+      "labels": [
+        "implementation",
+        "ir"
+      ],
+      "id": "TSPEC-F08",
+      "title": "CONTAINS edges (file -> class -> method symbol tree)",
+      "owner": "ROLE_IMPLEMENTER",
+      "package": "ir",
+      "module": "contains-edges",
+      "state": "DRAFT",
+      "repository_path": "packages/ir",
+      "branch": "feature/tspec-f08-contains-edges-file-class-method-symbol-tree",
+      "parent_branch": "main",
+      "blocks": [
+        "TSPEC-F13",
+        "TSPEC-F19"
+      ],
+      "reviewers": [
+        "ROLE_ARCHITECT"
+      ],
+      "version": "1.0.0",
+      "created_at": "2026-06-27T00:00:00Z",
+      "updated_at": "2026-06-27T00:00:00Z",
+      "wave": 7,
+      "critical_path": false,
+      "parallel_group": "wave-7",
+      "spec_path": "eos/specs/TSPEC-F08.spec.md",
+      "spec_required": true,
+      "spec_status": "MISSING"
+    },
+    {
+      "priority": "P2",
+      "complexity": "MEDIUM",
+      "risk": "MEDIUM",
+      "estimated_effort": 3,
+      "depends_on": [
+        "TSPEC-F01"
+      ],
+      "references": [],
+      "architecture_documents": [
+        "docs/ADR-0025-ir-fidelity-steal-from-codegraph.md"
+      ],
+      "deliverables": [
+        "EdgeKind EXTENDS/IMPLEMENTS",
+        "'what implements this interface?' queries",
+        "copy: inspirations/codegraph/src/extraction/index.ts"
+      ],
+      "outputs": [],
+      "tests": [
+        "unit",
+        "integration",
+        "golden"
+      ],
+      "acceptance_criteria": [
+        "Builds",
+        "Typechecks",
+        "Lint clean",
+        "Tests pass",
+        "Coverage >= 95%"
+      ],
+      "forbidden_changes": [
+        "Repository IR schema",
+        "Requirement IR schema",
+        "Ontology ids / properties",
+        "Compiler pipeline / builder order",
+        "Closure / coverage / consistency rules"
+      ],
+      "labels": [
+        "implementation",
+        "ir"
+      ],
+      "id": "TSPEC-F09",
+      "title": "EXTENDS + IMPLEMENTS edges (class hierarchy)",
+      "owner": "ROLE_IMPLEMENTER",
+      "package": "ir",
+      "module": "hierarchy-edges",
+      "state": "DRAFT",
+      "repository_path": "packages/ir",
+      "branch": "feature/tspec-f09-extends-implements-edges-class-hierarchy",
+      "parent_branch": "main",
+      "blocks": [],
+      "reviewers": [
+        "ROLE_ARCHITECT"
+      ],
+      "version": "1.0.0",
+      "created_at": "2026-06-27T00:00:00Z",
+      "updated_at": "2026-06-27T00:00:00Z",
+      "wave": 7,
+      "critical_path": false,
+      "parallel_group": "wave-7",
+      "spec_path": "eos/specs/TSPEC-F09.spec.md",
+      "spec_required": true,
+      "spec_status": "MISSING"
+    },
+    {
+      "priority": "P2",
+      "complexity": "MEDIUM",
+      "risk": "MEDIUM",
+      "estimated_effort": 3,
+      "depends_on": [
+        "TSPEC-F01"
+      ],
+      "references": [],
+      "architecture_documents": [
+        "docs/ADR-0025-ir-fidelity-steal-from-codegraph.md"
+      ],
+      "deliverables": [
+        "EdgeKind INSTANTIATES",
+        "copy: inspirations/codegraph/src/extraction/index.ts"
+      ],
+      "outputs": [],
+      "tests": [
+        "unit",
+        "integration",
+        "golden"
+      ],
+      "acceptance_criteria": [
+        "Builds",
+        "Typechecks",
+        "Lint clean",
+        "Tests pass",
+        "Coverage >= 95%"
+      ],
+      "forbidden_changes": [
+        "Repository IR schema",
+        "Requirement IR schema",
+        "Ontology ids / properties",
+        "Compiler pipeline / builder order",
+        "Closure / coverage / consistency rules"
+      ],
+      "labels": [
+        "implementation",
+        "ir"
+      ],
+      "id": "TSPEC-F10",
+      "title": "INSTANTIATES edges (new X() — DI/factory analysis)",
+      "owner": "ROLE_IMPLEMENTER",
+      "package": "ir",
+      "module": "instantiates-edges",
+      "state": "DRAFT",
+      "repository_path": "packages/ir",
+      "branch": "feature/tspec-f10-instantiates-edges-new-x-di-factory-analysis",
+      "parent_branch": "main",
+      "blocks": [
+        "TSPEC-F15"
+      ],
+      "reviewers": [
+        "ROLE_ARCHITECT"
+      ],
+      "version": "1.0.0",
+      "created_at": "2026-06-27T00:00:00Z",
+      "updated_at": "2026-06-27T00:00:00Z",
+      "wave": 7,
+      "critical_path": false,
+      "parallel_group": "wave-7",
+      "spec_path": "eos/specs/TSPEC-F10.spec.md",
+      "spec_required": true,
+      "spec_status": "MISSING"
+    },
+    {
+      "priority": "P1",
+      "complexity": "MEDIUM",
+      "risk": "MEDIUM",
+      "estimated_effort": 3,
+      "depends_on": [
+        "TSPEC-A021"
+      ],
+      "references": [],
+      "architecture_documents": [
+        "docs/ADR-0025-ir-fidelity-steal-from-codegraph.md"
+      ],
+      "deliverables": [
+        "restrict imperative .get/.post to known router receivers (drop configService.get -> 'GET api.port')",
+        "complete NestJS decorator coverage"
+      ],
+      "outputs": [],
+      "tests": [
+        "unit",
+        "integration",
+        "golden"
+      ],
+      "acceptance_criteria": [
+        "Builds",
+        "Typechecks",
+        "Lint clean",
+        "Tests pass",
+        "Coverage >= 95%"
+      ],
+      "forbidden_changes": [
+        "Repository IR schema",
+        "Requirement IR schema",
+        "Ontology ids / properties",
+        "Compiler pipeline / builder order",
+        "Closure / coverage / consistency rules"
+      ],
+      "labels": [
+        "implementation",
+        "code-compiler"
+      ],
+      "id": "TSPEC-F20",
+      "title": "Route extraction correctness: kill config-call false positives",
+      "owner": "ROLE_IMPLEMENTER",
+      "package": "code-compiler",
+      "module": "route-precision",
+      "state": "DRAFT",
+      "repository_path": "packages/code-compiler",
+      "branch": "feature/tspec-f20-route-extraction-correctness-kill-config-call-false-positives",
+      "parent_branch": "main",
+      "blocks": [],
+      "reviewers": [
+        "ROLE_ARCHITECT"
+      ],
+      "version": "1.0.0",
+      "created_at": "2026-06-27T00:00:00Z",
+      "updated_at": "2026-06-27T00:00:00Z",
+      "wave": 7,
+      "critical_path": false,
+      "parallel_group": "wave-7",
+      "spec_path": "eos/specs/TSPEC-F20.spec.md",
+      "spec_required": true,
+      "spec_status": "MISSING"
+    },
+    {
+      "priority": "P2",
+      "complexity": "MEDIUM",
+      "risk": "MEDIUM",
+      "estimated_effort": 3,
+      "depends_on": [
+        "TSPEC-F06"
+      ],
+      "references": [],
+      "architecture_documents": [
+        "docs/ADR-0025-ir-fidelity-steal-from-codegraph.md"
+      ],
+      "deliverables": [
+        "EdgeKind REFERENCES (metadata.valueRef)",
+        "copy: inspirations/codegraph/src/extraction/index.ts"
+      ],
+      "outputs": [],
+      "tests": [
+        "unit",
+        "integration",
+        "golden"
+      ],
+      "acceptance_criteria": [
+        "Builds",
+        "Typechecks",
+        "Lint clean",
+        "Tests pass",
+        "Coverage >= 95%"
+      ],
+      "forbidden_changes": [
+        "Repository IR schema",
+        "Requirement IR schema",
+        "Ontology ids / properties",
+        "Compiler pipeline / builder order",
+        "Closure / coverage / consistency rules"
+      ],
+      "labels": [
+        "implementation",
+        "ir"
+      ],
+      "id": "TSPEC-F11",
+      "title": "REFERENCES edges (value/constant/config usage)",
+      "owner": "ROLE_IMPLEMENTER",
+      "package": "ir",
+      "module": "references-edges",
+      "state": "DRAFT",
+      "repository_path": "packages/ir",
+      "branch": "feature/tspec-f11-references-edges-value-constant-config-usage",
+      "parent_branch": "main",
+      "blocks": [],
+      "reviewers": [
+        "ROLE_ARCHITECT"
+      ],
+      "version": "1.0.0",
+      "created_at": "2026-06-27T00:00:00Z",
+      "updated_at": "2026-06-27T00:00:00Z",
+      "wave": 8,
+      "critical_path": false,
+      "parallel_group": "wave-8",
+      "spec_path": "eos/specs/TSPEC-F11.spec.md",
+      "spec_required": true,
+      "spec_status": "MISSING"
+    },
+    {
+      "priority": "P2",
+      "complexity": "MEDIUM",
+      "risk": "MEDIUM",
+      "estimated_effort": 2,
+      "depends_on": [
+        "TSPEC-F03"
+      ],
+      "references": [],
+      "architecture_documents": [
+        "docs/ADR-0025-ir-fidelity-steal-from-codegraph.md"
+      ],
+      "deliverables": [
+        "EdgeKind DECORATES",
+        "copy: inspirations/codegraph/src/extraction/index.ts"
+      ],
+      "outputs": [],
+      "tests": [
+        "unit",
+        "integration",
+        "golden"
+      ],
+      "acceptance_criteria": [
+        "Builds",
+        "Typechecks",
+        "Lint clean",
+        "Tests pass",
+        "Coverage >= 95%"
+      ],
+      "forbidden_changes": [
+        "Repository IR schema",
+        "Requirement IR schema",
+        "Ontology ids / properties",
+        "Compiler pipeline / builder order",
+        "Closure / coverage / consistency rules"
+      ],
+      "labels": [
+        "implementation",
+        "ir"
+      ],
+      "id": "TSPEC-F12",
+      "title": "DECORATES edges (which decorator applied where)",
+      "owner": "ROLE_IMPLEMENTER",
+      "package": "ir",
+      "module": "decorates-edges",
+      "state": "DRAFT",
+      "repository_path": "packages/ir",
+      "branch": "feature/tspec-f12-decorates-edges-which-decorator-applied-where",
+      "parent_branch": "main",
+      "blocks": [],
+      "reviewers": [
+        "ROLE_ARCHITECT"
+      ],
+      "version": "1.0.0",
+      "created_at": "2026-06-27T00:00:00Z",
+      "updated_at": "2026-06-27T00:00:00Z",
+      "wave": 8,
+      "critical_path": false,
+      "parallel_group": "wave-8",
+      "spec_path": "eos/specs/TSPEC-F12.spec.md",
+      "spec_required": true,
+      "spec_status": "MISSING"
+    },
+    {
+      "priority": "P1",
+      "complexity": "MEDIUM",
+      "risk": "HIGH",
+      "estimated_effort": 13,
+      "depends_on": [
+        "TSPEC-F02",
+        "TSPEC-F08"
+      ],
+      "references": [],
+      "architecture_documents": [
+        "docs/ADR-0025-ir-fidelity-steal-from-codegraph.md"
+      ],
+      "deliverables": [
+        "new packages/resolution: resolve callee names to defs across files -> real CALLS edges (288 -> ~46k on cal.com)",
+        "copy: inspirations/codegraph/src/resolution/import-resolver.ts",
+        "copy: inspirations/codegraph/src/resolution/name-matcher.ts",
+        "copy: inspirations/codegraph/src/resolution/path-aliases.ts",
+        "copy: inspirations/codegraph/src/resolution/index.ts"
+      ],
+      "outputs": [],
+      "tests": [
+        "unit",
+        "integration",
+        "golden"
+      ],
+      "acceptance_criteria": [
+        "Builds",
+        "Typechecks",
+        "Lint clean",
+        "Tests pass",
+        "Coverage >= 95%"
+      ],
+      "forbidden_changes": [
+        "Repository IR schema",
+        "Requirement IR schema",
+        "Ontology ids / properties",
+        "Compiler pipeline / builder order",
+        "Closure / coverage / consistency rules"
+      ],
+      "labels": [
+        "implementation",
+        "resolution"
+      ],
+      "id": "TSPEC-F13",
+      "title": "ReferenceResolver: import resolution + name matching (deep call graph)",
+      "owner": "ROLE_IMPLEMENTER",
+      "package": "resolution",
+      "module": "reference-resolver",
+      "state": "DRAFT",
+      "repository_path": "packages/resolution",
+      "branch": "feature/tspec-f13-referenceresolver-import-resolution-name-matching-deep-call-graph",
+      "parent_branch": "main",
+      "blocks": [
+        "TSPEC-F14",
+        "TSPEC-F16",
+        "TSPEC-F17",
+        "TSPEC-F29"
+      ],
+      "reviewers": [
+        "ROLE_ARCHITECT"
+      ],
+      "version": "1.0.0",
+      "created_at": "2026-06-27T00:00:00Z",
+      "updated_at": "2026-06-27T00:00:00Z",
+      "wave": 8,
+      "critical_path": true,
+      "parallel_group": "wave-8",
+      "spec_path": "eos/specs/TSPEC-F13.spec.md",
+      "spec_required": true,
+      "spec_status": "MISSING"
+    },
+    {
+      "priority": "P3",
+      "complexity": "MEDIUM",
+      "risk": "MEDIUM",
+      "estimated_effort": 5,
+      "depends_on": [
+        "TSPEC-F08"
+      ],
+      "references": [],
+      "architecture_documents": [
+        "docs/ADR-0025-ir-fidelity-steal-from-codegraph.md"
+      ],
+      "deliverables": [
+        "EdgeKind CATCHES/THROWS/WRAPS",
+        "NodeKind MIDDLEWARE",
+        "NestJS middleware/guard pipeline visible"
+      ],
+      "outputs": [],
+      "tests": [
+        "unit",
+        "integration",
+        "golden"
+      ],
+      "acceptance_criteria": [
+        "Builds",
+        "Typechecks",
+        "Lint clean",
+        "Tests pass",
+        "Coverage >= 95%"
+      ],
+      "forbidden_changes": [
+        "Repository IR schema",
+        "Requirement IR schema",
+        "Ontology ids / properties",
+        "Compiler pipeline / builder order",
+        "Closure / coverage / consistency rules"
+      ],
+      "labels": [
+        "implementation",
+        "ir"
+      ],
+      "id": "TSPEC-F19",
+      "title": "Error-handling (CATCHES/THROWS) + middleware (MIDDLEWARE node, WRAPS edges)",
+      "owner": "ROLE_IMPLEMENTER",
+      "package": "ir",
+      "module": "control-flow-edges",
+      "state": "DRAFT",
+      "repository_path": "packages/ir",
+      "branch": "feature/tspec-f19-error-handling-catches-throws-middleware-middleware-node-wraps-edges",
+      "parent_branch": "main",
+      "blocks": [],
+      "reviewers": [
+        "ROLE_ARCHITECT"
+      ],
+      "version": "1.0.0",
+      "created_at": "2026-06-27T00:00:00Z",
+      "updated_at": "2026-06-27T00:00:00Z",
+      "wave": 8,
+      "critical_path": false,
+      "parallel_group": "wave-8",
+      "spec_path": "eos/specs/TSPEC-F19.spec.md",
+      "spec_required": true,
+      "spec_status": "MISSING"
+    },
+    {
+      "priority": "P3",
+      "complexity": "MEDIUM",
+      "risk": "MEDIUM",
+      "estimated_effort": 3,
+      "depends_on": [
+        "TSPEC-F02",
+        "TSPEC-F04"
+      ],
+      "references": [],
+      "architecture_documents": [
+        "docs/ADR-0025-ir-fidelity-steal-from-codegraph.md"
+      ],
+      "deliverables": [
+        "rir search CLI over an ir.json",
+        "copy: inspirations/codegraph/src/search/query-parser.ts",
+        "copy: inspirations/codegraph/src/search/query-utils.ts"
+      ],
+      "outputs": [],
+      "tests": [
+        "unit",
+        "integration",
+        "golden"
+      ],
+      "acceptance_criteria": [
+        "Builds",
+        "Typechecks",
+        "Lint clean",
+        "Tests pass",
+        "Coverage >= 95%"
+      ],
+      "forbidden_changes": [
+        "Repository IR schema",
+        "Requirement IR schema",
+        "Ontology ids / properties",
+        "Compiler pipeline / builder order",
+        "Closure / coverage / consistency rules"
+      ],
+      "labels": [
+        "implementation",
+        "cli"
+      ],
+      "id": "TSPEC-F23",
+      "title": "rir search <query> — full-text over node name/qualifiedName/docstring",
+      "owner": "ROLE_IMPLEMENTER",
+      "package": "cli",
+      "module": "search",
+      "state": "DRAFT",
+      "repository_path": "apps/cli",
+      "branch": "feature/tspec-f23-rir-search-query-full-text-over-node-name-qualifiedname-docstring",
+      "parent_branch": "main",
+      "blocks": [],
+      "reviewers": [
+        "ROLE_ARCHITECT"
+      ],
+      "version": "1.0.0",
+      "created_at": "2026-06-27T00:00:00Z",
+      "updated_at": "2026-06-27T00:00:00Z",
+      "wave": 8,
+      "critical_path": false,
+      "parallel_group": "wave-8",
+      "spec_path": "eos/specs/TSPEC-F23.spec.md",
+      "spec_required": true,
+      "spec_status": "MISSING"
+    },
+    {
+      "priority": "P3",
+      "complexity": "MEDIUM",
+      "risk": "MEDIUM",
+      "estimated_effort": 5,
+      "depends_on": [
+        "TSPEC-F02"
+      ],
+      "references": [],
+      "architecture_documents": [
+        "docs/ADR-0025-ir-fidelity-steal-from-codegraph.md"
+      ],
+      "deliverables": [
+        "ingest lcov/coverage-final.json, set execution.tested + TESTS evidence per node"
+      ],
+      "outputs": [],
+      "tests": [
+        "unit",
+        "integration",
+        "golden"
+      ],
+      "acceptance_criteria": [
+        "Builds",
+        "Typechecks",
+        "Lint clean",
+        "Tests pass",
+        "Coverage >= 95%"
+      ],
+      "forbidden_changes": [
+        "Repository IR schema",
+        "Requirement IR schema",
+        "Ontology ids / properties",
+        "Compiler pipeline / builder order",
+        "Closure / coverage / consistency rules"
+      ],
+      "labels": [
+        "implementation",
+        "passes"
+      ],
+      "id": "TSPEC-F24",
+      "title": "Test-coverage mapping (lcov -> node.execution.tested)",
+      "owner": "ROLE_IMPLEMENTER",
+      "package": "passes",
+      "module": "coverage-ingest",
+      "state": "DRAFT",
+      "repository_path": "packages/passes",
+      "branch": "feature/tspec-f24-test-coverage-mapping-lcov-node-execution-tested",
+      "parent_branch": "main",
+      "blocks": [],
+      "reviewers": [
+        "ROLE_ARCHITECT"
+      ],
+      "version": "1.0.0",
+      "created_at": "2026-06-27T00:00:00Z",
+      "updated_at": "2026-06-27T00:00:00Z",
+      "wave": 8,
+      "critical_path": false,
+      "parallel_group": "wave-8",
+      "spec_path": "eos/specs/TSPEC-F24.spec.md",
+      "spec_required": true,
+      "spec_status": "MISSING"
+    },
+    {
+      "priority": "P3",
+      "complexity": "MEDIUM",
+      "risk": "MEDIUM",
+      "estimated_effort": 3,
+      "depends_on": [
+        "TSPEC-F02"
+      ],
+      "references": [],
+      "architecture_documents": [
+        "docs/ADR-0025-ir-fidelity-steal-from-codegraph.md"
+      ],
+      "deliverables": [
+        "per-node commit count / last-modified via git log (extends GitPass)"
+      ],
+      "outputs": [],
+      "tests": [
+        "unit",
+        "integration",
+        "golden"
+      ],
+      "acceptance_criteria": [
+        "Builds",
+        "Typechecks",
+        "Lint clean",
+        "Tests pass",
+        "Coverage >= 95%"
+      ],
+      "forbidden_changes": [
+        "Repository IR schema",
+        "Requirement IR schema",
+        "Ontology ids / properties",
+        "Compiler pipeline / builder order",
+        "Closure / coverage / consistency rules"
+      ],
+      "labels": [
+        "implementation",
+        "passes"
+      ],
+      "id": "TSPEC-F25",
+      "title": "Git churn / change-frequency per node",
+      "owner": "ROLE_IMPLEMENTER",
+      "package": "passes",
+      "module": "git-churn",
+      "state": "DRAFT",
+      "repository_path": "packages/passes",
+      "branch": "feature/tspec-f25-git-churn-change-frequency-per-node",
+      "parent_branch": "main",
+      "blocks": [],
+      "reviewers": [
+        "ROLE_ARCHITECT"
+      ],
+      "version": "1.0.0",
+      "created_at": "2026-06-27T00:00:00Z",
+      "updated_at": "2026-06-27T00:00:00Z",
+      "wave": 8,
+      "critical_path": false,
+      "parallel_group": "wave-8",
+      "spec_path": "eos/specs/TSPEC-F25.spec.md",
+      "spec_required": true,
+      "spec_status": "MISSING"
+    },
+    {
       "priority": "P2",
       "complexity": "MEDIUM",
       "risk": "MEDIUM",
@@ -6536,7 +7913,7 @@
       "created_at": "2026-06-27T00:00:00Z",
       "updated_at": "2026-06-27T00:00:00Z",
       "wave": 8,
-      "critical_path": true,
+      "critical_path": false,
       "parallel_group": "wave-8",
       "spec_path": "eos/specs/TSPEC-SC01.spec.md",
       "spec_required": true,
@@ -6604,6 +7981,514 @@
       "parallel_group": "wave-8",
       "spec_path": "eos/specs/TSPEC-SC03.spec.md",
       "spec_required": true,
+      "spec_status": "MISSING"
+    },
+    {
+      "priority": "P1",
+      "complexity": "MEDIUM",
+      "risk": "HIGH",
+      "estimated_effort": 13,
+      "depends_on": [
+        "TSPEC-F03",
+        "TSPEC-F13"
+      ],
+      "references": [],
+      "architecture_documents": [
+        "docs/ADR-0025-ir-fidelity-steal-from-codegraph.md"
+      ],
+      "deliverables": [
+        "framework resolvers emit ROUTE nodes from decorators/annotations -> ~314 routes on cal.com, 0 config-call false positives",
+        "copy: inspirations/codegraph/src/resolution/frameworks/nestjs.ts",
+        "copy: inspirations/codegraph/src/resolution/frameworks/express.ts",
+        "copy: inspirations/codegraph/src/resolution/frameworks/java.ts",
+        "copy: inspirations/codegraph/src/resolution/frameworks/python.ts",
+        "copy: inspirations/codegraph/src/resolution/frameworks/go.ts",
+        "copy: inspirations/codegraph/src/resolution/frameworks/index.ts"
+      ],
+      "outputs": [],
+      "tests": [
+        "unit",
+        "integration",
+        "golden"
+      ],
+      "acceptance_criteria": [
+        "Builds",
+        "Typechecks",
+        "Lint clean",
+        "Tests pass",
+        "Coverage >= 95%"
+      ],
+      "forbidden_changes": [
+        "Repository IR schema",
+        "Requirement IR schema",
+        "Ontology ids / properties",
+        "Compiler pipeline / builder order",
+        "Closure / coverage / consistency rules"
+      ],
+      "labels": [
+        "implementation",
+        "resolution"
+      ],
+      "id": "TSPEC-F14",
+      "title": "Framework route + DI resolution (NestJS/Express/Spring/FastAPI/Gin)",
+      "owner": "ROLE_IMPLEMENTER",
+      "package": "resolution",
+      "module": "frameworks",
+      "state": "DRAFT",
+      "repository_path": "packages/resolution",
+      "branch": "feature/tspec-f14-framework-route-di-resolution-nestjs-express-spring-fastapi-gin",
+      "parent_branch": "main",
+      "blocks": [
+        "TSPEC-F15",
+        "TSPEC-F18"
+      ],
+      "reviewers": [
+        "ROLE_ARCHITECT"
+      ],
+      "version": "1.0.0",
+      "created_at": "2026-06-27T00:00:00Z",
+      "updated_at": "2026-06-27T00:00:00Z",
+      "wave": 9,
+      "critical_path": true,
+      "parallel_group": "wave-9",
+      "spec_path": "eos/specs/TSPEC-F14.spec.md",
+      "spec_required": true,
+      "spec_status": "MISSING"
+    },
+    {
+      "priority": "P3",
+      "complexity": "MEDIUM",
+      "risk": "HIGH",
+      "estimated_effort": 8,
+      "depends_on": [
+        "TSPEC-F13"
+      ],
+      "references": [],
+      "architecture_documents": [
+        "docs/ADR-0025-ir-fidelity-steal-from-codegraph.md"
+      ],
+      "deliverables": [
+        "bridge dynamic edges (provenance=heuristic)",
+        "copy: inspirations/codegraph/src/resolution/callback-synthesizer.ts"
+      ],
+      "outputs": [],
+      "tests": [
+        "unit",
+        "integration",
+        "golden"
+      ],
+      "acceptance_criteria": [
+        "Builds",
+        "Typechecks",
+        "Lint clean",
+        "Tests pass",
+        "Coverage >= 95%"
+      ],
+      "forbidden_changes": [
+        "Repository IR schema",
+        "Requirement IR schema",
+        "Ontology ids / properties",
+        "Compiler pipeline / builder order",
+        "Closure / coverage / consistency rules"
+      ],
+      "labels": [
+        "implementation",
+        "resolution"
+      ],
+      "id": "TSPEC-F16",
+      "title": "Dynamic-dispatch synthesizers (callback/observer/event edges)",
+      "owner": "ROLE_IMPLEMENTER",
+      "package": "resolution",
+      "module": "synthesizers",
+      "state": "DRAFT",
+      "repository_path": "packages/resolution",
+      "branch": "feature/tspec-f16-dynamic-dispatch-synthesizers-callback-observer-event-edges",
+      "parent_branch": "main",
+      "blocks": [],
+      "reviewers": [
+        "ROLE_ARCHITECT"
+      ],
+      "version": "1.0.0",
+      "created_at": "2026-06-27T00:00:00Z",
+      "updated_at": "2026-06-27T00:00:00Z",
+      "wave": 9,
+      "critical_path": false,
+      "parallel_group": "wave-9",
+      "spec_path": "eos/specs/TSPEC-F16.spec.md",
+      "spec_required": true,
+      "spec_status": "MISSING"
+    },
+    {
+      "priority": "P1",
+      "complexity": "MEDIUM",
+      "risk": "HIGH",
+      "estimated_effort": 5,
+      "depends_on": [
+        "TSPEC-F13"
+      ],
+      "references": [],
+      "architecture_documents": [
+        "docs/ADR-0025-ir-fidelity-steal-from-codegraph.md"
+      ],
+      "deliverables": [
+        "trace reachability from bootstrap()/main()/route handlers over the resolved graph; fix reachable:false on 99% of nodes"
+      ],
+      "outputs": [],
+      "tests": [
+        "unit",
+        "integration",
+        "golden"
+      ],
+      "acceptance_criteria": [
+        "Builds",
+        "Typechecks",
+        "Lint clean",
+        "Tests pass",
+        "Coverage >= 95%"
+      ],
+      "forbidden_changes": [
+        "Repository IR schema",
+        "Requirement IR schema",
+        "Ontology ids / properties",
+        "Compiler pipeline / builder order",
+        "Closure / coverage / consistency rules"
+      ],
+      "labels": [
+        "implementation",
+        "passes"
+      ],
+      "id": "TSPEC-F17",
+      "title": "Entry-point reachability tracing (bootstrap/main -> call graph)",
+      "owner": "ROLE_IMPLEMENTER",
+      "package": "passes",
+      "module": "reachability-deep",
+      "state": "DRAFT",
+      "repository_path": "packages/passes",
+      "branch": "feature/tspec-f17-entry-point-reachability-tracing-bootstrap-main-call-graph",
+      "parent_branch": "main",
+      "blocks": [
+        "TSPEC-F18",
+        "TSPEC-F26",
+        "TSPEC-F27"
+      ],
+      "reviewers": [
+        "ROLE_ARCHITECT"
+      ],
+      "version": "1.0.0",
+      "created_at": "2026-06-27T00:00:00Z",
+      "updated_at": "2026-06-27T00:00:00Z",
+      "wave": 9,
+      "critical_path": false,
+      "parallel_group": "wave-9",
+      "spec_path": "eos/specs/TSPEC-F17.spec.md",
+      "spec_required": true,
+      "spec_status": "MISSING"
+    },
+    {
+      "priority": "P3",
+      "complexity": "MEDIUM",
+      "risk": "HIGH",
+      "estimated_effort": 8,
+      "depends_on": [
+        "TSPEC-F13"
+      ],
+      "references": [],
+      "architecture_documents": [
+        "docs/ADR-0025-ir-fidelity-steal-from-codegraph.md"
+      ],
+      "deliverables": [
+        "detect SQL_QUERY inside a loop/iteration on the resolved call graph -> N+1 finding",
+        "mark hot paths (high fan-in on the call graph) and slow-op signals (sync IO in a request path) as node annotations"
+      ],
+      "outputs": [],
+      "tests": [
+        "unit",
+        "integration",
+        "golden"
+      ],
+      "acceptance_criteria": [
+        "Builds",
+        "Typechecks",
+        "Lint clean",
+        "Tests pass",
+        "Coverage >= 95%"
+      ],
+      "forbidden_changes": [
+        "Repository IR schema",
+        "Requirement IR schema",
+        "Ontology ids / properties",
+        "Compiler pipeline / builder order",
+        "Closure / coverage / consistency rules"
+      ],
+      "labels": [
+        "implementation",
+        "consistency"
+      ],
+      "id": "TSPEC-F29",
+      "title": "Performance annotations: N+1 query + hot-path / slow-operation detection",
+      "owner": "ROLE_IMPLEMENTER",
+      "package": "consistency",
+      "module": "perf-annotations",
+      "state": "DRAFT",
+      "repository_path": "packages/consistency",
+      "branch": "feature/tspec-f29-performance-annotations-n-1-query-hot-path-slow-operation-detection",
+      "parent_branch": "main",
+      "blocks": [],
+      "reviewers": [
+        "ROLE_ARCHITECT"
+      ],
+      "version": "1.0.0",
+      "created_at": "2026-06-27T00:00:00Z",
+      "updated_at": "2026-06-27T00:00:00Z",
+      "wave": 9,
+      "critical_path": false,
+      "parallel_group": "wave-9",
+      "spec_path": "eos/specs/TSPEC-F29.spec.md",
+      "spec_required": true,
+      "spec_status": "MISSING"
+    },
+    {
+      "priority": "P1",
+      "complexity": "MEDIUM",
+      "risk": "HIGH",
+      "estimated_effort": 8,
+      "depends_on": [
+        "TSPEC-F05",
+        "TSPEC-F10",
+        "TSPEC-F14"
+      ],
+      "references": [],
+      "architecture_documents": [
+        "docs/ADR-0025-ir-fidelity-steal-from-codegraph.md"
+      ],
+      "deliverables": [
+        "PROVIDES edges MODULE->SERVICE/REPOSITORY; connect controller -> injected service -> repository so closure can traverse",
+        "copy: inspirations/codegraph/src/resolution/frameworks/nestjs.ts"
+      ],
+      "outputs": [],
+      "tests": [
+        "unit",
+        "integration",
+        "golden"
+      ],
+      "acceptance_criteria": [
+        "Builds",
+        "Typechecks",
+        "Lint clean",
+        "Tests pass",
+        "Coverage >= 95%"
+      ],
+      "forbidden_changes": [
+        "Repository IR schema",
+        "Requirement IR schema",
+        "Ontology ids / properties",
+        "Compiler pipeline / builder order",
+        "Closure / coverage / consistency rules"
+      ],
+      "labels": [
+        "implementation",
+        "resolution"
+      ],
+      "id": "TSPEC-F15",
+      "title": "DI/provider mapping: PROVIDES edges (NestJS @Module + constructor injection)",
+      "owner": "ROLE_IMPLEMENTER",
+      "package": "resolution",
+      "module": "di-providers",
+      "state": "DRAFT",
+      "repository_path": "packages/resolution",
+      "branch": "feature/tspec-f15-di-provider-mapping-provides-edges-nestjs-module-constructor-injection",
+      "parent_branch": "main",
+      "blocks": [
+        "TSPEC-F18"
+      ],
+      "reviewers": [
+        "ROLE_ARCHITECT"
+      ],
+      "version": "1.0.0",
+      "created_at": "2026-06-27T00:00:00Z",
+      "updated_at": "2026-06-27T00:00:00Z",
+      "wave": 10,
+      "critical_path": true,
+      "parallel_group": "wave-10",
+      "spec_path": "eos/specs/TSPEC-F15.spec.md",
+      "spec_required": true,
+      "spec_status": "MISSING"
+    },
+    {
+      "priority": "P3",
+      "complexity": "MEDIUM",
+      "risk": "MEDIUM",
+      "estimated_effort": 3,
+      "depends_on": [
+        "TSPEC-F17"
+      ],
+      "references": [],
+      "architecture_documents": [
+        "docs/ADR-0025-ir-fidelity-steal-from-codegraph.md"
+      ],
+      "deliverables": [
+        "report exported-but-unreachable + never-referenced symbols as a finding"
+      ],
+      "outputs": [],
+      "tests": [
+        "unit",
+        "integration",
+        "golden"
+      ],
+      "acceptance_criteria": [
+        "Builds",
+        "Typechecks",
+        "Lint clean",
+        "Tests pass",
+        "Coverage >= 95%"
+      ],
+      "forbidden_changes": [
+        "Repository IR schema",
+        "Requirement IR schema",
+        "Ontology ids / properties",
+        "Compiler pipeline / builder order",
+        "Closure / coverage / consistency rules"
+      ],
+      "labels": [
+        "implementation",
+        "consistency"
+      ],
+      "id": "TSPEC-F26",
+      "title": "Dead-code detection (reachability + graph)",
+      "owner": "ROLE_IMPLEMENTER",
+      "package": "consistency",
+      "module": "dead-code",
+      "state": "DRAFT",
+      "repository_path": "packages/consistency",
+      "branch": "feature/tspec-f26-dead-code-detection-reachability-graph",
+      "parent_branch": "main",
+      "blocks": [],
+      "reviewers": [
+        "ROLE_ARCHITECT"
+      ],
+      "version": "1.0.0",
+      "created_at": "2026-06-27T00:00:00Z",
+      "updated_at": "2026-06-27T00:00:00Z",
+      "wave": 10,
+      "critical_path": false,
+      "parallel_group": "wave-10",
+      "spec_path": "eos/specs/TSPEC-F26.spec.md",
+      "spec_required": true,
+      "spec_status": "MISSING"
+    },
+    {
+      "priority": "P3",
+      "complexity": "MEDIUM",
+      "risk": "HIGH",
+      "estimated_effort": 13,
+      "depends_on": [
+        "TSPEC-F17"
+      ],
+      "references": [],
+      "architecture_documents": [
+        "docs/ADR-0025-ir-fidelity-steal-from-codegraph.md",
+        "docs/ADR-0024-gaps-v2-program.md"
+      ],
+      "deliverables": [
+        "ingest OTel spans -> RUNTIME evidence; reconcile static vs runtime edges (GAPS-v2 V4)"
+      ],
+      "outputs": [],
+      "tests": [
+        "ADR review",
+        "schema golden test"
+      ],
+      "acceptance_criteria": [
+        "ADR accepted",
+        "No ambiguity remains",
+        "Versioned"
+      ],
+      "forbidden_changes": [
+        "Implementation code beyond reference snippets",
+        "CRUD / boilerplate"
+      ],
+      "labels": [
+        "architecture",
+        "passes"
+      ],
+      "id": "TSPEC-F27",
+      "title": "Runtime-trace ingestion (execution.runtimeObserved via OTel)",
+      "owner": "ROLE_ARCHITECT",
+      "package": "passes",
+      "module": "runtime-ingest",
+      "state": "DRAFT",
+      "repository_path": "packages/passes",
+      "branch": "feature/tspec-f27-runtime-trace-ingestion-execution-runtimeobserved-via-otel",
+      "parent_branch": "main",
+      "blocks": [],
+      "reviewers": [
+        "ROLE_ARCHITECT"
+      ],
+      "version": "1.0.0",
+      "created_at": "2026-06-27T00:00:00Z",
+      "updated_at": "2026-06-27T00:00:00Z",
+      "wave": 10,
+      "critical_path": false,
+      "parallel_group": "wave-10",
+      "spec_path": "eos/specs/TSPEC-F27.spec.md",
+      "spec_required": false,
+      "spec_status": "MISSING"
+    },
+    {
+      "priority": "P1",
+      "complexity": "MEDIUM",
+      "risk": "HIGH",
+      "estimated_effort": 5,
+      "depends_on": [
+        "TSPEC-F14",
+        "TSPEC-F15",
+        "TSPEC-F17"
+      ],
+      "references": [],
+      "architecture_documents": [
+        "docs/ADR-0025-ir-fidelity-steal-from-codegraph.md"
+      ],
+      "deliverables": [
+        ">=1 cal.com capability reaches CLOSED; closure states move off all-ORPHAN; golden regression on cal.com IR"
+      ],
+      "outputs": [],
+      "tests": [
+        "ADR review",
+        "schema golden test"
+      ],
+      "acceptance_criteria": [
+        "ADR accepted",
+        "No ambiguity remains",
+        "Versioned"
+      ],
+      "forbidden_changes": [
+        "Implementation code beyond reference snippets",
+        "CRUD / boilerplate"
+      ],
+      "labels": [
+        "architecture",
+        "closure"
+      ],
+      "id": "TSPEC-F18",
+      "title": "Closure populates on the resolved DI graph (the headline fix)",
+      "owner": "ROLE_ARCHITECT",
+      "package": "closure",
+      "module": "real-closure",
+      "state": "DRAFT",
+      "repository_path": "packages/closure",
+      "branch": "feature/tspec-f18-closure-populates-on-the-resolved-di-graph-the-headline-fix",
+      "parent_branch": "main",
+      "blocks": [],
+      "reviewers": [
+        "ROLE_ARCHITECT"
+      ],
+      "version": "1.0.0",
+      "created_at": "2026-06-27T00:00:00Z",
+      "updated_at": "2026-06-27T00:00:00Z",
+      "wave": 11,
+      "critical_path": true,
+      "parallel_group": "wave-11",
+      "spec_path": "eos/specs/TSPEC-F18.spec.md",
+      "spec_required": false,
       "spec_status": "MISSING"
     }
   ]
