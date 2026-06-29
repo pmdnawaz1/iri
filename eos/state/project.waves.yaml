@@ -38,6 +38,10 @@ waves:
       - "TSPEC-A017"
       - "TSPEC-A019"
       - "TSPEC-A020"
+      - "TSPEC-A024"
+      - "TSPEC-A025"
+      - "TSPEC-A030"
+      - "TSPEC-A032"
       - "TSPEC-CI01"
       - "TSPEC-DF01"
       - "TSPEC-DF02"
@@ -54,6 +58,12 @@ waves:
     parallel_group: "wave-4"
     tspecs:
       - "TSPEC-A018"
+      - "TSPEC-A022"
+      - "TSPEC-A023"
+      - "TSPEC-A026"
+      - "TSPEC-A027"
+      - "TSPEC-A028"
+      - "TSPEC-A029"
       - "TSPEC-DN01"
       - "TSPEC-E05"
       - "TSPEC-E07"
@@ -61,6 +71,7 @@ waves:
   - wave: 5
     parallel_group: "wave-5"
     tspecs:
+      - "TSPEC-A031"
       - "TSPEC-AD01"
       - "TSPEC-AD02"
       - "TSPEC-AD03"

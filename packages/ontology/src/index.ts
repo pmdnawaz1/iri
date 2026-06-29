@@ -582,4 +582,58 @@ export function allCapabilities(): readonly CapabilityDefinition[] {
   return [...CAPABILITY_BY_ID.values()];
 }
 
+// ---------------------------------------------------------------------------
+// Capability metadata for the GAPS-v2 program (ADR-0024). Kept as lookup tables
+// rather than fields on every cap() so the additions are non-invasive. Architect-owned.
+// ---------------------------------------------------------------------------
+
+/** Business criticality of a capability — weights findings (TSPEC-A025 / GAPS-v2 V8). */
+export const Criticality = {
+  Critical: "CRITICAL",
+  High: "HIGH",
+  Normal: "NORMAL",
+  Low: "LOW",
+} as const;
+export type Criticality = (typeof Criticality)[keyof typeof Criticality];
+
+const CRITICALITY_BY_FEATURE: Record<string, Criticality> = {
+  AUTH: "CRITICAL",
+  PAYMENT: "CRITICAL",
+  API_KEY: "CRITICAL",
+  OAUTH: "CRITICAL",
+  ORDER: "HIGH",
+  CHECKOUT: "HIGH",
+  INVENTORY: "HIGH",
+  TEAM: "HIGH",
+  WEBHOOK: "HIGH",
+  SUBSCRIPTION: "HIGH",
+  DISCOUNT: "HIGH",
+  SHIPPING: "HIGH",
+};
+
+/** Capability business criticality. Defaults to NORMAL when the feature is unlisted. */
+export function getCriticality(capabilityId: string): Criticality {
+  const feature = capabilityId.split(".")[0] ?? "";
+  return CRITICALITY_BY_FEATURE[feature] ?? "NORMAL";
+}
+
+// Capabilities reachable WITHOUT a prior authenticated session (the public surface).
+// Everything else is expected to sit behind an auth/authorization guard (GAPS-v2 V5).
+const PUBLIC_CAPABILITIES = new Set<string>([
+  "AUTH.LOGIN",
+  "AUTH.REGISTER",
+  "AUTH.RESET_PASSWORD",
+  "AUTH.VERIFY_EMAIL",
+  "AUTH.VERIFY_OTP",
+  "AUTH.REFRESH_TOKEN",
+  "OAUTH.AUTHORIZE",
+  "OAUTH.EXCHANGE_TOKEN",
+]);
+
+/** Whether a capability must traverse an auth/authorization guard to be securely closed
+ *  (TSPEC-A024 / GAPS-v2 V5 guard closure). Public auth-entry capabilities are exempt. */
+export function requiresAuth(capabilityId: string): boolean {
+  return !PUBLIC_CAPABILITIES.has(capabilityId);
+}
+
 export { validateOntology, validateFeatures, type OntologyProblem } from "./validators.js";

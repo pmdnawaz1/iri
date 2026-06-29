@@ -15,7 +15,11 @@ risk: "HIGH"
 estimated_effort: 5
 depends_on:
   - "TSPEC-A009"
-blocks: []
+blocks:
+  - "TSPEC-A023"
+  - "TSPEC-A026"
+  - "TSPEC-A028"
+  - "TSPEC-A029"
 references: []
 architecture_documents:
   - "docs/ADR-0019-full-execution-closure.md"

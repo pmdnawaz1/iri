@@ -17,7 +17,8 @@ import { ONTOLOGY_VERSION, allCapabilities } from "@rir/ontology";
 import { DefaultClosureEngine } from "@rir/closure";
 import { DefaultCoverageEngine } from "@rir/coverage";
 import { emptyRequirementSet } from "@rir/ir";
-import { compileRepository, compileWithDocuments, suggestDocumentAliases } from "@rir/compiler";
+import { compileRepository, compileWithDocuments, diffClosures, suggestDocumentAliases } from "@rir/compiler";
+import type { ClosureResult } from "@rir/closure";
 import { prove } from "./prove.js";
 
 const log = new ConsoleLogger("info");
@@ -33,7 +34,7 @@ Usage:
   rir compile <dir>           Compile a repo (adapters -> passes -> IR -> closure)
   rir compile <dir> --docs <d>  Also compile docs and report doc<->code consistency
   rir suggest-aliases <docs>  BM25-rank ontology for UNMAPPED doc statements (proposal-only)
-  rir diff <a> <b>            (pipeline not yet assembled)
+  rir diff <a.json> <b.json>  Closure drift between two compile --json runs (CI-gateable)
   rir query <capability>      (pipeline not yet assembled)
   rir graph                   (pipeline not yet assembled)
   rir snapshot                (pipeline not yet assembled)
@@ -181,24 +182,41 @@ async function main(rawArgv: readonly string[]): Promise<number> {
       const docsIdx = rest.indexOf("--docs");
       const docsDir = docsIdx === -1 ? undefined : rest[docsIdx + 1];
       if (docsDir) {
-        const { ir, closure, requirements, findings } = await compileWithDocuments(dir, docsDir);
+        const { ir, closure, requirements, findings, guardFindings, scope } = await compileWithDocuments(
+          dir,
+          docsDir,
+        );
+        const failed = [...findings, ...guardFindings].some((f) => f.severity === "ERROR");
         if (rest.includes("--json")) {
           process.stdout.write(
-            JSON.stringify({ dir, docsDir, ir, closure, requirements, findings }, null, 2) + "\n",
+            JSON.stringify(
+              { dir, docsDir, scope, ir, closure, requirements, findings, guardFindings },
+              null,
+              2,
+            ) + "\n",
           );
-          return findings.some((f) => f.severity === "ERROR") ? 1 : 0;
+          return failed ? 1 : 0;
         }
         process.stdout.write(
-          `Compiled ${dir} + docs ${docsDir}: ${ir.capabilities.length} code capabilities, ${requirements.requirements.length} documented\n`,
+          `Compiled ${dir} + docs ${docsDir}: ${ir.capabilities.length} code capabilities, ${requirements.requirements.length} documented${scope ? " (scoped)" : ""}\n`,
         );
-        if (findings.length === 0) {
-          process.stdout.write("  doc<->code consistency: OK (no findings)\n");
+        const all = [...findings, ...guardFindings];
+        if (all.length === 0) {
+          process.stdout.write("  doc<->code consistency + guard closure: OK (no findings)\n");
         } else {
-          for (const f of findings) {
-            process.stdout.write(`  [${f.severity}] ${f.code}\t${f.capability}\t${f.message}\n`);
+          // Criticality first (CRITICAL→LOW), then ERROR before WARNING.
+          const critRank: Record<string, number> = { CRITICAL: 0, HIGH: 1, NORMAL: 2, LOW: 3 };
+          for (const f of [...all].sort(
+            (a, b) =>
+              critRank[a.criticality]! - critRank[b.criticality]! ||
+              (a.severity === b.severity ? 0 : a.severity === "ERROR" ? -1 : 1),
+          )) {
+            process.stdout.write(
+              `  [${f.severity}/${f.criticality}] ${f.code}\t${f.capability}\t${f.message}\n`,
+            );
           }
         }
-        return findings.some((f) => f.severity === "ERROR") ? 1 : 0;
+        return failed ? 1 : 0;
       }
 
       const { ir, closure } = await compileRepository(dir);
@@ -220,7 +238,35 @@ async function main(rawArgv: readonly string[]): Promise<number> {
       }
       return closure.every((c) => c.state === ClosureState.Closed) ? 0 : 1;
     }
-    case "diff":
+    case "diff": {
+      // Closure drift between two `rir compile --json` outputs (GAPS-v2 V11). CI-gateable:
+      // exit 1 if any capability moved away from CLOSED.
+      const [aPath, bPath] = rest.filter((a) => !a.startsWith("--"));
+      if (!aPath || !bPath) {
+        process.stderr.write("usage: rir diff <before.json> <after.json>\n");
+        return 64;
+      }
+      const loadClosure = async (p: string): Promise<ClosureResult[]> => {
+        const obj = JSON.parse(await readFile(p, "utf8")) as { closure?: ClosureResult[] };
+        if (!obj.closure) throw new Error(`${p} has no 'closure' (use 'rir compile --json')`);
+        return obj.closure;
+      };
+      const { transitions, regressions } = diffClosures(await loadClosure(aPath), await loadClosure(bPath));
+      if (transitions.length === 0) {
+        process.stdout.write("No closure changes.\n");
+        return 0;
+      }
+      for (const t of transitions) {
+        const mark = t.direction === "REGRESSED" ? "✗" : t.direction === "IMPROVED" ? "✓" : "~";
+        process.stdout.write(`  ${mark} ${t.capabilityId}\t${t.from} -> ${t.to}\t(${t.direction})\n`);
+      }
+      if (regressions.length) {
+        process.stderr.write(
+          `\n${regressions.length} regression(s) — capabilities moved away from CLOSED.\n`,
+        );
+      }
+      return regressions.length ? 1 : 0;
+    }
     case "query":
     case "graph":
     case "snapshot": {
