@@ -13,50 +13,254 @@ function getSpan(sf: import("typescript").SourceFile, node: import("typescript")
   return { startLine: start.line, startColumn: start.character, endLine: end.line, endColumn: end.character };
 }
 
+function extractNodeDecorators(
+  node: import("typescript").Node,
+): { name: string; args: string[] }[] | undefined {
+  if (!ts.canHaveDecorators(node)) return undefined;
+  const decs = ts.getDecorators(node);
+  if (!decs || decs.length === 0) return undefined;
+  return decs
+    .map((dec) => {
+      const expr = dec.expression;
+      if (ts.isCallExpression(expr) && ts.isIdentifier(expr.expression)) {
+        const args: string[] = [];
+        for (const arg of expr.arguments) {
+          if (ts.isStringLiteral(arg)) args.push(arg.text);
+        }
+        return { name: expr.expression.text, args };
+      }
+      if (ts.isIdentifier(expr)) return { name: expr.text, args: [] };
+      return null;
+    })
+    .filter((d): d is { name: string; args: string[] } => d !== null);
+}
+
+function extractDocstring(node: import("typescript").Node): string | undefined {
+  let target = node;
+  if (
+    ts.isVariableDeclaration(node) &&
+    node.parent &&
+    node.parent.parent &&
+    ts.isVariableStatement(node.parent.parent)
+  ) {
+    target = node.parent.parent;
+  }
+  const jsDocs = (target as any).jsDoc;
+  if (Array.isArray(jsDocs) && jsDocs.length > 0) {
+    const doc = jsDocs[jsDocs.length - 1];
+    if (typeof doc.comment === "string") return doc.comment;
+    if (Array.isArray(doc.comment)) return doc.comment.map((c: any) => c.text).join("");
+  }
+  return undefined;
+}
+
+function extractHeritage(
+  node: import("typescript").ClassDeclaration | import("typescript").InterfaceDeclaration,
+  sf: import("typescript").SourceFile,
+): { extendsList?: string[]; implementsList?: string[] } {
+  let extendsList: string[] | undefined;
+  let implementsList: string[] | undefined;
+  if (node.heritageClauses) {
+    for (const clause of node.heritageClauses) {
+      const types = clause.types.map((t) => t.expression.getText(sf));
+      if (clause.token === ts.SyntaxKind.ExtendsKeyword) {
+        extendsList = types;
+      } else if (clause.token === ts.SyntaxKind.ImplementsKeyword) {
+        implementsList = types;
+      }
+    }
+  }
+  return { extendsList, implementsList };
+}
+
 function extractSymbols(sf: import("typescript").SourceFile): SymbolFact[] {
   const symbols: SymbolFact[] = [];
-  const visit = (node: import("typescript").Node): void => {
+  const visit = (node: import("typescript").Node, enclosing?: string): void => {
+    let childEnclosing = enclosing;
+
     if (ts.isClassDeclaration(node) && node.name) {
+      childEnclosing = enclosing ? `${enclosing}::${node.name.text}` : node.name.text;
+      const heritage = extractHeritage(node, sf);
       symbols.push({
         name: node.name.text,
         kind: "class",
-        exported: hasExportModifier(node),
+        exported: hasModifier(node, ts.SyntaxKind.ExportKeyword),
         span: getSpan(sf, node),
+        visibility: getVisibility(node),
+        isAbstract: hasModifier(node, ts.SyntaxKind.AbstractKeyword),
+        isStatic: hasModifier(node, ts.SyntaxKind.StaticKeyword),
+        typeParameters: getTypeParameters(node, sf),
+        qualifiedName: childEnclosing,
+        decorators: extractNodeDecorators(node),
+        docstring: extractDocstring(node),
+        extends: heritage.extendsList,
+        implements: heritage.implementsList,
       });
     } else if (ts.isFunctionDeclaration(node) && node.name && isTopLevel(node, sf)) {
+      const qName = enclosing ? `${enclosing}::${node.name.text}` : node.name.text;
       symbols.push({
         name: node.name.text,
         kind: "function",
-        exported: hasExportModifier(node),
+        exported: hasModifier(node, ts.SyntaxKind.ExportKeyword),
         span: getSpan(sf, node),
+        isAsync: hasModifier(node, ts.SyntaxKind.AsyncKeyword),
+        signature: getSignature(node, sf),
+        returnType: getReturnType(node, sf),
+        typeParameters: getTypeParameters(node, sf),
+        qualifiedName: qName,
+        decorators: extractNodeDecorators(node),
+        docstring: extractDocstring(node),
+      });
+    } else if (ts.isPropertyDeclaration(node) && node.name) {
+      const nameText = node.name.getText(sf);
+      const qName = enclosing ? `${enclosing}::${nameText}` : nameText;
+      symbols.push({
+        name: nameText,
+        kind: "property",
+        exported: false,
+        span: getSpan(sf, node),
+        visibility: getVisibility(node),
+        isStatic: hasModifier(node, ts.SyntaxKind.StaticKeyword),
+        returnType: node.type ? node.type.getText(sf) : undefined,
+        qualifiedName: qName,
+        decorators: extractNodeDecorators(node),
+        docstring: extractDocstring(node),
       });
     } else if (ts.isMethodDeclaration(node) && node.name) {
-      symbols.push({ name: node.name.getText(sf), kind: "method", exported: false, span: getSpan(sf, node) });
+      const nameText = node.name.getText(sf);
+      const qName = enclosing ? `${enclosing}::${nameText}` : nameText;
+      const methodDecs = extractNodeDecorators(node) ?? [];
+      const paramDecs = node.parameters.flatMap((p) => extractNodeDecorators(p) ?? []);
+      const allDecs = [...methodDecs, ...paramDecs];
+
+      symbols.push({
+        name: nameText,
+        kind: "method",
+        exported: false,
+        span: getSpan(sf, node),
+        visibility: getVisibility(node),
+        isAsync: hasModifier(node, ts.SyntaxKind.AsyncKeyword),
+        isStatic: hasModifier(node, ts.SyntaxKind.StaticKeyword),
+        isAbstract: hasModifier(node, ts.SyntaxKind.AbstractKeyword),
+        signature: getSignature(node, sf),
+        returnType: getReturnType(node, sf),
+        typeParameters: getTypeParameters(node, sf),
+        qualifiedName: qName,
+        decorators: allDecs.length > 0 ? allDecs : undefined,
+        docstring: extractDocstring(node),
+      });
     } else if (ts.isInterfaceDeclaration(node) && node.name && isTopLevel(node, sf)) {
+      const qName = enclosing ? `${enclosing}::${node.name.text}` : node.name.text;
+      const heritage = extractHeritage(node, sf);
       symbols.push({
         name: node.name.text,
         kind: "interface",
-        exported: hasExportModifier(node),
+        exported: hasModifier(node, ts.SyntaxKind.ExportKeyword),
         span: getSpan(sf, node),
+        typeParameters: getTypeParameters(node, sf),
+        qualifiedName: qName,
+        docstring: extractDocstring(node),
+        extends: heritage.extendsList,
+        implements: heritage.implementsList,
       });
     } else if (ts.isTypeAliasDeclaration(node) && node.name && isTopLevel(node, sf)) {
+      const qName = enclosing ? `${enclosing}::${node.name.text}` : node.name.text;
       symbols.push({
         name: node.name.text,
-        kind: "type",
-        exported: hasExportModifier(node),
+        kind: "type_alias",
+        exported: hasModifier(node, ts.SyntaxKind.ExportKeyword),
         span: getSpan(sf, node),
+        typeParameters: getTypeParameters(node, sf),
+        qualifiedName: qName,
+        docstring: extractDocstring(node),
+      });
+    } else if (ts.isEnumDeclaration(node) && node.name && isTopLevel(node, sf)) {
+      const qName = enclosing ? `${enclosing}::${node.name.text}` : node.name.text;
+      symbols.push({
+        name: node.name.text,
+        kind: "enum",
+        exported: hasModifier(node, ts.SyntaxKind.ExportKeyword),
+        span: getSpan(sf, node),
+        qualifiedName: qName,
+        docstring: extractDocstring(node),
       });
     } else if (ts.isVariableDeclaration(node) && ts.isIdentifier(node.name) && isTopLevel(node, sf)) {
+      const qName = enclosing ? `${enclosing}::${node.name.text}` : node.name.text;
+      const isConst =
+        node.parent &&
+        ts.isVariableDeclarationList(node.parent) &&
+        (node.parent.flags & ts.NodeFlags.Const) !== 0;
       symbols.push({
         name: node.name.text,
-        kind: "variable",
+        kind: isConst ? "constant" : "variable",
         exported: hasExportModifier(node),
         span: getSpan(sf, node),
+        qualifiedName: qName,
+      });
+    } else if (ts.isPropertyDeclaration(node) && ts.isIdentifier(node.name)) {
+      const qName = enclosing ? `${enclosing}::${node.name.text}` : node.name.text;
+      symbols.push({
+        name: node.name.text,
+        kind: "field",
+        exported: false,
+        span: getSpan(sf, node),
+        visibility: getVisibility(node),
+        isStatic: hasModifier(node, ts.SyntaxKind.StaticKeyword),
+        qualifiedName: qName,
+        docstring: extractDocstring(node),
+        decorators: extractNodeDecorators(node),
+      });
+    } else if (
+      ts.isParameter(node) &&
+      ts.isIdentifier(node.name) &&
+      node.parent &&
+      ts.isConstructorDeclaration(node.parent) &&
+      (hasModifier(node, ts.SyntaxKind.PrivateKeyword) ||
+        hasModifier(node, ts.SyntaxKind.ProtectedKeyword) ||
+        hasModifier(node, ts.SyntaxKind.PublicKeyword) ||
+        hasModifier(node, ts.SyntaxKind.ReadonlyKeyword))
+    ) {
+      const qName = enclosing ? `${enclosing}::${node.name.text}` : node.name.text;
+      symbols.push({
+        name: node.name.text,
+        kind: "field",
+        exported: false,
+        span: getSpan(sf, node),
+        visibility:
+          getVisibility(node) ?? (hasModifier(node, ts.SyntaxKind.ReadonlyKeyword) ? "public" : undefined),
+        qualifiedName: qName,
+        decorators: extractNodeDecorators(node),
+      });
+    } else if (ts.isEnumMember(node) && ts.isIdentifier(node.name)) {
+      const qName = enclosing ? `${enclosing}::${node.name.text}` : node.name.text;
+      symbols.push({
+        name: node.name.text,
+        kind: "enum_member",
+        exported: false,
+        span: getSpan(sf, node),
+        qualifiedName: qName,
+        docstring: extractDocstring(node),
+      });
+    } else if (ts.isImportSpecifier(node)) {
+      symbols.push({
+        name: node.name.text,
+        kind: "import",
+        exported: false,
+        span: getSpan(sf, node),
+        qualifiedName: node.name.text,
+      });
+    } else if (ts.isImportClause(node) && node.name) {
+      symbols.push({
+        name: node.name.text,
+        kind: "import",
+        exported: false,
+        span: getSpan(sf, node),
+        qualifiedName: node.name.text,
       });
     }
-    ts.forEachChild(node, visit);
+    ts.forEachChild(node, (child) => visit(child, childEnclosing));
   };
-  visit(sf);
+  visit(sf, undefined);
   return symbols;
 }
 
@@ -76,11 +280,59 @@ function isTopLevel(node: import("typescript").Node, sf: import("typescript").So
   return false;
 }
 
+function hasModifier(node: import("typescript").Node, kind: import("typescript").SyntaxKind): boolean {
+  return ts.canHaveModifiers(node) && (ts.getModifiers(node) ?? []).some((m) => m.kind === kind);
+}
+
 function hasExportModifier(node: import("typescript").Node): boolean {
-  return (
-    ts.canHaveModifiers(node) &&
-    (ts.getModifiers(node) ?? []).some((m) => m.kind === ts.SyntaxKind.ExportKeyword)
-  );
+  return hasModifier(node, ts.SyntaxKind.ExportKeyword);
+}
+
+function getVisibility(node: import("typescript").Node): "public" | "private" | "protected" | undefined {
+  if (hasModifier(node, ts.SyntaxKind.PrivateKeyword)) return "private";
+  if (hasModifier(node, ts.SyntaxKind.ProtectedKeyword)) return "protected";
+  if (hasModifier(node, ts.SyntaxKind.PublicKeyword)) return "public";
+  return undefined;
+}
+
+function getSignature(
+  node: import("typescript").Node,
+  sf: import("typescript").SourceFile,
+): string | undefined {
+  if (ts.isFunctionDeclaration(node) || ts.isMethodDeclaration(node)) {
+    const params = node.parameters.map((p) => p.getText(sf)).join(", ");
+    const ret = node.type ? `: ${node.type.getText(sf)}` : "";
+    return `(${params})${ret}`;
+  }
+  return undefined;
+}
+
+function getReturnType(
+  node: import("typescript").Node,
+  sf: import("typescript").SourceFile,
+): string | undefined {
+  if ((ts.isFunctionDeclaration(node) || ts.isMethodDeclaration(node)) && node.type) {
+    return node.type.getText(sf);
+  }
+  return undefined;
+}
+
+function getTypeParameters(
+  node: import("typescript").Node,
+  sf: import("typescript").SourceFile,
+): string[] | undefined {
+  if (
+    (ts.isFunctionDeclaration(node) ||
+      ts.isMethodDeclaration(node) ||
+      ts.isClassDeclaration(node) ||
+      ts.isInterfaceDeclaration(node) ||
+      ts.isTypeAliasDeclaration(node)) &&
+    node.typeParameters &&
+    node.typeParameters.length > 0
+  ) {
+    return node.typeParameters.map((p) => p.getText(sf));
+  }
+  return undefined;
 }
 
 function extractImports(sf: import("typescript").SourceFile): ImportFact[] {
@@ -151,6 +403,13 @@ function extractCalls(sf: import("typescript").SourceFile): CallFact[] {
         enclosing: childEnclosing,
         span: getSpan(sf, node),
       });
+    } else if (ts.isNewExpression(node)) {
+      calls.push({
+        callee: node.expression.getText(sf),
+        enclosing: childEnclosing,
+        span: getSpan(sf, node),
+        isNew: true,
+      });
     }
 
     ts.forEachChild(node, (child) => visit(child, childEnclosing));
@@ -207,7 +466,7 @@ function extractDecoratorRoutes(sf: TsSourceFile): RouteFact[] {
             const info = decoratorNameAndArg(dec);
             if (!info || !HTTP_VERB_DECORATORS.has(info.name)) continue;
             routes.push({
-              method: info.name === "All" ? "ALL" : info.name.toUpperCase(),
+              method: (info.name === "All" ? "ALL" : info.name.toUpperCase()) as RouteFact["method"],
               path: joinRoutePath(base, info.path),
               handler: `${className}.${member.name.getText(sf)}`,
               span: getSpan(sf, member),
@@ -249,7 +508,12 @@ function extractFileBasedRoutes(sf: TsSourceFile, path: string): RouteFact[] {
   const routes: RouteFact[] = [];
   const add = (name: string, node: TsNode): void => {
     if (HTTP_VERB_EXPORTS.has(name))
-      routes.push({ method: name, path: routePath, handler: name, span: getSpan(sf, node) });
+      routes.push({
+        method: name as RouteFact["method"],
+        path: routePath,
+        handler: name,
+        span: getSpan(sf, node),
+      });
   };
   for (const stmt of sf.statements) {
     const exported =
@@ -276,7 +540,7 @@ function extractRoutes(sf: TsSourceFile, path: string): RouteFact[] {
       const second = node.arguments[1];
       if (first !== undefined && second !== undefined && ts.isStringLiteral(first)) {
         routes.push({
-          method: node.expression.name.text.toUpperCase(),
+          method: node.expression.name.text.toUpperCase() as RouteFact["method"],
           path: first.text,
           handler: second.getText(sf),
           span: getSpan(sf, node),
@@ -287,6 +551,54 @@ function extractRoutes(sf: TsSourceFile, path: string): RouteFact[] {
   };
   visit(sf);
   return [...routes, ...extractDecoratorRoutes(sf), ...extractFileBasedRoutes(sf, path)];
+}
+
+function extractControlFlows(sf: import("typescript").SourceFile): import("@rir/core").ControlFlowFact[] {
+  const flows: import("@rir/core").ControlFlowFact[] = [];
+  const visit = (node: import("typescript").Node, enclosing?: string): void => {
+    let childEnclosing = enclosing;
+    if (ts.isClassDeclaration(node) && node.name) {
+      childEnclosing = enclosing ? `${enclosing}::${node.name.text}` : node.name.text;
+    } else if (ts.isMethodDeclaration(node) && node.name) {
+      const nameText = node.name.getText(sf);
+      childEnclosing = enclosing ? `${enclosing}::${nameText}` : nameText;
+    } else if (ts.isFunctionDeclaration(node) && node.name) {
+      childEnclosing = enclosing ? `${enclosing}::${node.name.text}` : node.name.text;
+    } else if (
+      ts.isVariableDeclaration(node) &&
+      ts.isIdentifier(node.name) &&
+      node.initializer &&
+      (ts.isArrowFunction(node.initializer) || ts.isFunctionExpression(node.initializer))
+    ) {
+      childEnclosing = enclosing ? `${enclosing}::${node.name.text}` : node.name.text;
+    }
+
+    if (ts.isThrowStatement(node)) {
+      let typeName: string | undefined;
+      if (
+        node.expression &&
+        ts.isNewExpression(node.expression) &&
+        ts.isIdentifier(node.expression.expression)
+      ) {
+        typeName = node.expression.expression.text;
+      }
+      flows.push({ kind: "THROW", enclosing: childEnclosing, typeName, span: getSpan(sf, node) });
+    } else if (ts.isCatchClause(node)) {
+      let typeName: string | undefined;
+      if (
+        node.variableDeclaration &&
+        node.variableDeclaration.type &&
+        ts.isTypeReferenceNode(node.variableDeclaration.type) &&
+        ts.isIdentifier(node.variableDeclaration.type.typeName)
+      ) {
+        typeName = node.variableDeclaration.type.typeName.text;
+      }
+      flows.push({ kind: "CATCH", enclosing: childEnclosing, typeName, span: getSpan(sf, node) });
+    }
+    ts.forEachChild(node, (c) => visit(c, childEnclosing));
+  };
+  visit(sf, undefined);
+  return flows;
 }
 
 export function extractParseResult(sf: import("typescript").SourceFile, path: string): ParseResult {
@@ -304,6 +616,7 @@ export function extractParseResult(sf: import("typescript").SourceFile, path: st
     exports: extractExports(sf),
     calls: extractCalls(sf),
     routes: extractRoutes(sf, path),
+    controlFlows: extractControlFlows(sf),
   };
 }
 

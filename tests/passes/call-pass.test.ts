@@ -79,7 +79,7 @@ describe("CallPass", () => {
     expect(draft.getNodes().some((n) => n.name === "doSomething" && n.kind === "FUNCTION")).toBe(true);
   });
 
-  it("call with enclosing AuthController + callee this.authService.login yields CALLS edge to AuthService", () => {
+  it("call with enclosing AuthController + callee this.authService.login yields ROUTES_TO edge to AuthService", () => {
     const draft = new DefaultIRDraft();
     const ctx2: CompilationContext = {
       ...ctx,
@@ -99,7 +99,7 @@ describe("CallPass", () => {
     expect(
       edges.some(
         (e) =>
-          e.kind === "CALLS" &&
+          e.kind === "ROUTES_TO" &&
           e.from === makeId("decl", "AuthController") &&
           e.to === makeId("decl", "AuthService"),
       ),

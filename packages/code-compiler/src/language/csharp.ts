@@ -148,6 +148,7 @@ export class CSharpAdapter implements LanguageAdapter {
       exports: extractExports(tree.rootNode),
       calls: extractCalls(tree.rootNode),
       routes: [],
+      controlFlows: [],
     };
   }
 }

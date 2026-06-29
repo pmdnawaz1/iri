@@ -34,6 +34,7 @@ export class ComponentPass extends AbstractPass {
         artifactId: makeId("art", path),
         span: null,
         hash: "0",
+        filePath: path,
         execution: { reachable: false, entryDistance: null, runtimeObserved: false, tested: false },
         evidence: AST(path),
       });

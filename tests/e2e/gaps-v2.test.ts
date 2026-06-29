@@ -25,6 +25,7 @@ function node(id: string, kind: string, name: string): NodeIR {
     artifactId: "art|x",
     span: null,
     hash: "0",
+    filePath: "x",
     execution: { reachable: true, entryDistance: 0, runtimeObserved: false, tested: false },
     evidence: [{ source: "AST", locator: "x", confidence: 1 }],
   };
@@ -41,7 +42,15 @@ function cap(id: string, capability: string, nodes: string[]): CapabilityIR {
   };
 }
 function ir(nodes: NodeIR[], caps: CapabilityIR[]): RepositoryIR {
-  return { version: RIR_VERSION, nodes, edges: [], artifacts: [], capabilities: caps };
+  return {
+    version: RIR_VERSION,
+    schemaVersion: RIR_VERSION,
+    nodes,
+    edges: [],
+    artifacts: [],
+    files: [],
+    capabilities: caps,
+  };
 }
 function req(capability: string, priority: RequirementIR["priority"] = "MUST"): RequirementIR {
   return {

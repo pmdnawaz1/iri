@@ -201,7 +201,7 @@ function extractRoutes(root: SyntaxNode): RouteFact[] {
         const verb = JAVA_MAPPING_VERB[info.name] ?? (info.name === "RequestMapping" ? "ALL" : undefined);
         if (verb)
           routes.push({
-            method: verb,
+            method: verb as RouteFact["method"],
             path: joinJavaPath(classBase, info.path),
             handler,
             span: getSpan(node),
@@ -244,6 +244,7 @@ export class JavaAdapter implements LanguageAdapter {
       exports: extractExports(tree.rootNode),
       calls: extractCalls(tree.rootNode),
       routes: extractRoutes(tree.rootNode),
+      controlFlows: [],
     };
   }
 }

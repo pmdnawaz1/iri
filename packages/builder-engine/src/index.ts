@@ -60,9 +60,17 @@ export class DefaultIRDraft implements IRDraft {
   seal(): RepositoryIR {
     return {
       version: RIR_VERSION,
+      schemaVersion: RIR_VERSION,
       nodes: [...this.nodes.values()],
       edges: [...this.edges.values()],
       artifacts: [...this.artifacts.values()],
+      files: [...this.artifacts.values()].map((a) => ({
+        path: a.path,
+        language: a.language,
+        size: 0,
+        contentHash: a.hash,
+        nodeCount: [...this.nodes.values()].filter((n) => n.artifactId === a.id).length,
+      })),
       capabilities: [...this.capabilities.values()],
     };
   }

@@ -9,6 +9,14 @@ Paste this ENTIRE file into a fresh implementer session. It is ONE branch = ONE 
 ## This PR
 Add packages/resolution: import-resolution + name-matching for a deep call graph, framework route+DI resolvers (NestJS/Express/Spring/FastAPI/Gin), PROVIDES/DI edges, dynamic-dispatch synthesizers, entry-point reachability — then closure actually CLOSES on a real repo. Route precision kills config-call false positives.
 
+## Foundation already shipped (use these EXACT names — do not invent or rename)
+- NodeIR fields: signature, returnType, typeParameters (string[]), visibility, isExported, isAsync, isStatic, isAbstract, qualifiedName, filePath (optional), decorators ({name,args}[]), docstring.
+- NodeKind: PROPERTY, FIELD, ENUM, ENUM_MEMBER, CONSTANT, TYPE_ALIAS, IMPORT, MIDDLEWARE (+ existing CONTROLLER/SERVICE/REPOSITORY/ROUTE/...).
+- EdgeKind: CONTAINS, EXTENDS, IMPLEMENTS, INSTANTIATES, REFERENCES, DECORATES, CATCHES, THROWS, WRAPS (+ existing CALLS/IMPORTS/DEPENDS_ON/ROUTES_TO/...). NOTE: heritage `extends` is EXTENDS (not INHERITS).
+- @rir/core: SymbolFact.kind += field/enum_member/type_alias/import; ControlFlowFact {kind:'THROW'|'CATCH', enclosing?, typeName?, span}; ParseResult.controlFlows.
+- RepositoryIR: files[] are objects {path, language, size, contentHash?, nodeCount?}; schemaVersion = RIR_VERSION. RIR_VERSION is 1.1.0.
+- F15 (DI) consumes the FIELD nodes PR1 emits for constructor-injected params (the injection token = the param's type).
+
 You are ROLE_IMPLEMENTER for the RIR repository. This is ONE PR that implements
 MULTIPLE related TSPECs on ONE branch, in the order given.
 

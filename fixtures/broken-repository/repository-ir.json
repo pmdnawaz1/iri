@@ -1,5 +1,5 @@
 {
-  "version": "1.0.0",
+  "version": "1.1.0",
   "artifacts": [
     { "id": "art|src/auth.ts", "kind": "CODE", "path": "src/auth.ts", "language": "typescript", "hash": "0000000000000000" }
   ],
@@ -36,6 +36,8 @@
       "evidence": [{ "source": "AST", "locator": "src/auth.ts", "confidence": 1 }]
     }
   ],
+  "files": [],
+  "schemaVersion": "1.1.0",
   "capabilities": [
     {
       "id": "cap|AUTH.LOGIN|1",

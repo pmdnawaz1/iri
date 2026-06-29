@@ -11,7 +11,7 @@
  * implementers must NOT add fields here.
  */
 
-export const RIR_VERSION = "1.0.0" as const;
+export const RIR_VERSION = "1.1.0" as const;
 export const REQUIREMENT_IR_VERSION = "1.0.0" as const;
 
 // ---------------------------------------------------------------------------
@@ -25,12 +25,20 @@ export const NodeKind = {
   Class: "CLASS",
   Method: "METHOD",
   Variable: "VARIABLE",
+  Property: "PROPERTY",
+  Enum: "ENUM",
+  Constant: "CONSTANT",
   Type: "TYPE",
   Interface: "INTERFACE",
   Route: "ROUTE",
   Controller: "CONTROLLER",
   Service: "SERVICE",
   Repository: "REPOSITORY",
+  Middleware: "MIDDLEWARE",
+  Field: "FIELD",
+  EnumMember: "ENUM_MEMBER",
+  TypeAlias: "TYPE_ALIAS",
+  Import: "IMPORT",
   Component: "COMPONENT",
   Handler: "HANDLER",
   ApiCall: "API_CALL",
@@ -54,8 +62,12 @@ export const EdgeKind = {
   Exports: "EXPORTS",
   Calls: "CALLS",
   CalledBy: "CALLED_BY",
+  Contains: "CONTAINS",
+  References: "REFERENCES",
+  Decorates: "DECORATES",
   Implements: "IMPLEMENTS",
   Inherits: "INHERITS",
+  Instantiates: "INSTANTIATES",
   DependsOn: "DEPENDS_ON",
   Renders: "RENDERS",
   Emits: "EMITS",
@@ -63,6 +75,10 @@ export const EdgeKind = {
   Reads: "READS",
   Writes: "WRITES",
   RoutesTo: "ROUTES_TO",
+  Extends: "EXTENDS",
+  Catches: "CATCHES",
+  Throws: "THROWS",
+  Wraps: "WRAPS",
   Tests: "TESTS",
   Documents: "DOCUMENTS",
 } as const;
@@ -158,6 +174,18 @@ export interface NodeIR {
   /** Execution facts populated by the Reachability / Runtime / Test passes. */
   readonly execution: ExecutionFacts;
   readonly evidence: readonly EvidenceIR[];
+  readonly signature?: string;
+  readonly returnType?: string;
+  readonly typeParameters?: string[];
+  readonly visibility?: "public" | "private" | "protected" | "internal";
+  readonly isExported?: boolean;
+  readonly isAsync?: boolean;
+  readonly isStatic?: boolean;
+  readonly isAbstract?: boolean;
+  readonly qualifiedName?: string;
+  readonly filePath?: string;
+  readonly decorators?: { readonly name: string; readonly args: readonly string[] }[];
+  readonly docstring?: string;
 }
 
 /** Execution-related facts attached to a node. */
@@ -210,9 +238,17 @@ export interface CapabilityIR {
 /** The full Repository IR for one compilation of one repository. */
 export interface RepositoryIR {
   readonly version: typeof RIR_VERSION;
+  readonly schemaVersion?: string;
   readonly nodes: readonly NodeIR[];
   readonly edges: readonly EdgeIR[];
   readonly artifacts: readonly ArtifactIR[];
+  readonly files: readonly {
+    readonly path: string;
+    readonly language: string | null;
+    readonly size: number;
+    readonly contentHash?: string;
+    readonly nodeCount?: number;
+  }[];
   readonly capabilities: readonly CapabilityIR[];
 }
 
@@ -278,7 +314,15 @@ export function isClosureState(value: string): value is ClosureState {
 }
 
 export function emptyRepositoryIR(): RepositoryIR {
-  return { version: RIR_VERSION, nodes: [], edges: [], artifacts: [], capabilities: [] };
+  return {
+    version: RIR_VERSION,
+    schemaVersion: RIR_VERSION,
+    nodes: [],
+    edges: [],
+    artifacts: [],
+    files: [],
+    capabilities: [],
+  };
 }
 
 export function emptyRequirementSet(): RequirementSet {

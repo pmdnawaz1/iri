@@ -171,7 +171,12 @@ function extractRoutes(root: Parser.SyntaxNode): RouteFact[] {
           const verb = field.toUpperCase();
           const method = verb === "HANDLE" || verb === "HANDLEFUNC" ? "ALL" : verb;
           const handler = args?.namedChild(1)?.text ?? field;
-          routes.push({ method, path: stripGoString(first.text), handler, span: getSpan(node) });
+          routes.push({
+            method: method as RouteFact["method"],
+            path: stripGoString(first.text),
+            handler,
+            span: getSpan(node),
+          });
         }
       }
     }
@@ -208,6 +213,7 @@ export class GoAdapter implements LanguageAdapter {
       exports: extractExports(tree.rootNode),
       calls: extractCalls(tree.rootNode),
       routes: extractRoutes(tree.rootNode),
+      controlFlows: [],
     };
   }
 }

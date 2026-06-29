@@ -9,8 +9,10 @@ export default tseslint.config(
       '**/dist/**',
       'node_modules/**',
       '.claude/**',
+      'inspirations/**',
       'eos/state/**',
-      'eos/tspecs/**'
+      'eos/tspecs/**',
+      'tools/steal/**'
     ],
   },
   {

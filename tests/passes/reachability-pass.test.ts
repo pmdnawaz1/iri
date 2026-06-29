@@ -36,6 +36,7 @@ function makeNode(id: string, kind: NodeIR["kind"]): NodeIR {
     artifactId: "artifact|app.ts",
     span,
     hash: "0",
+    filePath: "app.ts",
     execution: { ...baseExecution },
     evidence: [{ source: "AST", locator: "app.ts", confidence: 1 }],
   };

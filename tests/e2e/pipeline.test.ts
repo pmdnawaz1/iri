@@ -12,6 +12,14 @@ describe("Repository Compiler — express-auth", () => {
 
     // Capability discovery bound the route to the ontology.
     const login = ir.capabilities.find((c) => c.capability === "AUTH.LOGIN");
+    console.log(
+      "Nodes:",
+      ir.nodes.map((n) => n.id),
+    );
+    console.log(
+      "Edges:",
+      ir.edges.map((e) => `${e.kind} ${e.from} -> ${e.to}`),
+    );
     expect(login).toBeDefined();
 
     // The pipeline built the backend chain: route -> controller -> service -> repository.

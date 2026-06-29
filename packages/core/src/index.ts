@@ -20,9 +20,34 @@ import type { ArtifactIR, CapabilityIR, EdgeIR, NodeIR, RepositoryIR, Span } fro
 /** A raw symbol declared in a source file (syntactic; no role classification). */
 export interface SymbolFact {
   readonly name: string;
-  readonly kind: "function" | "class" | "method" | "variable" | "type" | "interface";
+  readonly kind:
+    | "function"
+    | "class"
+    | "method"
+    | "variable"
+    | "type"
+    | "interface"
+    | "property"
+    | "enum"
+    | "constant"
+    | "field"
+    | "enum_member"
+    | "type_alias"
+    | "import";
   readonly exported: boolean;
   readonly span: Span;
+  readonly signature?: string;
+  readonly returnType?: string;
+  readonly typeParameters?: string[];
+  readonly visibility?: "public" | "private" | "protected" | "internal";
+  readonly isAsync?: boolean;
+  readonly isStatic?: boolean;
+  readonly isAbstract?: boolean;
+  readonly qualifiedName?: string;
+  readonly decorators?: { readonly name: string; readonly args: readonly string[] }[];
+  readonly docstring?: string;
+  readonly extends?: readonly string[];
+  readonly implements?: readonly string[];
 }
 
 /** A raw import as written in source (unresolved). */
@@ -42,13 +67,22 @@ export interface CallFact {
    */
   readonly enclosing?: string;
   readonly span: Span;
+  readonly isNew?: boolean;
 }
 
 /** A route declaration discovered syntactically (no semantic mapping). */
 export interface RouteFact {
-  readonly method: string;
+  readonly method: "GET" | "POST" | "PUT" | "DELETE" | "PATCH" | "ALL" | "HEAD" | "OPTIONS";
   readonly path: string;
   readonly handler: string;
+  readonly span: Span;
+}
+
+/** Error propagation and middleware wrapping control flow. */
+export interface ControlFlowFact {
+  readonly kind: "THROW" | "CATCH";
+  readonly enclosing?: string;
+  readonly typeName?: string;
   readonly span: Span;
 }
 
@@ -60,6 +94,7 @@ export interface ParseResult {
   readonly exports: readonly string[];
   readonly calls: readonly CallFact[];
   readonly routes: readonly RouteFact[];
+  readonly controlFlows: readonly ControlFlowFact[];
 }
 
 /** Immutable inputs handed to every pass during one compilation. */

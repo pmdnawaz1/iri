@@ -33,6 +33,7 @@ export class ImportPass extends AbstractPass {
         artifactId: pr.artifact.id,
         span: null,
         hash: "0",
+        filePath: pr.artifact.path,
         language: pr.artifact.language,
         execution: {
           reachable: false,
@@ -59,6 +60,7 @@ export class ImportPass extends AbstractPass {
           artifactId: pr.artifact.id,
           span: null,
           hash: "0",
+          filePath: pr.artifact.path,
           language: pr.artifact.language,
           execution: {
             reachable: false,

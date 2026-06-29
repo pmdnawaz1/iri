@@ -22,6 +22,8 @@ interface Group {
   order: string[];
   dependsOnPr: string;
   extraAcceptance: string[];
+  /** Exact contract names already shipped by an earlier PR — use these, do not invent. */
+  foundation?: string[];
 }
 
 const GROUPS: Group[] = [
@@ -63,6 +65,14 @@ const GROUPS: Group[] = [
     order: ["F20", "F13", "F14", "F15", "F16", "F17", "F18"],
     dependsOnPr:
       "PR1 (needs qualifiedName/filePath F02, CONTAINS F08, decorators F03, property/field F05, instantiates F10)",
+    foundation: [
+      "NodeIR fields: signature, returnType, typeParameters (string[]), visibility, isExported, isAsync, isStatic, isAbstract, qualifiedName, filePath (optional), decorators ({name,args}[]), docstring.",
+      "NodeKind: PROPERTY, FIELD, ENUM, ENUM_MEMBER, CONSTANT, TYPE_ALIAS, IMPORT, MIDDLEWARE (+ existing CONTROLLER/SERVICE/REPOSITORY/ROUTE/...).",
+      "EdgeKind: CONTAINS, EXTENDS, IMPLEMENTS, INSTANTIATES, REFERENCES, DECORATES, CATCHES, THROWS, WRAPS (+ existing CALLS/IMPORTS/DEPENDS_ON/ROUTES_TO/...). NOTE: heritage `extends` is EXTENDS (not INHERITS).",
+      "@rir/core: SymbolFact.kind += field/enum_member/type_alias/import; ControlFlowFact {kind:'THROW'|'CATCH', enclosing?, typeName?, span}; ParseResult.controlFlows.",
+      "RepositoryIR: files[] are objects {path, language, size, contentHash?, nodeCount?}; schemaVersion = RIR_VERSION. RIR_VERSION is 1.1.0.",
+      "F15 (DI) consumes the FIELD nodes PR1 emits for constructor-injected params (the injection token = the param's type).",
+    ],
     extraAcceptance: [
       "GOLDEN: rir compile D:/rir-targets/cal.com/apps/api/v2/src yields >=300 routes, 0 config-call false positives, >=1 capability CLOSED, and CALLS/edge counts within ~2x of the steal transform output.",
       "closure state distribution is no longer 100% ORPHAN/PARTIAL.",
@@ -133,6 +143,13 @@ for (const g of GROUPS) {
     `## This PR`,
     g.summary,
     "",
+    ...(g.foundation
+      ? [
+          "## Foundation already shipped (use these EXACT names — do not invent or rename)",
+          ...g.foundation.map((f) => `- ${f}`),
+          "",
+        ]
+      : []),
     RULES,
     "",
     `## Extra acceptance for ${g.id}`,
