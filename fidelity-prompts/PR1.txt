@@ -1,0 +1,763 @@
+================================================================================
+RIR PR1 — IR depth — node fields, node/edge kinds, files[], schemaVersion
+Branch: feat/ir-fidelity-1-depth
+Depends on: (none — start here)
+TSPECs (in order): F01 -> F02 -> F03 -> F04 -> F05 -> F06 -> F07 -> F08 -> F09 -> F10 -> F11 -> F12 -> F19 -> F21 -> F22
+Paste this ENTIRE file into a fresh implementer session. It is ONE branch = ONE PR.
+================================================================================
+
+## This PR
+Enrich the IR to real-codebase fidelity: rich node fields (signature/qualifiedName/decorators/docstring/modifiers), new node kinds (property/field/constant/enum/type_alias/import), structural edges (contains/extends/implements/instantiates/references/decorates), control-flow edges, files[] metadata, schemaVersion. All additive to packages/ir + the TS adapter.
+
+You are ROLE_IMPLEMENTER for the RIR repository. This is ONE PR that implements
+MULTIPLE related TSPECs on ONE branch, in the order given.
+
+Hard rules (decision1.md):
+- Implement the work orders below IN ORDER. They build on each other.
+- ADDITIVE to the IR: bump RIR_VERSION once for the whole PR; new fields/kinds are optional.
+  Do NOT change closure/coverage/consistency/ontology RULES unless a work order says so.
+- STEAL, do not reinvent: every work order's "USE THE STEAL TRANSFORM" section is mandatory.
+  tools/steal/codegraph-to-rir.mjs is your field/kind mapping AND your validation oracle.
+  Steal-and-adapt the cited inspirations/codegraph/src/* files; never adopt their SQLite.
+- Real, formatted, multi-line source. No TODOs, no placeholders, no minify (CI runs prettier --check).
+- If a work order is ambiguous or wrong, STOP and report — do not guess.
+
+Workflow:
+1. Create the branch named below from main.
+2. Implement each work order in order; keep its tests passing before moving to the next.
+3. Run: pnpm install && pnpm format && pnpm build && pnpm typecheck && pnpm typecheck:tests && pnpm test  — all green.
+4. Open ONE PR for the whole branch (commit per work order is fine) using
+   .github/pull_request_template.md.
+
+Definition of done: build + typecheck (incl. tests) + lint + all the work orders' acceptance
+criteria + this PR's extra acceptance, with coverage >= 95%.
+
+## Extra acceptance for PR1
+- RIR_VERSION bumped once; all new fields/kinds are optional/additive; existing tests stay green.
+- Validate against the steal oracle: node fields you emit match tools/steal/codegraph-to-rir.mjs output for the same constructs.
+
+## The 15 work orders (implement in this order)
+
+===== WORK ORDER F01 ============================================================
+
+# TSPEC-F01 — NodeIR rich fields: signature / returnType / typeParameters / visibility / modifiers (Work Order)
+
+> Authored by ROLE_ARCHITECT for the IR-fidelity program (ADR-0025). STEAL-AND-ADAPT from
+> CodeGraph (`inspirations/codegraph`), then map the output onto RIR's IR. Keep RIR's IR as a single portable JSON (do NOT adopt CodeGraph's SQLite). Steal the logic, map the output to NodeIR/EdgeIR. Additive only — bump RIR_VERSION, never break existing fields.
+
+- **TSPEC:** TSPEC-F01 · **Owner:** ROLE_IMPLEMENTER · **Header:** `eos/tspecs/TSPEC-F01.yaml`
+- **Depends on:** TSPEC-P01 · **ADR:** docs/ADR-0025-ir-fidelity-steal-from-codegraph.md
+
+## 1. Objective
+Add type-aware metadata to every METHOD/FUNCTION/CLASS node so RIR can answer 'what does this accept/return?' and reason about access/async. Today NodeIR has none of it.
+
+## 2. USE THE STEAL TRANSFORM (mapping + oracle — do not reimplement blind)
+The CG->RIR field/edge-kind mapping is already implemented and PROVEN in
+`tools/steal/codegraph-to-rir.mjs` (run on cal.com it yields 314 ROUTE, 46,659 CALLS,
+51,475 CONTAINS, plus signature/qualifiedName/decorators on nodes). Use it TWO ways:
+1. **MAPPING** — it defines the EXACT RIR field/kind names your extractor must emit (e.g.
+   `qualifiedName`, `signature`, `decorators`, `CONTAINS`/`EXTENDS`/`INSTANTIATES`). Match them.
+2. **ORACLE** — generate the reference IR:
+   `node --experimental-sqlite tools/steal/codegraph-to-rir.mjs <repo>/.codegraph/codegraph.db ref.json`
+   then assert YOUR native `rir compile <repo>` reproduces the same kind/field for the same
+   construct (file+line) within tolerance. The transform is your golden target.
+
+Then steal-and-adapt the extraction logic from CodeGraph source:
+- inspirations/codegraph/src/extraction/index.ts
+- inspirations/codegraph/src/extraction/languages/typescript.ts
+- inspirations/codegraph/src/types.ts
+
+## 3. Files
+- modify packages/ir/src/index.ts (NodeIR += optional signature, returnType, typeParameters, visibility, isExported, isAsync, isStatic, isAbstract; bump RIR_VERSION)
+- modify packages/code-compiler/src/language/typescript.ts (populate them from the AST)
+- modify tests/e2e or tests/compiler with assertions
+
+## 4. Algorithm / behavior
+- Port CodeGraph's signature builder (extraction/languages/typescript.ts `returnField`/signature) and modifier readers (isAsync etc.) — adapt to emit onto NodeIR fields, not SQLite columns.
+- visibility = public|private|protected|internal from TS modifiers; isExported from export modifier; isStatic/isAbstract/isAsync from modifiers.
+- Leave nodes without a signature (e.g. ROUTE) unset; fields are optional.
+
+## 5. Acceptance criteria
+- a method `login(email: string): Promise<Token>` yields signature with params+return, isAsync=true, visibility set
+- an exported class has isExported=true
+- existing IR tests still pass; RIR_VERSION bumped
+- Builds, typechecks, lint clean, `pnpm typecheck:tests` green, coverage >= 95%.
+
+## 6. Forbidden changes
+- Do NOT adopt CodeGraph's SQLite/schema — RIR stays one portable JSON.
+- Do NOT change closure/coverage/consistency/ontology RULES (architect-owned) unless this TSPEC says so.
+- Additive only; bump RIR_VERSION when adding IR fields/kinds. No minify, no TODOs.
+
+## 7. References
+- ADR-0025 (program + copy-from mapping + coverage matrix) · docs/codegraph-comparison-table.md
+- CodeGraph architecture: `inspirations/codegraph/CLAUDE.md`
+
+===== WORK ORDER F02 ============================================================
+
+# TSPEC-F02 — NodeIR qualifiedName + promoted filePath + node-level line/col span (Work Order)
+
+> Authored by ROLE_ARCHITECT for the IR-fidelity program (ADR-0025). STEAL-AND-ADAPT from
+> CodeGraph (`inspirations/codegraph`), then map the output onto RIR's IR. Keep RIR's IR as a single portable JSON (do NOT adopt CodeGraph's SQLite). Steal the logic, map the output to NodeIR/EdgeIR. Additive only — bump RIR_VERSION, never break existing fields.
+
+- **TSPEC:** TSPEC-F02 · **Owner:** ROLE_IMPLEMENTER · **Header:** `eos/tspecs/TSPEC-F02.yaml`
+- **Depends on:** TSPEC-F01 · **ADR:** docs/ADR-0025-ir-fidelity-steal-from-codegraph.md
+
+## 1. Objective
+Disambiguate same-name symbols across classes/files (Class::method) and give every node precise location, not just file-level evidence.
+
+## 2. USE THE STEAL TRANSFORM (mapping + oracle — do not reimplement blind)
+The CG->RIR field/edge-kind mapping is already implemented and PROVEN in
+`tools/steal/codegraph-to-rir.mjs` (run on cal.com it yields 314 ROUTE, 46,659 CALLS,
+51,475 CONTAINS, plus signature/qualifiedName/decorators on nodes). Use it TWO ways:
+1. **MAPPING** — it defines the EXACT RIR field/kind names your extractor must emit (e.g.
+   `qualifiedName`, `signature`, `decorators`, `CONTAINS`/`EXTENDS`/`INSTANTIATES`). Match them.
+2. **ORACLE** — generate the reference IR:
+   `node --experimental-sqlite tools/steal/codegraph-to-rir.mjs <repo>/.codegraph/codegraph.db ref.json`
+   then assert YOUR native `rir compile <repo>` reproduces the same kind/field for the same
+   construct (file+line) within tolerance. The transform is your golden target.
+
+Then steal-and-adapt the extraction logic from CodeGraph source:
+- inspirations/codegraph/src/types.ts
+- inspirations/codegraph/src/extraction/index.ts
+
+## 3. Files
+- modify packages/ir/src/index.ts (NodeIR += qualifiedName, filePath; ensure span carries startLine/endLine/startColumn/endColumn)
+- modify the adapters to populate qualifiedName + filePath
+
+## 4. Algorithm / behavior
+- qualifiedName = enclosing-chain joined `Class::method` (CodeGraph types.ts qualifiedName).
+- Promote filePath onto the node (today only in evidence.locator).
+- Populate span with real start/end line+col from the AST node.
+
+## 5. Acceptance criteria
+- two classes each with `create()` produce distinct qualifiedName values
+- every node has filePath and a line/col span
+- Builds, typechecks, lint clean, `pnpm typecheck:tests` green, coverage >= 95%.
+
+## 6. Forbidden changes
+- Do NOT adopt CodeGraph's SQLite/schema — RIR stays one portable JSON.
+- Do NOT change closure/coverage/consistency/ontology RULES (architect-owned) unless this TSPEC says so.
+- Additive only; bump RIR_VERSION when adding IR fields/kinds. No minify, no TODOs.
+
+## 7. References
+- ADR-0025 (program + copy-from mapping + coverage matrix) · docs/codegraph-comparison-table.md
+- CodeGraph architecture: `inspirations/codegraph/CLAUDE.md`
+
+===== WORK ORDER F03 ============================================================
+
+# TSPEC-F03 — NodeIR decorators[] as data (critical for NestJS) (Work Order)
+
+> Authored by ROLE_ARCHITECT for the IR-fidelity program (ADR-0025). STEAL-AND-ADAPT from
+> CodeGraph (`inspirations/codegraph`), then map the output onto RIR's IR. Keep RIR's IR as a single portable JSON (do NOT adopt CodeGraph's SQLite). Steal the logic, map the output to NodeIR/EdgeIR. Additive only — bump RIR_VERSION, never break existing fields.
+
+- **TSPEC:** TSPEC-F03 · **Owner:** ROLE_IMPLEMENTER · **Header:** `eos/tspecs/TSPEC-F03.yaml`
+- **Depends on:** TSPEC-F01 · **ADR:** docs/ADR-0025-ir-fidelity-steal-from-codegraph.md
+
+## 1. Objective
+Capture decorators as structured data so route/DI/guard discovery can read @Controller/@Get/@Injectable/@Module/@UseGuards instead of guessing.
+
+## 2. USE THE STEAL TRANSFORM (mapping + oracle — do not reimplement blind)
+The CG->RIR field/edge-kind mapping is already implemented and PROVEN in
+`tools/steal/codegraph-to-rir.mjs` (run on cal.com it yields 314 ROUTE, 46,659 CALLS,
+51,475 CONTAINS, plus signature/qualifiedName/decorators on nodes). Use it TWO ways:
+1. **MAPPING** — it defines the EXACT RIR field/kind names your extractor must emit (e.g.
+   `qualifiedName`, `signature`, `decorators`, `CONTAINS`/`EXTENDS`/`INSTANTIATES`). Match them.
+2. **ORACLE** — generate the reference IR:
+   `node --experimental-sqlite tools/steal/codegraph-to-rir.mjs <repo>/.codegraph/codegraph.db ref.json`
+   then assert YOUR native `rir compile <repo>` reproduces the same kind/field for the same
+   construct (file+line) within tolerance. The transform is your golden target.
+
+Then steal-and-adapt the extraction logic from CodeGraph source:
+- inspirations/codegraph/src/extraction/languages/typescript.ts
+- inspirations/codegraph/src/extraction/index.ts
+
+## 3. Files
+- modify packages/ir/src/index.ts (NodeIR.decorators?: { name: string; args: string[] }[])
+- modify packages/code-compiler/src/language/typescript.ts (extract decorators on classes/methods/params)
+
+## 4. Algorithm / behavior
+- Reuse the A021 decorator walker; instead of only producing routes, attach the full decorator list to the owning node.
+- Record name + string-literal args (path, token).
+
+## 5. Acceptance criteria
+- a @Controller('auth') class node has decorators including {name:'Controller',args:['auth']}
+- a @Post('login') method node carries that decorator
+- Builds, typechecks, lint clean, `pnpm typecheck:tests` green, coverage >= 95%.
+
+## 6. Forbidden changes
+- Do NOT adopt CodeGraph's SQLite/schema — RIR stays one portable JSON.
+- Do NOT change closure/coverage/consistency/ontology RULES (architect-owned) unless this TSPEC says so.
+- Additive only; bump RIR_VERSION when adding IR fields/kinds. No minify, no TODOs.
+
+## 7. References
+- ADR-0025 (program + copy-from mapping + coverage matrix) · docs/codegraph-comparison-table.md
+- CodeGraph architecture: `inspirations/codegraph/CLAUDE.md`
+
+===== WORK ORDER F04 ============================================================
+
+# TSPEC-F04 — NodeIR docstring (JSDoc/TSDoc) extraction (Work Order)
+
+> Authored by ROLE_ARCHITECT for the IR-fidelity program (ADR-0025). STEAL-AND-ADAPT from
+> CodeGraph (`inspirations/codegraph`), then map the output onto RIR's IR. Keep RIR's IR as a single portable JSON (do NOT adopt CodeGraph's SQLite). Steal the logic, map the output to NodeIR/EdgeIR. Additive only — bump RIR_VERSION, never break existing fields.
+
+- **TSPEC:** TSPEC-F04 · **Owner:** ROLE_IMPLEMENTER · **Header:** `eos/tspecs/TSPEC-F04.yaml`
+- **Depends on:** TSPEC-F01 · **ADR:** docs/ADR-0025-ir-fidelity-steal-from-codegraph.md
+
+## 1. Objective
+Extract leading JSDoc/TSDoc into node.docstring for doc-coverage and search.
+
+## 2. USE THE STEAL TRANSFORM (mapping + oracle — do not reimplement blind)
+The CG->RIR field/edge-kind mapping is already implemented and PROVEN in
+`tools/steal/codegraph-to-rir.mjs` (run on cal.com it yields 314 ROUTE, 46,659 CALLS,
+51,475 CONTAINS, plus signature/qualifiedName/decorators on nodes). Use it TWO ways:
+1. **MAPPING** — it defines the EXACT RIR field/kind names your extractor must emit (e.g.
+   `qualifiedName`, `signature`, `decorators`, `CONTAINS`/`EXTENDS`/`INSTANTIATES`). Match them.
+2. **ORACLE** — generate the reference IR:
+   `node --experimental-sqlite tools/steal/codegraph-to-rir.mjs <repo>/.codegraph/codegraph.db ref.json`
+   then assert YOUR native `rir compile <repo>` reproduces the same kind/field for the same
+   construct (file+line) within tolerance. The transform is your golden target.
+
+Then steal-and-adapt the extraction logic from CodeGraph source:
+- inspirations/codegraph/src/extraction/index.ts
+
+## 3. Files
+- modify packages/ir/src/index.ts (NodeIR.docstring?: string)
+- modify packages/code-compiler/src/language/typescript.ts
+
+## 4. Algorithm / behavior
+- Read the leading comment block above a declaration; strip `/**` markers; store trimmed text.
+
+## 5. Acceptance criteria
+- a documented function carries its docstring text
+- undocumented nodes leave it unset
+- Builds, typechecks, lint clean, `pnpm typecheck:tests` green, coverage >= 95%.
+
+## 6. Forbidden changes
+- Do NOT adopt CodeGraph's SQLite/schema — RIR stays one portable JSON.
+- Do NOT change closure/coverage/consistency/ontology RULES (architect-owned) unless this TSPEC says so.
+- Additive only; bump RIR_VERSION when adding IR fields/kinds. No minify, no TODOs.
+
+## 7. References
+- ADR-0025 (program + copy-from mapping + coverage matrix) · docs/codegraph-comparison-table.md
+- CodeGraph architecture: `inspirations/codegraph/CLAUDE.md`
+
+===== WORK ORDER F05 ============================================================
+
+# TSPEC-F05 — PROPERTY / FIELD nodes (class fields, DI tokens) (Work Order)
+
+> Authored by ROLE_ARCHITECT for the IR-fidelity program (ADR-0025). STEAL-AND-ADAPT from
+> CodeGraph (`inspirations/codegraph`), then map the output onto RIR's IR. Keep RIR's IR as a single portable JSON (do NOT adopt CodeGraph's SQLite). Steal the logic, map the output to NodeIR/EdgeIR. Additive only — bump RIR_VERSION, never break existing fields.
+
+- **TSPEC:** TSPEC-F05 · **Owner:** ROLE_IMPLEMENTER · **Header:** `eos/tspecs/TSPEC-F05.yaml`
+- **Depends on:** TSPEC-F01 · **ADR:** docs/ADR-0025-ir-fidelity-steal-from-codegraph.md
+
+## 1. Objective
+Make class fields and constructor-injected params first-class nodes — the injection points NestJS DI needs (F15).
+
+## 2. USE THE STEAL TRANSFORM (mapping + oracle — do not reimplement blind)
+The CG->RIR field/edge-kind mapping is already implemented and PROVEN in
+`tools/steal/codegraph-to-rir.mjs` (run on cal.com it yields 314 ROUTE, 46,659 CALLS,
+51,475 CONTAINS, plus signature/qualifiedName/decorators on nodes). Use it TWO ways:
+1. **MAPPING** — it defines the EXACT RIR field/kind names your extractor must emit (e.g.
+   `qualifiedName`, `signature`, `decorators`, `CONTAINS`/`EXTENDS`/`INSTANTIATES`). Match them.
+2. **ORACLE** — generate the reference IR:
+   `node --experimental-sqlite tools/steal/codegraph-to-rir.mjs <repo>/.codegraph/codegraph.db ref.json`
+   then assert YOUR native `rir compile <repo>` reproduces the same kind/field for the same
+   construct (file+line) within tolerance. The transform is your golden target.
+
+Then steal-and-adapt the extraction logic from CodeGraph source:
+- inspirations/codegraph/src/types.ts
+- inspirations/codegraph/src/extraction/index.ts
+
+## 3. Files
+- modify packages/ir/src/index.ts (NodeKind += PROPERTY, FIELD)
+- modify packages/code-compiler/src/language/typescript.ts (emit fields + ctor params)
+
+## 4. Algorithm / behavior
+- Emit a PROPERTY/FIELD node per class field and per constructor parameter (the DI token = its type).
+- Carry the declared type so F15 can resolve provider→consumer.
+
+## 5. Acceptance criteria
+- a `constructor(private svc: AuthService)` yields a FIELD node typed AuthService
+- Builds, typechecks, lint clean, `pnpm typecheck:tests` green, coverage >= 95%.
+
+## 6. Forbidden changes
+- Do NOT adopt CodeGraph's SQLite/schema — RIR stays one portable JSON.
+- Do NOT change closure/coverage/consistency/ontology RULES (architect-owned) unless this TSPEC says so.
+- Additive only; bump RIR_VERSION when adding IR fields/kinds. No minify, no TODOs.
+
+## 7. References
+- ADR-0025 (program + copy-from mapping + coverage matrix) · docs/codegraph-comparison-table.md
+- CodeGraph architecture: `inspirations/codegraph/CLAUDE.md`
+
+===== WORK ORDER F06 ============================================================
+
+# TSPEC-F06 — CONSTANT / ENUM / ENUM_MEMBER nodes (Work Order)
+
+> Authored by ROLE_ARCHITECT for the IR-fidelity program (ADR-0025). STEAL-AND-ADAPT from
+> CodeGraph (`inspirations/codegraph`), then map the output onto RIR's IR. Keep RIR's IR as a single portable JSON (do NOT adopt CodeGraph's SQLite). Steal the logic, map the output to NodeIR/EdgeIR. Additive only — bump RIR_VERSION, never break existing fields.
+
+- **TSPEC:** TSPEC-F06 · **Owner:** ROLE_IMPLEMENTER · **Header:** `eos/tspecs/TSPEC-F06.yaml`
+- **Depends on:** TSPEC-F01 · **ADR:** docs/ADR-0025-ir-fidelity-steal-from-codegraph.md
+
+## 1. Objective
+Surface config values and type constants so code-side constraint extraction (P10) can read enum values instead of scanning raw text.
+
+## 2. USE THE STEAL TRANSFORM (mapping + oracle — do not reimplement blind)
+The CG->RIR field/edge-kind mapping is already implemented and PROVEN in
+`tools/steal/codegraph-to-rir.mjs` (run on cal.com it yields 314 ROUTE, 46,659 CALLS,
+51,475 CONTAINS, plus signature/qualifiedName/decorators on nodes). Use it TWO ways:
+1. **MAPPING** — it defines the EXACT RIR field/kind names your extractor must emit (e.g.
+   `qualifiedName`, `signature`, `decorators`, `CONTAINS`/`EXTENDS`/`INSTANTIATES`). Match them.
+2. **ORACLE** — generate the reference IR:
+   `node --experimental-sqlite tools/steal/codegraph-to-rir.mjs <repo>/.codegraph/codegraph.db ref.json`
+   then assert YOUR native `rir compile <repo>` reproduces the same kind/field for the same
+   construct (file+line) within tolerance. The transform is your golden target.
+
+Then steal-and-adapt the extraction logic from CodeGraph source:
+- inspirations/codegraph/src/types.ts
+- inspirations/codegraph/src/extraction/index.ts
+
+## 3. Files
+- modify packages/ir/src/index.ts (NodeKind += CONSTANT, ENUM, ENUM_MEMBER)
+- modify packages/code-compiler/src/language/typescript.ts
+
+## 4. Algorithm / behavior
+- Emit ENUM + ENUM_MEMBER nodes for enums; CONSTANT for top-level const literals.
+
+## 5. Acceptance criteria
+- a TS enum yields one ENUM + N ENUM_MEMBER nodes
+- Builds, typechecks, lint clean, `pnpm typecheck:tests` green, coverage >= 95%.
+
+## 6. Forbidden changes
+- Do NOT adopt CodeGraph's SQLite/schema — RIR stays one portable JSON.
+- Do NOT change closure/coverage/consistency/ontology RULES (architect-owned) unless this TSPEC says so.
+- Additive only; bump RIR_VERSION when adding IR fields/kinds. No minify, no TODOs.
+
+## 7. References
+- ADR-0025 (program + copy-from mapping + coverage matrix) · docs/codegraph-comparison-table.md
+- CodeGraph architecture: `inspirations/codegraph/CLAUDE.md`
+
+===== WORK ORDER F07 ============================================================
+
+# TSPEC-F07 — TYPE_ALIAS nodes + granular IMPORT nodes (Work Order)
+
+> Authored by ROLE_ARCHITECT for the IR-fidelity program (ADR-0025). STEAL-AND-ADAPT from
+> CodeGraph (`inspirations/codegraph`), then map the output onto RIR's IR. Keep RIR's IR as a single portable JSON (do NOT adopt CodeGraph's SQLite). Steal the logic, map the output to NodeIR/EdgeIR. Additive only — bump RIR_VERSION, never break existing fields.
+
+- **TSPEC:** TSPEC-F07 · **Owner:** ROLE_IMPLEMENTER · **Header:** `eos/tspecs/TSPEC-F07.yaml`
+- **Depends on:** TSPEC-F01 · **ADR:** docs/ADR-0025-ir-fidelity-steal-from-codegraph.md
+
+## 1. Objective
+Track custom types and which specific symbols are imported (today all imports collapse into DEPENDS_ON, losing the symbol).
+
+## 2. USE THE STEAL TRANSFORM (mapping + oracle — do not reimplement blind)
+The CG->RIR field/edge-kind mapping is already implemented and PROVEN in
+`tools/steal/codegraph-to-rir.mjs` (run on cal.com it yields 314 ROUTE, 46,659 CALLS,
+51,475 CONTAINS, plus signature/qualifiedName/decorators on nodes). Use it TWO ways:
+1. **MAPPING** — it defines the EXACT RIR field/kind names your extractor must emit (e.g.
+   `qualifiedName`, `signature`, `decorators`, `CONTAINS`/`EXTENDS`/`INSTANTIATES`). Match them.
+2. **ORACLE** — generate the reference IR:
+   `node --experimental-sqlite tools/steal/codegraph-to-rir.mjs <repo>/.codegraph/codegraph.db ref.json`
+   then assert YOUR native `rir compile <repo>` reproduces the same kind/field for the same
+   construct (file+line) within tolerance. The transform is your golden target.
+
+Then steal-and-adapt the extraction logic from CodeGraph source:
+- inspirations/codegraph/src/extraction/index.ts
+
+## 3. Files
+- modify packages/ir/src/index.ts (NodeKind += TYPE_ALIAS, IMPORT)
+- modify packages/code-compiler/src/language/typescript.ts
+
+## 4. Algorithm / behavior
+- Emit a TYPE_ALIAS node per `type X = ...`; one IMPORT node per imported symbol (keep the existing DEPENDS_ON edge).
+
+## 5. Acceptance criteria
+- `import { A, B } from 'x'` yields 2 IMPORT nodes
+- Builds, typechecks, lint clean, `pnpm typecheck:tests` green, coverage >= 95%.
+
+## 6. Forbidden changes
+- Do NOT adopt CodeGraph's SQLite/schema — RIR stays one portable JSON.
+- Do NOT change closure/coverage/consistency/ontology RULES (architect-owned) unless this TSPEC says so.
+- Additive only; bump RIR_VERSION when adding IR fields/kinds. No minify, no TODOs.
+
+## 7. References
+- ADR-0025 (program + copy-from mapping + coverage matrix) · docs/codegraph-comparison-table.md
+- CodeGraph architecture: `inspirations/codegraph/CLAUDE.md`
+
+===== WORK ORDER F08 ============================================================
+
+# TSPEC-F08 — CONTAINS edges (file -> class -> method symbol tree) (Work Order)
+
+> Authored by ROLE_ARCHITECT for the IR-fidelity program (ADR-0025). STEAL-AND-ADAPT from
+> CodeGraph (`inspirations/codegraph`), then map the output onto RIR's IR. Keep RIR's IR as a single portable JSON (do NOT adopt CodeGraph's SQLite). Steal the logic, map the output to NodeIR/EdgeIR. Additive only — bump RIR_VERSION, never break existing fields.
+
+- **TSPEC:** TSPEC-F08 · **Owner:** ROLE_IMPLEMENTER · **Header:** `eos/tspecs/TSPEC-F08.yaml`
+- **Depends on:** TSPEC-F01 · **ADR:** docs/ADR-0025-ir-fidelity-steal-from-codegraph.md
+
+## 1. Objective
+Add the containment tree so 'what's in this file/class?' needs no scan; F13/F17 traverse it.
+
+## 2. USE THE STEAL TRANSFORM (mapping + oracle — do not reimplement blind)
+The CG->RIR field/edge-kind mapping is already implemented and PROVEN in
+`tools/steal/codegraph-to-rir.mjs` (run on cal.com it yields 314 ROUTE, 46,659 CALLS,
+51,475 CONTAINS, plus signature/qualifiedName/decorators on nodes). Use it TWO ways:
+1. **MAPPING** — it defines the EXACT RIR field/kind names your extractor must emit (e.g.
+   `qualifiedName`, `signature`, `decorators`, `CONTAINS`/`EXTENDS`/`INSTANTIATES`). Match them.
+2. **ORACLE** — generate the reference IR:
+   `node --experimental-sqlite tools/steal/codegraph-to-rir.mjs <repo>/.codegraph/codegraph.db ref.json`
+   then assert YOUR native `rir compile <repo>` reproduces the same kind/field for the same
+   construct (file+line) within tolerance. The transform is your golden target.
+
+Then steal-and-adapt the extraction logic from CodeGraph source:
+- inspirations/codegraph/src/extraction/index.ts
+- inspirations/codegraph/src/types.ts
+
+## 3. Files
+- modify packages/ir/src/index.ts (EdgeKind += CONTAINS)
+- modify the adapters / a pass to emit file->symbol and class->member CONTAINS edges
+
+## 4. Algorithm / behavior
+- For each declaration, emit CONTAINS from its artifact/file node (or enclosing class) to it.
+
+## 5. Acceptance criteria
+- a file with one class+method yields file->class and class->method CONTAINS edges
+- Builds, typechecks, lint clean, `pnpm typecheck:tests` green, coverage >= 95%.
+
+## 6. Forbidden changes
+- Do NOT adopt CodeGraph's SQLite/schema — RIR stays one portable JSON.
+- Do NOT change closure/coverage/consistency/ontology RULES (architect-owned) unless this TSPEC says so.
+- Additive only; bump RIR_VERSION when adding IR fields/kinds. No minify, no TODOs.
+
+## 7. References
+- ADR-0025 (program + copy-from mapping + coverage matrix) · docs/codegraph-comparison-table.md
+- CodeGraph architecture: `inspirations/codegraph/CLAUDE.md`
+
+===== WORK ORDER F09 ============================================================
+
+# TSPEC-F09 — EXTENDS + IMPLEMENTS edges (class hierarchy) (Work Order)
+
+> Authored by ROLE_ARCHITECT for the IR-fidelity program (ADR-0025). STEAL-AND-ADAPT from
+> CodeGraph (`inspirations/codegraph`), then map the output onto RIR's IR. Keep RIR's IR as a single portable JSON (do NOT adopt CodeGraph's SQLite). Steal the logic, map the output to NodeIR/EdgeIR. Additive only — bump RIR_VERSION, never break existing fields.
+
+- **TSPEC:** TSPEC-F09 · **Owner:** ROLE_IMPLEMENTER · **Header:** `eos/tspecs/TSPEC-F09.yaml`
+- **Depends on:** TSPEC-F01 · **ADR:** docs/ADR-0025-ir-fidelity-steal-from-codegraph.md
+
+## 1. Objective
+Build the inheritance graph so 'what implements this interface?' is answerable.
+
+## 2. USE THE STEAL TRANSFORM (mapping + oracle — do not reimplement blind)
+The CG->RIR field/edge-kind mapping is already implemented and PROVEN in
+`tools/steal/codegraph-to-rir.mjs` (run on cal.com it yields 314 ROUTE, 46,659 CALLS,
+51,475 CONTAINS, plus signature/qualifiedName/decorators on nodes). Use it TWO ways:
+1. **MAPPING** — it defines the EXACT RIR field/kind names your extractor must emit (e.g.
+   `qualifiedName`, `signature`, `decorators`, `CONTAINS`/`EXTENDS`/`INSTANTIATES`). Match them.
+2. **ORACLE** — generate the reference IR:
+   `node --experimental-sqlite tools/steal/codegraph-to-rir.mjs <repo>/.codegraph/codegraph.db ref.json`
+   then assert YOUR native `rir compile <repo>` reproduces the same kind/field for the same
+   construct (file+line) within tolerance. The transform is your golden target.
+
+Then steal-and-adapt the extraction logic from CodeGraph source:
+- inspirations/codegraph/src/extraction/index.ts
+
+## 3. Files
+- modify packages/ir/src/index.ts (EdgeKind += EXTENDS, IMPLEMENTS)
+- modify packages/code-compiler/src/language/typescript.ts
+
+## 4. Algorithm / behavior
+- From `class X extends Y implements Z` emit EXTENDS X->Y and IMPLEMENTS X->Z (resolve names in F13).
+
+## 5. Acceptance criteria
+- a class extending a base + implementing an interface yields both edges
+- Builds, typechecks, lint clean, `pnpm typecheck:tests` green, coverage >= 95%.
+
+## 6. Forbidden changes
+- Do NOT adopt CodeGraph's SQLite/schema — RIR stays one portable JSON.
+- Do NOT change closure/coverage/consistency/ontology RULES (architect-owned) unless this TSPEC says so.
+- Additive only; bump RIR_VERSION when adding IR fields/kinds. No minify, no TODOs.
+
+## 7. References
+- ADR-0025 (program + copy-from mapping + coverage matrix) · docs/codegraph-comparison-table.md
+- CodeGraph architecture: `inspirations/codegraph/CLAUDE.md`
+
+===== WORK ORDER F10 ============================================================
+
+# TSPEC-F10 — INSTANTIATES edges (new X()) (Work Order)
+
+> Authored by ROLE_ARCHITECT for the IR-fidelity program (ADR-0025). STEAL-AND-ADAPT from
+> CodeGraph (`inspirations/codegraph`), then map the output onto RIR's IR. Keep RIR's IR as a single portable JSON (do NOT adopt CodeGraph's SQLite). Steal the logic, map the output to NodeIR/EdgeIR. Additive only — bump RIR_VERSION, never break existing fields.
+
+- **TSPEC:** TSPEC-F10 · **Owner:** ROLE_IMPLEMENTER · **Header:** `eos/tspecs/TSPEC-F10.yaml`
+- **Depends on:** TSPEC-F01 · **ADR:** docs/ADR-0025-ir-fidelity-steal-from-codegraph.md
+
+## 1. Objective
+Trace who constructs what — needed for DI/factory analysis (F15).
+
+## 2. USE THE STEAL TRANSFORM (mapping + oracle — do not reimplement blind)
+The CG->RIR field/edge-kind mapping is already implemented and PROVEN in
+`tools/steal/codegraph-to-rir.mjs` (run on cal.com it yields 314 ROUTE, 46,659 CALLS,
+51,475 CONTAINS, plus signature/qualifiedName/decorators on nodes). Use it TWO ways:
+1. **MAPPING** — it defines the EXACT RIR field/kind names your extractor must emit (e.g.
+   `qualifiedName`, `signature`, `decorators`, `CONTAINS`/`EXTENDS`/`INSTANTIATES`). Match them.
+2. **ORACLE** — generate the reference IR:
+   `node --experimental-sqlite tools/steal/codegraph-to-rir.mjs <repo>/.codegraph/codegraph.db ref.json`
+   then assert YOUR native `rir compile <repo>` reproduces the same kind/field for the same
+   construct (file+line) within tolerance. The transform is your golden target.
+
+Then steal-and-adapt the extraction logic from CodeGraph source:
+- inspirations/codegraph/src/extraction/index.ts
+
+## 3. Files
+- modify packages/ir/src/index.ts (EdgeKind += INSTANTIATES)
+- modify packages/code-compiler/src/language/typescript.ts
+
+## 4. Algorithm / behavior
+- For each `new X(...)` emit INSTANTIATES from the enclosing symbol to X.
+
+## 5. Acceptance criteria
+- a method doing `new AuthService()` yields an INSTANTIATES edge
+- Builds, typechecks, lint clean, `pnpm typecheck:tests` green, coverage >= 95%.
+
+## 6. Forbidden changes
+- Do NOT adopt CodeGraph's SQLite/schema — RIR stays one portable JSON.
+- Do NOT change closure/coverage/consistency/ontology RULES (architect-owned) unless this TSPEC says so.
+- Additive only; bump RIR_VERSION when adding IR fields/kinds. No minify, no TODOs.
+
+## 7. References
+- ADR-0025 (program + copy-from mapping + coverage matrix) · docs/codegraph-comparison-table.md
+- CodeGraph architecture: `inspirations/codegraph/CLAUDE.md`
+
+===== WORK ORDER F11 ============================================================
+
+# TSPEC-F11 — REFERENCES edges (value / constant / config usage) (Work Order)
+
+> Authored by ROLE_ARCHITECT for the IR-fidelity program (ADR-0025). STEAL-AND-ADAPT from
+> CodeGraph (`inspirations/codegraph`), then map the output onto RIR's IR. Keep RIR's IR as a single portable JSON (do NOT adopt CodeGraph's SQLite). Steal the logic, map the output to NodeIR/EdgeIR. Additive only — bump RIR_VERSION, never break existing fields.
+
+- **TSPEC:** TSPEC-F11 · **Owner:** ROLE_IMPLEMENTER · **Header:** `eos/tspecs/TSPEC-F11.yaml`
+- **Depends on:** TSPEC-F06 · **ADR:** docs/ADR-0025-ir-fidelity-steal-from-codegraph.md
+
+## 1. Objective
+Trace constant/config usage through code (CodeGraph: 18k references edges; RIR: 0).
+
+## 2. USE THE STEAL TRANSFORM (mapping + oracle — do not reimplement blind)
+The CG->RIR field/edge-kind mapping is already implemented and PROVEN in
+`tools/steal/codegraph-to-rir.mjs` (run on cal.com it yields 314 ROUTE, 46,659 CALLS,
+51,475 CONTAINS, plus signature/qualifiedName/decorators on nodes). Use it TWO ways:
+1. **MAPPING** — it defines the EXACT RIR field/kind names your extractor must emit (e.g.
+   `qualifiedName`, `signature`, `decorators`, `CONTAINS`/`EXTENDS`/`INSTANTIATES`). Match them.
+2. **ORACLE** — generate the reference IR:
+   `node --experimental-sqlite tools/steal/codegraph-to-rir.mjs <repo>/.codegraph/codegraph.db ref.json`
+   then assert YOUR native `rir compile <repo>` reproduces the same kind/field for the same
+   construct (file+line) within tolerance. The transform is your golden target.
+
+Then steal-and-adapt the extraction logic from CodeGraph source:
+- inspirations/codegraph/src/extraction/index.ts
+
+## 3. Files
+- modify packages/ir/src/index.ts (EdgeKind += REFERENCES, edge metadata.valueRef)
+- modify the adapters
+
+## 4. Algorithm / behavior
+- Emit REFERENCES from a symbol to a CONSTANT/ENUM_MEMBER it reads, metadata.valueRef=true.
+
+## 5. Acceptance criteria
+- a function reading an enum member yields a REFERENCES edge
+- Builds, typechecks, lint clean, `pnpm typecheck:tests` green, coverage >= 95%.
+
+## 6. Forbidden changes
+- Do NOT adopt CodeGraph's SQLite/schema — RIR stays one portable JSON.
+- Do NOT change closure/coverage/consistency/ontology RULES (architect-owned) unless this TSPEC says so.
+- Additive only; bump RIR_VERSION when adding IR fields/kinds. No minify, no TODOs.
+
+## 7. References
+- ADR-0025 (program + copy-from mapping + coverage matrix) · docs/codegraph-comparison-table.md
+- CodeGraph architecture: `inspirations/codegraph/CLAUDE.md`
+
+===== WORK ORDER F12 ============================================================
+
+# TSPEC-F12 — DECORATES edges (which decorator applied where) (Work Order)
+
+> Authored by ROLE_ARCHITECT for the IR-fidelity program (ADR-0025). STEAL-AND-ADAPT from
+> CodeGraph (`inspirations/codegraph`), then map the output onto RIR's IR. Keep RIR's IR as a single portable JSON (do NOT adopt CodeGraph's SQLite). Steal the logic, map the output to NodeIR/EdgeIR. Additive only — bump RIR_VERSION, never break existing fields.
+
+- **TSPEC:** TSPEC-F12 · **Owner:** ROLE_IMPLEMENTER · **Header:** `eos/tspecs/TSPEC-F12.yaml`
+- **Depends on:** TSPEC-F03 · **ADR:** docs/ADR-0025-ir-fidelity-steal-from-codegraph.md
+
+## 1. Objective
+Make the decorator→target relationship a graph edge.
+
+## 2. USE THE STEAL TRANSFORM (mapping + oracle — do not reimplement blind)
+The CG->RIR field/edge-kind mapping is already implemented and PROVEN in
+`tools/steal/codegraph-to-rir.mjs` (run on cal.com it yields 314 ROUTE, 46,659 CALLS,
+51,475 CONTAINS, plus signature/qualifiedName/decorators on nodes). Use it TWO ways:
+1. **MAPPING** — it defines the EXACT RIR field/kind names your extractor must emit (e.g.
+   `qualifiedName`, `signature`, `decorators`, `CONTAINS`/`EXTENDS`/`INSTANTIATES`). Match them.
+2. **ORACLE** — generate the reference IR:
+   `node --experimental-sqlite tools/steal/codegraph-to-rir.mjs <repo>/.codegraph/codegraph.db ref.json`
+   then assert YOUR native `rir compile <repo>` reproduces the same kind/field for the same
+   construct (file+line) within tolerance. The transform is your golden target.
+
+Then steal-and-adapt the extraction logic from CodeGraph source:
+- inspirations/codegraph/src/extraction/index.ts
+
+## 3. Files
+- modify packages/ir/src/index.ts (EdgeKind += DECORATES)
+- modify packages/code-compiler/src/language/typescript.ts
+
+## 4. Algorithm / behavior
+- For each decorator on a node, emit DECORATES from a decorator node to the decorated node.
+
+## 5. Acceptance criteria
+- @Injectable on a class yields a DECORATES edge
+- Builds, typechecks, lint clean, `pnpm typecheck:tests` green, coverage >= 95%.
+
+## 6. Forbidden changes
+- Do NOT adopt CodeGraph's SQLite/schema — RIR stays one portable JSON.
+- Do NOT change closure/coverage/consistency/ontology RULES (architect-owned) unless this TSPEC says so.
+- Additive only; bump RIR_VERSION when adding IR fields/kinds. No minify, no TODOs.
+
+## 7. References
+- ADR-0025 (program + copy-from mapping + coverage matrix) · docs/codegraph-comparison-table.md
+- CodeGraph architecture: `inspirations/codegraph/CLAUDE.md`
+
+===== WORK ORDER F19 ============================================================
+
+# TSPEC-F19 — Control-flow edges (CATCHES / THROWS) + MIDDLEWARE node + WRAPS edges (Work Order)
+
+> Authored by ROLE_ARCHITECT for the IR-fidelity program (ADR-0025). STEAL-AND-ADAPT from
+> CodeGraph (`inspirations/codegraph`), then map the output onto RIR's IR. Keep RIR's IR as a single portable JSON (do NOT adopt CodeGraph's SQLite). Steal the logic, map the output to NodeIR/EdgeIR. Additive only — bump RIR_VERSION, never break existing fields.
+
+- **TSPEC:** TSPEC-F19 · **Owner:** ROLE_IMPLEMENTER · **Header:** `eos/tspecs/TSPEC-F19.yaml`
+- **Depends on:** TSPEC-F08 · **ADR:** docs/ADR-0025-ir-fidelity-steal-from-codegraph.md
+
+## 1. Objective
+Make error propagation and the NestJS middleware/guard pipeline visible.
+
+## 2. USE THE STEAL TRANSFORM (mapping + oracle — do not reimplement blind)
+The CG->RIR field/edge-kind mapping is already implemented and PROVEN in
+`tools/steal/codegraph-to-rir.mjs` (run on cal.com it yields 314 ROUTE, 46,659 CALLS,
+51,475 CONTAINS, plus signature/qualifiedName/decorators on nodes). Use it TWO ways:
+1. **MAPPING** — it defines the EXACT RIR field/kind names your extractor must emit (e.g.
+   `qualifiedName`, `signature`, `decorators`, `CONTAINS`/`EXTENDS`/`INSTANTIATES`). Match them.
+2. **ORACLE** — generate the reference IR:
+   `node --experimental-sqlite tools/steal/codegraph-to-rir.mjs <repo>/.codegraph/codegraph.db ref.json`
+   then assert YOUR native `rir compile <repo>` reproduces the same kind/field for the same
+   construct (file+line) within tolerance. The transform is your golden target.
+
+Then steal-and-adapt the extraction logic from CodeGraph source:
+- inspirations/codegraph/src/extraction/index.ts
+
+## 3. Files
+- modify packages/ir/src/index.ts (EdgeKind += CATCHES, THROWS, WRAPS; NodeKind += MIDDLEWARE)
+- emit from adapters/resolvers
+
+## 4. Algorithm / behavior
+- try/catch => CATCHES; throw => THROWS; middleware/guard wrapping a route => MIDDLEWARE node + WRAPS edge.
+
+## 5. Acceptance criteria
+- a guarded route has a MIDDLEWARE node and a WRAPS edge
+- Builds, typechecks, lint clean, `pnpm typecheck:tests` green, coverage >= 95%.
+
+## 6. Forbidden changes
+- Do NOT adopt CodeGraph's SQLite/schema — RIR stays one portable JSON.
+- Do NOT change closure/coverage/consistency/ontology RULES (architect-owned) unless this TSPEC says so.
+- Additive only; bump RIR_VERSION when adding IR fields/kinds. No minify, no TODOs.
+
+## 7. References
+- ADR-0025 (program + copy-from mapping + coverage matrix) · docs/codegraph-comparison-table.md
+- CodeGraph architecture: `inspirations/codegraph/CLAUDE.md`
+
+===== WORK ORDER F21 ============================================================
+
+# TSPEC-F21 — IR files[] metadata (language / size / hash / nodeCount) (Work Order)
+
+> Authored by ROLE_ARCHITECT for the IR-fidelity program (ADR-0025). STEAL-AND-ADAPT from
+> CodeGraph (`inspirations/codegraph`), then map the output onto RIR's IR. Keep RIR's IR as a single portable JSON (do NOT adopt CodeGraph's SQLite). Steal the logic, map the output to NodeIR/EdgeIR. Additive only — bump RIR_VERSION, never break existing fields.
+
+- **TSPEC:** TSPEC-F21 · **Owner:** ROLE_IMPLEMENTER · **Header:** `eos/tspecs/TSPEC-F21.yaml`
+- **Depends on:** TSPEC-P01 · **ADR:** docs/ADR-0025-ir-fidelity-steal-from-codegraph.md
+
+## 1. Objective
+Add a files[] section for file-level impact analysis.
+
+## 2. USE THE STEAL TRANSFORM (mapping + oracle — do not reimplement blind)
+The CG->RIR field/edge-kind mapping is already implemented and PROVEN in
+`tools/steal/codegraph-to-rir.mjs` (run on cal.com it yields 314 ROUTE, 46,659 CALLS,
+51,475 CONTAINS, plus signature/qualifiedName/decorators on nodes). Use it TWO ways:
+1. **MAPPING** — it defines the EXACT RIR field/kind names your extractor must emit (e.g.
+   `qualifiedName`, `signature`, `decorators`, `CONTAINS`/`EXTENDS`/`INSTANTIATES`). Match them.
+2. **ORACLE** — generate the reference IR:
+   `node --experimental-sqlite tools/steal/codegraph-to-rir.mjs <repo>/.codegraph/codegraph.db ref.json`
+   then assert YOUR native `rir compile <repo>` reproduces the same kind/field for the same
+   construct (file+line) within tolerance. The transform is your golden target.
+
+Then steal-and-adapt the extraction logic from CodeGraph source:
+- inspirations/codegraph/src/db/schema.sql
+
+## 3. Files
+- modify packages/ir/src/index.ts (RepositoryIR.files[])
+- populate in @rir/compiler
+
+## 4. Algorithm / behavior
+- Per compiled file emit { path, language, size, contentHash, nodeCount }.
+
+## 5. Acceptance criteria
+- the IR has one files[] entry per source file with a content hash
+- Builds, typechecks, lint clean, `pnpm typecheck:tests` green, coverage >= 95%.
+
+## 6. Forbidden changes
+- Do NOT adopt CodeGraph's SQLite/schema — RIR stays one portable JSON.
+- Do NOT change closure/coverage/consistency/ontology RULES (architect-owned) unless this TSPEC says so.
+- Additive only; bump RIR_VERSION when adding IR fields/kinds. No minify, no TODOs.
+
+## 7. References
+- ADR-0025 (program + copy-from mapping + coverage matrix) · docs/codegraph-comparison-table.md
+- CodeGraph architecture: `inspirations/codegraph/CLAUDE.md`
+
+===== WORK ORDER F22 ============================================================
+
+# TSPEC-F22 — IR schemaVersion header + migration discipline (Work Order)
+
+> Authored by ROLE_ARCHITECT for the IR-fidelity program (ADR-0025). STEAL-AND-ADAPT from
+> CodeGraph (`inspirations/codegraph`), then map the output onto RIR's IR. Keep RIR's IR as a single portable JSON (do NOT adopt CodeGraph's SQLite). Steal the logic, map the output to NodeIR/EdgeIR. Additive only — bump RIR_VERSION, never break existing fields.
+
+- **TSPEC:** TSPEC-F22 · **Owner:** ROLE_IMPLEMENTER · **Header:** `eos/tspecs/TSPEC-F22.yaml`
+- **Depends on:** TSPEC-P01 · **ADR:** docs/ADR-0025-ir-fidelity-steal-from-codegraph.md
+
+## 1. Objective
+Stamp a schemaVersion on the IR and document the additive-only migration rule.
+
+## 2. USE THE STEAL TRANSFORM (mapping + oracle — do not reimplement blind)
+The CG->RIR field/edge-kind mapping is already implemented and PROVEN in
+`tools/steal/codegraph-to-rir.mjs` (run on cal.com it yields 314 ROUTE, 46,659 CALLS,
+51,475 CONTAINS, plus signature/qualifiedName/decorators on nodes). Use it TWO ways:
+1. **MAPPING** — it defines the EXACT RIR field/kind names your extractor must emit (e.g.
+   `qualifiedName`, `signature`, `decorators`, `CONTAINS`/`EXTENDS`/`INSTANTIATES`). Match them.
+2. **ORACLE** — generate the reference IR:
+   `node --experimental-sqlite tools/steal/codegraph-to-rir.mjs <repo>/.codegraph/codegraph.db ref.json`
+   then assert YOUR native `rir compile <repo>` reproduces the same kind/field for the same
+   construct (file+line) within tolerance. The transform is your golden target.
+
+Then steal-and-adapt the extraction logic from CodeGraph source:
+- inspirations/codegraph/src/db/migrations.ts
+
+## 3. Files
+- modify packages/ir/src/index.ts (schemaVersion on RepositoryIR header)
+- docs note on additive migrations
+
+## 4. Algorithm / behavior
+- Add schemaVersion constant; document that new fields/kinds are additive and bump it.
+
+## 5. Acceptance criteria
+- serialized IR carries schemaVersion
+- Builds, typechecks, lint clean, `pnpm typecheck:tests` green, coverage >= 95%.
+
+## 6. Forbidden changes
+- Do NOT adopt CodeGraph's SQLite/schema — RIR stays one portable JSON.
+- Do NOT change closure/coverage/consistency/ontology RULES (architect-owned) unless this TSPEC says so.
+- Additive only; bump RIR_VERSION when adding IR fields/kinds. No minify, no TODOs.
+
+## 7. References
+- ADR-0025 (program + copy-from mapping + coverage matrix) · docs/codegraph-comparison-table.md
+- CodeGraph architecture: `inspirations/codegraph/CLAUDE.md`

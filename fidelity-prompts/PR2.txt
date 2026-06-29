@@ -1,0 +1,382 @@
+================================================================================
+RIR PR2 — Resolution layer + closure on real code (the headline fix)
+Branch: feat/ir-fidelity-2-resolution
+Depends on: PR1 (needs qualifiedName/filePath F02, CONTAINS F08, decorators F03, property/field F05, instantiates F10)
+TSPECs (in order): F20 -> F13 -> F14 -> F15 -> F16 -> F17 -> F18
+Paste this ENTIRE file into a fresh implementer session. It is ONE branch = ONE PR.
+================================================================================
+
+## This PR
+Add packages/resolution: import-resolution + name-matching for a deep call graph, framework route+DI resolvers (NestJS/Express/Spring/FastAPI/Gin), PROVIDES/DI edges, dynamic-dispatch synthesizers, entry-point reachability — then closure actually CLOSES on a real repo. Route precision kills config-call false positives.
+
+You are ROLE_IMPLEMENTER for the RIR repository. This is ONE PR that implements
+MULTIPLE related TSPECs on ONE branch, in the order given.
+
+Hard rules (decision1.md):
+- Implement the work orders below IN ORDER. They build on each other.
+- ADDITIVE to the IR: bump RIR_VERSION once for the whole PR; new fields/kinds are optional.
+  Do NOT change closure/coverage/consistency/ontology RULES unless a work order says so.
+- STEAL, do not reinvent: every work order's "USE THE STEAL TRANSFORM" section is mandatory.
+  tools/steal/codegraph-to-rir.mjs is your field/kind mapping AND your validation oracle.
+  Steal-and-adapt the cited inspirations/codegraph/src/* files; never adopt their SQLite.
+- Real, formatted, multi-line source. No TODOs, no placeholders, no minify (CI runs prettier --check).
+- If a work order is ambiguous or wrong, STOP and report — do not guess.
+
+Workflow:
+1. Create the branch named below from main.
+2. Implement each work order in order; keep its tests passing before moving to the next.
+3. Run: pnpm install && pnpm format && pnpm build && pnpm typecheck && pnpm typecheck:tests && pnpm test  — all green.
+4. Open ONE PR for the whole branch (commit per work order is fine) using
+   .github/pull_request_template.md.
+
+Definition of done: build + typecheck (incl. tests) + lint + all the work orders' acceptance
+criteria + this PR's extra acceptance, with coverage >= 95%.
+
+## Extra acceptance for PR2
+- GOLDEN: rir compile D:/rir-targets/cal.com/apps/api/v2/src yields >=300 routes, 0 config-call false positives, >=1 capability CLOSED, and CALLS/edge counts within ~2x of the steal transform output.
+- closure state distribution is no longer 100% ORPHAN/PARTIAL.
+
+## The 7 work orders (implement in this order)
+
+===== WORK ORDER F20 ============================================================
+
+# TSPEC-F20 — Route extraction correctness: kill config-call false positives (Work Order)
+
+> Authored by ROLE_ARCHITECT for the IR-fidelity program (ADR-0025). STEAL-AND-ADAPT from
+> CodeGraph (`inspirations/codegraph`), then map the output onto RIR's IR. Keep RIR's IR as a single portable JSON (do NOT adopt CodeGraph's SQLite). Steal the logic, map the output to NodeIR/EdgeIR. Additive only — bump RIR_VERSION, never break existing fields.
+
+- **TSPEC:** TSPEC-F20 · **Owner:** ROLE_IMPLEMENTER · **Header:** `eos/tspecs/TSPEC-F20.yaml`
+- **Depends on:** TSPEC-A021 · **ADR:** docs/ADR-0025-ir-fidelity-steal-from-codegraph.md
+
+## 1. Objective
+Stop misclassifying `configService.get('api.port')` as `GET api.port`. Routes should come from framework resolvers (F14) or known router receivers only.
+
+## 2. USE THE STEAL TRANSFORM (mapping + oracle — do not reimplement blind)
+The CG->RIR field/edge-kind mapping is already implemented and PROVEN in
+`tools/steal/codegraph-to-rir.mjs` (run on cal.com it yields 314 ROUTE, 46,659 CALLS,
+51,475 CONTAINS, plus signature/qualifiedName/decorators on nodes). Use it TWO ways:
+1. **MAPPING** — it defines the EXACT RIR field/kind names your extractor must emit (e.g.
+   `qualifiedName`, `signature`, `decorators`, `CONTAINS`/`EXTENDS`/`INSTANTIATES`). Match them.
+2. **ORACLE** — generate the reference IR:
+   `node --experimental-sqlite tools/steal/codegraph-to-rir.mjs <repo>/.codegraph/codegraph.db ref.json`
+   then assert YOUR native `rir compile <repo>` reproduces the same kind/field for the same
+   construct (file+line) within tolerance. The transform is your golden target.
+
+(no direct file steal — RIR-native; the transform output is still your field/kind oracle)
+
+## 3. Files
+- modify packages/code-compiler/src/language/{typescript,go}.ts route extraction
+
+## 4. Algorithm / behavior
+- Restrict imperative `.get/.post(...)` route detection to receivers that are known routers (app/router/r/e/fastify) — never arbitrary objects.
+- Prefer the F14 framework resolvers; the imperative path is the fallback.
+
+## 5. Acceptance criteria
+- compiling cal.com yields no ROUTE whose path looks like a config key
+- express fixtures still produce their routes
+- Builds, typechecks, lint clean, `pnpm typecheck:tests` green, coverage >= 95%.
+
+## 6. Forbidden changes
+- Do NOT adopt CodeGraph's SQLite/schema — RIR stays one portable JSON.
+- Do NOT change closure/coverage/consistency/ontology RULES (architect-owned) unless this TSPEC says so.
+- Additive only; bump RIR_VERSION when adding IR fields/kinds. No minify, no TODOs.
+
+## 7. References
+- ADR-0025 (program + copy-from mapping + coverage matrix) · docs/codegraph-comparison-table.md
+- CodeGraph architecture: `inspirations/codegraph/CLAUDE.md`
+
+===== WORK ORDER F13 ============================================================
+
+# TSPEC-F13 — ReferenceResolver: import resolution + name matching (deep call graph) (Work Order)
+
+> Authored by ROLE_ARCHITECT for the IR-fidelity program (ADR-0025). STEAL-AND-ADAPT from
+> CodeGraph (`inspirations/codegraph`), then map the output onto RIR's IR. Keep RIR's IR as a single portable JSON (do NOT adopt CodeGraph's SQLite). Steal the logic, map the output to NodeIR/EdgeIR. Additive only — bump RIR_VERSION, never break existing fields.
+
+- **TSPEC:** TSPEC-F13 · **Owner:** ROLE_IMPLEMENTER · **Header:** `eos/tspecs/TSPEC-F13.yaml`
+- **Depends on:** TSPEC-F02, TSPEC-F08 · **ADR:** docs/ADR-0025-ir-fidelity-steal-from-codegraph.md
+
+## 1. Objective
+THE missing layer. Resolve callee names to their definitions across files so CALLS edges actually connect (288 -> ~46k on cal.com). Without this, closure can never traverse route->service.
+
+## 2. USE THE STEAL TRANSFORM (mapping + oracle — do not reimplement blind)
+The CG->RIR field/edge-kind mapping is already implemented and PROVEN in
+`tools/steal/codegraph-to-rir.mjs` (run on cal.com it yields 314 ROUTE, 46,659 CALLS,
+51,475 CONTAINS, plus signature/qualifiedName/decorators on nodes). Use it TWO ways:
+1. **MAPPING** — it defines the EXACT RIR field/kind names your extractor must emit (e.g.
+   `qualifiedName`, `signature`, `decorators`, `CONTAINS`/`EXTENDS`/`INSTANTIATES`). Match them.
+2. **ORACLE** — generate the reference IR:
+   `node --experimental-sqlite tools/steal/codegraph-to-rir.mjs <repo>/.codegraph/codegraph.db ref.json`
+   then assert YOUR native `rir compile <repo>` reproduces the same kind/field for the same
+   construct (file+line) within tolerance. The transform is your golden target.
+
+Then steal-and-adapt the extraction logic from CodeGraph source:
+- inspirations/codegraph/src/resolution/import-resolver.ts
+- inspirations/codegraph/src/resolution/name-matcher.ts
+- inspirations/codegraph/src/resolution/path-aliases.ts
+- inspirations/codegraph/src/resolution/index.ts
+
+## 3. Files
+- create packages/resolution/ (new workspace package): a post-pass that runs after extraction
+- wire it into the compiler pipeline AFTER CallPass, BEFORE CapabilityPass (architect will confirm order)
+
+## 4. Algorithm / behavior
+- Port import-resolver (incl. tsconfig path aliases) + name-matcher: for each unresolved call, find the imported/defined symbol it targets and add a precise CALLS edge to that node.
+- Adapt CodeGraph's SQLite lookups to operate over the in-memory IR node set.
+
+## 5. Acceptance criteria
+- on fixtures/express-auth the controller->service->repository CALLS chain is fully connected
+- on cal.com the CALLS edge count rises into the tens of thousands (was 288)
+- Builds, typechecks, lint clean, `pnpm typecheck:tests` green, coverage >= 95%.
+
+## 6. Forbidden changes
+- Do NOT adopt CodeGraph's SQLite/schema — RIR stays one portable JSON.
+- Do NOT change closure/coverage/consistency/ontology RULES (architect-owned) unless this TSPEC says so.
+- Additive only; bump RIR_VERSION when adding IR fields/kinds. No minify, no TODOs.
+- Do NOT change the closure/ontology rules — only add edges.
+
+## 7. References
+- ADR-0025 (program + copy-from mapping + coverage matrix) · docs/codegraph-comparison-table.md
+- CodeGraph architecture: `inspirations/codegraph/CLAUDE.md`
+
+===== WORK ORDER F14 ============================================================
+
+# TSPEC-F14 — Framework route + DI resolution (NestJS / Express / Spring / FastAPI / Gin) (Work Order)
+
+> Authored by ROLE_ARCHITECT for the IR-fidelity program (ADR-0025). STEAL-AND-ADAPT from
+> CodeGraph (`inspirations/codegraph`), then map the output onto RIR's IR. Keep RIR's IR as a single portable JSON (do NOT adopt CodeGraph's SQLite). Steal the logic, map the output to NodeIR/EdgeIR. Additive only — bump RIR_VERSION, never break existing fields.
+
+- **TSPEC:** TSPEC-F14 · **Owner:** ROLE_IMPLEMENTER · **Header:** `eos/tspecs/TSPEC-F14.yaml`
+- **Depends on:** TSPEC-F03, TSPEC-F13 · **ADR:** docs/ADR-0025-ir-fidelity-steal-from-codegraph.md
+
+## 1. Objective
+Emit ROUTE nodes from framework conventions so cal.com yields ~314 routes with ZERO false positives (today: 132 incl. `GET api.port` from configService.get).
+
+## 2. USE THE STEAL TRANSFORM (mapping + oracle — do not reimplement blind)
+The CG->RIR field/edge-kind mapping is already implemented and PROVEN in
+`tools/steal/codegraph-to-rir.mjs` (run on cal.com it yields 314 ROUTE, 46,659 CALLS,
+51,475 CONTAINS, plus signature/qualifiedName/decorators on nodes). Use it TWO ways:
+1. **MAPPING** — it defines the EXACT RIR field/kind names your extractor must emit (e.g.
+   `qualifiedName`, `signature`, `decorators`, `CONTAINS`/`EXTENDS`/`INSTANTIATES`). Match them.
+2. **ORACLE** — generate the reference IR:
+   `node --experimental-sqlite tools/steal/codegraph-to-rir.mjs <repo>/.codegraph/codegraph.db ref.json`
+   then assert YOUR native `rir compile <repo>` reproduces the same kind/field for the same
+   construct (file+line) within tolerance. The transform is your golden target.
+
+Then steal-and-adapt the extraction logic from CodeGraph source:
+- inspirations/codegraph/src/resolution/frameworks/nestjs.ts
+- inspirations/codegraph/src/resolution/frameworks/express.ts
+- inspirations/codegraph/src/resolution/frameworks/java.ts
+- inspirations/codegraph/src/resolution/frameworks/python.ts
+- inspirations/codegraph/src/resolution/frameworks/go.ts
+- inspirations/codegraph/src/resolution/frameworks/index.ts
+
+## 3. Files
+- add framework resolvers under packages/resolution/frameworks/
+- they consume decorators (F03) + the resolved graph (F13)
+
+## 4. Algorithm / behavior
+- Port the NestJS resolver: @Controller base + method HTTP decorators => ROUTE nodes wired to the handler method node.
+- Port Express/Spring/FastAPI/Gin resolvers similarly.
+- Route extraction comes from frameworks now — REMOVE the naive imperative `.get/.post` route guessing that produces config-call false positives (coordinate with F20).
+
+## 5. Acceptance criteria
+- cal.com (apps/api/v2/src) yields >=300 ROUTE nodes
+- no ROUTE named like `GET api.port` / `GET env.type`
+- Builds, typechecks, lint clean, `pnpm typecheck:tests` green, coverage >= 95%.
+
+## 6. Forbidden changes
+- Do NOT adopt CodeGraph's SQLite/schema — RIR stays one portable JSON.
+- Do NOT change closure/coverage/consistency/ontology RULES (architect-owned) unless this TSPEC says so.
+- Additive only; bump RIR_VERSION when adding IR fields/kinds. No minify, no TODOs.
+
+## 7. References
+- ADR-0025 (program + copy-from mapping + coverage matrix) · docs/codegraph-comparison-table.md
+- CodeGraph architecture: `inspirations/codegraph/CLAUDE.md`
+
+===== WORK ORDER F15 ============================================================
+
+# TSPEC-F15 — DI / provider mapping: PROVIDES edges (NestJS @Module + constructor injection) (Work Order)
+
+> Authored by ROLE_ARCHITECT for the IR-fidelity program (ADR-0025). STEAL-AND-ADAPT from
+> CodeGraph (`inspirations/codegraph`), then map the output onto RIR's IR. Keep RIR's IR as a single portable JSON (do NOT adopt CodeGraph's SQLite). Steal the logic, map the output to NodeIR/EdgeIR. Additive only — bump RIR_VERSION, never break existing fields.
+
+- **TSPEC:** TSPEC-F15 · **Owner:** ROLE_IMPLEMENTER · **Header:** `eos/tspecs/TSPEC-F15.yaml`
+- **Depends on:** TSPEC-F05, TSPEC-F10, TSPEC-F14 · **ADR:** docs/ADR-0025-ir-fidelity-steal-from-codegraph.md
+
+## 1. Objective
+Connect controller -> injected service -> repository through DI so the closure chain physically exists in the graph.
+
+## 2. USE THE STEAL TRANSFORM (mapping + oracle — do not reimplement blind)
+The CG->RIR field/edge-kind mapping is already implemented and PROVEN in
+`tools/steal/codegraph-to-rir.mjs` (run on cal.com it yields 314 ROUTE, 46,659 CALLS,
+51,475 CONTAINS, plus signature/qualifiedName/decorators on nodes). Use it TWO ways:
+1. **MAPPING** — it defines the EXACT RIR field/kind names your extractor must emit (e.g.
+   `qualifiedName`, `signature`, `decorators`, `CONTAINS`/`EXTENDS`/`INSTANTIATES`). Match them.
+2. **ORACLE** — generate the reference IR:
+   `node --experimental-sqlite tools/steal/codegraph-to-rir.mjs <repo>/.codegraph/codegraph.db ref.json`
+   then assert YOUR native `rir compile <repo>` reproduces the same kind/field for the same
+   construct (file+line) within tolerance. The transform is your golden target.
+
+Then steal-and-adapt the extraction logic from CodeGraph source:
+- inspirations/codegraph/src/resolution/frameworks/nestjs.ts
+
+## 3. Files
+- extend packages/resolution/frameworks/nestjs.ts adaptation
+
+## 4. Algorithm / behavior
+- Read @Module providers/controllers; for each controller's constructor FIELD (F05) typed as a provider, add an edge controller->service (CALLS or a new USES).
+- Add PROVIDES edges MODULE->SERVICE/REPOSITORY.
+
+## 5. Acceptance criteria
+- a NestJS controller injecting a service that injects a repository forms a connected path in the IR
+- Builds, typechecks, lint clean, `pnpm typecheck:tests` green, coverage >= 95%.
+
+## 6. Forbidden changes
+- Do NOT adopt CodeGraph's SQLite/schema — RIR stays one portable JSON.
+- Do NOT change closure/coverage/consistency/ontology RULES (architect-owned) unless this TSPEC says so.
+- Additive only; bump RIR_VERSION when adding IR fields/kinds. No minify, no TODOs.
+
+## 7. References
+- ADR-0025 (program + copy-from mapping + coverage matrix) · docs/codegraph-comparison-table.md
+- CodeGraph architecture: `inspirations/codegraph/CLAUDE.md`
+
+===== WORK ORDER F16 ============================================================
+
+# TSPEC-F16 — Dynamic-dispatch synthesizers (callback / observer / event edges) (Work Order)
+
+> Authored by ROLE_ARCHITECT for the IR-fidelity program (ADR-0025). STEAL-AND-ADAPT from
+> CodeGraph (`inspirations/codegraph`), then map the output onto RIR's IR. Keep RIR's IR as a single portable JSON (do NOT adopt CodeGraph's SQLite). Steal the logic, map the output to NodeIR/EdgeIR. Additive only — bump RIR_VERSION, never break existing fields.
+
+- **TSPEC:** TSPEC-F16 · **Owner:** ROLE_IMPLEMENTER · **Header:** `eos/tspecs/TSPEC-F16.yaml`
+- **Depends on:** TSPEC-F13 · **ADR:** docs/ADR-0025-ir-fidelity-steal-from-codegraph.md
+
+## 1. Objective
+Bridge dynamic edges (callbacks, EventEmitter) so flows don't break at indirection.
+
+## 2. USE THE STEAL TRANSFORM (mapping + oracle — do not reimplement blind)
+The CG->RIR field/edge-kind mapping is already implemented and PROVEN in
+`tools/steal/codegraph-to-rir.mjs` (run on cal.com it yields 314 ROUTE, 46,659 CALLS,
+51,475 CONTAINS, plus signature/qualifiedName/decorators on nodes). Use it TWO ways:
+1. **MAPPING** — it defines the EXACT RIR field/kind names your extractor must emit (e.g.
+   `qualifiedName`, `signature`, `decorators`, `CONTAINS`/`EXTENDS`/`INSTANTIATES`). Match them.
+2. **ORACLE** — generate the reference IR:
+   `node --experimental-sqlite tools/steal/codegraph-to-rir.mjs <repo>/.codegraph/codegraph.db ref.json`
+   then assert YOUR native `rir compile <repo>` reproduces the same kind/field for the same
+   construct (file+line) within tolerance. The transform is your golden target.
+
+Then steal-and-adapt the extraction logic from CodeGraph source:
+- inspirations/codegraph/src/resolution/callback-synthesizer.ts
+
+## 3. Files
+- add packages/resolution/synthesizers/
+
+## 4. Algorithm / behavior
+- Port the callback synthesizer; mark synthesized edges with evidence confidence < 1 (provenance heuristic).
+
+## 5. Acceptance criteria
+- a callback registered then invoked is connected by a synthesized edge with confidence < 1
+- Builds, typechecks, lint clean, `pnpm typecheck:tests` green, coverage >= 95%.
+
+## 6. Forbidden changes
+- Do NOT adopt CodeGraph's SQLite/schema — RIR stays one portable JSON.
+- Do NOT change closure/coverage/consistency/ontology RULES (architect-owned) unless this TSPEC says so.
+- Additive only; bump RIR_VERSION when adding IR fields/kinds. No minify, no TODOs.
+
+## 7. References
+- ADR-0025 (program + copy-from mapping + coverage matrix) · docs/codegraph-comparison-table.md
+- CodeGraph architecture: `inspirations/codegraph/CLAUDE.md`
+
+===== WORK ORDER F17 ============================================================
+
+# TSPEC-F17 — Entry-point reachability tracing (bootstrap/main -> call graph) (Work Order)
+
+> Authored by ROLE_ARCHITECT for the IR-fidelity program (ADR-0025). STEAL-AND-ADAPT from
+> CodeGraph (`inspirations/codegraph`), then map the output onto RIR's IR. Keep RIR's IR as a single portable JSON (do NOT adopt CodeGraph's SQLite). Steal the logic, map the output to NodeIR/EdgeIR. Additive only — bump RIR_VERSION, never break existing fields.
+
+- **TSPEC:** TSPEC-F17 · **Owner:** ROLE_IMPLEMENTER · **Header:** `eos/tspecs/TSPEC-F17.yaml`
+- **Depends on:** TSPEC-F13 · **ADR:** docs/ADR-0025-ir-fidelity-steal-from-codegraph.md
+
+## 1. Objective
+Fix reachable:false on 99% of nodes. Trace reachability from real entrypoints over the RESOLVED graph (F13).
+
+## 2. USE THE STEAL TRANSFORM (mapping + oracle — do not reimplement blind)
+The CG->RIR field/edge-kind mapping is already implemented and PROVEN in
+`tools/steal/codegraph-to-rir.mjs` (run on cal.com it yields 314 ROUTE, 46,659 CALLS,
+51,475 CONTAINS, plus signature/qualifiedName/decorators on nodes). Use it TWO ways:
+1. **MAPPING** — it defines the EXACT RIR field/kind names your extractor must emit (e.g.
+   `qualifiedName`, `signature`, `decorators`, `CONTAINS`/`EXTENDS`/`INSTANTIATES`). Match them.
+2. **ORACLE** — generate the reference IR:
+   `node --experimental-sqlite tools/steal/codegraph-to-rir.mjs <repo>/.codegraph/codegraph.db ref.json`
+   then assert YOUR native `rir compile <repo>` reproduces the same kind/field for the same
+   construct (file+line) within tolerance. The transform is your golden target.
+
+(no direct file steal — RIR-native; the transform output is still your field/kind oracle)
+
+## 3. Files
+- modify packages/passes/src/ReachabilityPass.ts to traverse the resolved CALLS/CONTAINS graph from entrypoints
+
+## 4. Algorithm / behavior
+- Entrypoints = ROUTE/FRONTEND_ROUTE handlers + bootstrap()/main(). BFS over resolved edges; set execution.reachable + entryDistance.
+- Must run AFTER F13/F14 so the edges exist.
+
+## 5. Acceptance criteria
+- on cal.com the reachable-node count is a large fraction of nodes (was 13/3369)
+- a route's whole handler chain is reachable
+- Builds, typechecks, lint clean, `pnpm typecheck:tests` green, coverage >= 95%.
+
+## 6. Forbidden changes
+- Do NOT adopt CodeGraph's SQLite/schema — RIR stays one portable JSON.
+- Do NOT change closure/coverage/consistency/ontology RULES (architect-owned) unless this TSPEC says so.
+- Additive only; bump RIR_VERSION when adding IR fields/kinds. No minify, no TODOs.
+
+## 7. References
+- ADR-0025 (program + copy-from mapping + coverage matrix) · docs/codegraph-comparison-table.md
+- CodeGraph architecture: `inspirations/codegraph/CLAUDE.md`
+
+===== WORK ORDER F18 ============================================================
+
+# TSPEC-F18 — Closure populates on the resolved DI graph (the headline fix) (Work Order)
+
+> Authored by ROLE_ARCHITECT for the IR-fidelity program (ADR-0025). STEAL-AND-ADAPT from
+> CodeGraph (`inspirations/codegraph`), then map the output onto RIR's IR. Keep RIR's IR as a single portable JSON (do NOT adopt CodeGraph's SQLite). Steal the logic, map the output to NodeIR/EdgeIR. Additive only — bump RIR_VERSION, never break existing fields.
+
+- **TSPEC:** TSPEC-F18 · **Owner:** ROLE_IMPLEMENTER · **Header:** `eos/tspecs/TSPEC-F18.yaml`
+- **Depends on:** TSPEC-F14, TSPEC-F15, TSPEC-F17 · **ADR:** docs/ADR-0025-ir-fidelity-steal-from-codegraph.md
+
+## 1. Objective
+Make CLOSED true on a real repo. With routes (F14), DI edges (F15), and reachability (F17) in place, the closure chain route->controller->service->repository->db->response exists for real handlers.
+
+## 2. USE THE STEAL TRANSFORM (mapping + oracle — do not reimplement blind)
+The CG->RIR field/edge-kind mapping is already implemented and PROVEN in
+`tools/steal/codegraph-to-rir.mjs` (run on cal.com it yields 314 ROUTE, 46,659 CALLS,
+51,475 CONTAINS, plus signature/qualifiedName/decorators on nodes). Use it TWO ways:
+1. **MAPPING** — it defines the EXACT RIR field/kind names your extractor must emit (e.g.
+   `qualifiedName`, `signature`, `decorators`, `CONTAINS`/`EXTENDS`/`INSTANTIATES`). Match them.
+2. **ORACLE** — generate the reference IR:
+   `node --experimental-sqlite tools/steal/codegraph-to-rir.mjs <repo>/.codegraph/codegraph.db ref.json`
+   then assert YOUR native `rir compile <repo>` reproduces the same kind/field for the same
+   construct (file+line) within tolerance. The transform is your golden target.
+
+(no direct file steal — RIR-native; the transform output is still your field/kind oracle)
+
+## 3. Files
+- add a golden regression test compiling D:/rir-targets/cal.com/apps/api/v2/src (or a vendored slice) asserting closure leaves all-ORPHAN
+
+## 4. Algorithm / behavior
+- Verify STAGE_OF_NODE_KIND + tier rules map the resolved nodes correctly; fix gaps where a resolved chain still reads PARTIAL.
+- Confirm >=1 capability reaches CLOSED on cal.com.
+
+## 5. Acceptance criteria
+- >=1 cal.com capability is CLOSED
+- closure state distribution is no longer 100% ORPHAN/PARTIAL
+- Builds, typechecks, lint clean, `pnpm typecheck:tests` green, coverage >= 95%.
+
+## 6. Forbidden changes
+- Do NOT adopt CodeGraph's SQLite/schema — RIR stays one portable JSON.
+- Do NOT change closure/coverage/consistency/ontology RULES (architect-owned) unless this TSPEC says so.
+- Additive only; bump RIR_VERSION when adding IR fields/kinds. No minify, no TODOs.
+- Do NOT weaken the closure rules to force CLOSED — fix the graph, not the gate.
+
+## 7. References
+- ADR-0025 (program + copy-from mapping + coverage matrix) · docs/codegraph-comparison-table.md
+- CodeGraph architecture: `inspirations/codegraph/CLAUDE.md`
