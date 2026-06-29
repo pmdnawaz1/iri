@@ -11,6 +11,7 @@ function node(id: string, kind: NodeKind, reachable = true): NodeIR {
     artifactId: "art",
     span: null,
     hash: "0",
+    filePath: "f",
     execution: { reachable, entryDistance: reachable ? 0 : null, runtimeObserved: false, tested: false },
     evidence: [{ source: "AST", locator: "f", confidence: 1 }],
   };

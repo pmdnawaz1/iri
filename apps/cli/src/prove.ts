@@ -206,6 +206,7 @@ export function prove(dir: string): ProveResult {
     nodes,
     edges: irEdges,
     artifacts: [],
+    files: [],
     capabilities: [capability],
   };
 
@@ -224,6 +225,7 @@ function makeNode(id: string, kind: NodeKind, name: string, file: string): NodeI
     artifactId: makeId("art", file),
     span: null,
     hash: "0",
+    filePath: file,
     execution: { reachable: false, entryDistance: null, runtimeObserved: false, tested: false },
     evidence: [AST],
   };

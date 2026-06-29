@@ -63,6 +63,7 @@ export class DefaultIRDraft implements IRDraft {
       nodes: [...this.nodes.values()],
       edges: [...this.edges.values()],
       artifacts: [...this.artifacts.values()],
+      files: [...this.artifacts.values()].map((a) => a.path),
       capabilities: [...this.capabilities.values()],
     };
   }

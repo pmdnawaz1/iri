@@ -20,9 +20,21 @@ import type { ArtifactIR, CapabilityIR, EdgeIR, NodeIR, RepositoryIR, Span } fro
 /** A raw symbol declared in a source file (syntactic; no role classification). */
 export interface SymbolFact {
   readonly name: string;
-  readonly kind: "function" | "class" | "method" | "variable" | "type" | "interface";
+  readonly kind: "function" | "class" | "method" | "variable" | "type" | "interface" | "property" | "enum" | "constant";
   readonly exported: boolean;
   readonly span: Span;
+  readonly signature?: string;
+  readonly returnType?: string;
+  readonly typeParameters?: string;
+  readonly visibility?: "public" | "private" | "protected" | "internal";
+  readonly isAsync?: boolean;
+  readonly isStatic?: boolean;
+  readonly isAbstract?: boolean;
+  readonly qualifiedName?: string;
+  readonly decorators?: { readonly name: string; readonly args: readonly string[] }[];
+  readonly docstring?: string;
+  readonly extends?: readonly string[];
+  readonly implements?: readonly string[];
 }
 
 /** A raw import as written in source (unresolved). */
@@ -42,6 +54,7 @@ export interface CallFact {
    */
   readonly enclosing?: string;
   readonly span: Span;
+  readonly isNew?: boolean;
 }
 
 /** A route declaration discovered syntactically (no semantic mapping). */

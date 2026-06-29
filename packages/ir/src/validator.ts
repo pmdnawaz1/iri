@@ -7,9 +7,14 @@ export function validateRepositoryIR(value: unknown): asserts value is Repositor
 
   if (ir.version !== RIR_VERSION) throw new InvariantError(`Invalid version: ${String(ir.version)}`);
   if (!Array.isArray(ir.nodes)) throw new InvariantError("nodes must be an array");
-  if (!Array.isArray(ir.edges)) throw new InvariantError("edges must be an array");
-  if (!Array.isArray(ir.artifacts)) throw new InvariantError("artifacts must be an array");
-  if (!Array.isArray(ir.capabilities)) throw new InvariantError("capabilities must be an array");
+  if (!Array.isArray(ir.edges)) throw new InvariantError("IR edges must be an array");
+  if (!Array.isArray(ir.artifacts)) throw new InvariantError("IR artifacts must be an array");
+  if (!Array.isArray(ir.capabilities)) throw new InvariantError("IR capabilities must be an array");
+  if (!Array.isArray(ir.files)) throw new InvariantError("IR files must be an array");
+
+  for (const f of ir.files) {
+    if (typeof f !== "string") throw new InvariantError("IR files must contain only strings");
+  }
 
   const nodeIds = new Set<string>();
   for (const node of ir.nodes) {

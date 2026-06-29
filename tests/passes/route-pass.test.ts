@@ -54,6 +54,7 @@ function seedControllerNode(draft: DefaultIRDraft, name: string): void {
     artifactId: "artifact|app.ts",
     span,
     hash: "0",
+    filePath: "app.ts",
     execution: { reachable: false, entryDistance: null, runtimeObserved: false, tested: false },
     evidence: [{ source: "AST", locator: "app.ts", confidence: 1 }],
   };

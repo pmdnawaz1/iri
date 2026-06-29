@@ -37,6 +37,7 @@ export class SQLPass extends AbstractPass {
             artifactId: pr.artifact.id,
             span: call.span,
             hash: "0",
+            filePath: pr.artifact.path,
             execution: { reachable: false, entryDistance: null, runtimeObserved: false, tested: false },
             evidence: [{ source: "AST", locator: pr.artifact.path, confidence: 1 }],
           });
