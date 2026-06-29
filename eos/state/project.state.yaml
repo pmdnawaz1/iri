@@ -169,7 +169,7 @@ states:
   - id: "TSPEC-P15"
     state: "COMPLETE"
   - id: "TSPEC-A021"
-    state: "DRAFT"
+    state: "COMPLETE"
   - id: "TSPEC-CE01"
     state: "COMPLETE"
   - id: "TSPEC-CE02"

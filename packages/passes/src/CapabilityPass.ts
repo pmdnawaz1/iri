@@ -1,7 +1,8 @@
+import { readFileSync } from "node:fs";
 import { AbstractPass, PASS_PRIORITY } from "./base.js";
 import { makeId } from "@rir/common";
 import type { IRDraft, CompilationContext } from "@rir/core";
-import { ClosureState, type NodeIR } from "@rir/ir";
+import { ClosureState, type ConstraintIR, type NodeIR } from "@rir/ir";
 import { DirectedGraph, reachableFrom } from "@rir/graph";
 import { allCapabilities, getCapability, getFeature, resolveAlias } from "@rir/ontology";
 
@@ -50,6 +51,39 @@ function resolveRoute(routeName: string, controllerName: string | undefined): st
   return undefined;
 }
 
+/**
+ * Extract code-side constraints (TSPEC-P10 / G1) by scanning a capability's reachable node
+ * names for the ontology's declared constraint signals. Deterministic and symmetric with the
+ * document normalizer's `extractConstraints`: a constraint is only asserted when a key token is
+ * present (so `email` in a node name maps to LOGIN_IDENTIFIER only when "login" is also present,
+ * not to an unrelated OTP_CHANNEL). This is what lets the cross engine fire CONSTRAINT_MISMATCH.
+ */
+function extractCodeConstraints(capId: string, sourceText: string): ConstraintIR[] {
+  const def = getCapability(capId);
+  if (!def) return [];
+  const hay = sourceText.toLowerCase();
+  const evidence = [{ source: "AST" as const, locator: capId, confidence: 0.6 }];
+  const out: ConstraintIR[] = [];
+  for (const cd of def.constraints) {
+    const keyTokens = cd.key.toLowerCase().split("_");
+    if (!keyTokens.some((t) => hay.includes(t))) continue;
+    if (cd.type === "ENUM") {
+      const v = cd.enumValues.find((ev) => hay.includes(ev.toLowerCase()));
+      if (v) out.push({ key: cd.key, value: v, evidence });
+    } else if (cd.type === "BOOLEAN") {
+      out.push({
+        key: cd.key,
+        value: /\b(no|not|never|false|disable)\b/.test(hay) ? "FALSE" : "TRUE",
+        evidence,
+      });
+    } else if (cd.type === "INTEGER") {
+      const m = /\b(\d+)\b/.exec(hay);
+      if (m) out.push({ key: cd.key, value: m[1]!, evidence });
+    }
+  }
+  return out;
+}
+
 export class CapabilityPass extends AbstractPass {
   override name = "CapabilityPass" as const;
 
@@ -61,9 +95,30 @@ export class CapabilityPass extends AbstractPass {
     return true;
   }
 
-  override run(_ctx: CompilationContext, draft: IRDraft): void {
+  override run(ctx: CompilationContext, draft: IRDraft): void {
     const nodes = draft.getNodes();
     const edges = draft.getEdges();
+
+    // Source text per artifact, read once and cached (G1 constraint extraction needs the
+    // identifiers/string-literals — e.g. `findByEmail` — that node names alone do not carry).
+    const artifactPath = new Map(
+      (ctx.parseResults ?? []).map((p) => [p.artifact.id, p.artifact.path] as const),
+    );
+    const sourceCache = new Map<string, string>();
+    const sourceFor = (artifactId: string): string => {
+      if (sourceCache.has(artifactId)) return sourceCache.get(artifactId)!;
+      const path = artifactPath.get(artifactId);
+      let text = "";
+      if (path) {
+        try {
+          text = readFileSync(path, "utf8");
+        } catch {
+          text = "";
+        }
+      }
+      sourceCache.set(artifactId, text);
+      return text;
+    };
 
     // Undirected graph: a capability is the route plus everything connected to it (the
     // frontend subgraph reaches the route via API_CALL, the backend hangs off it). Closure
@@ -92,11 +147,13 @@ export class CapabilityPass extends AbstractPass {
 
       const capId = resolveRoute(node.name, controllerOf.get(node.id));
       if (capId) {
+        const artifactIds = new Set(reachable.map((id) => byId.get(id)?.artifactId).filter(Boolean));
+        const source = [...artifactIds].map((aid) => sourceFor(aid as string)).join("\n");
         draft.addCapability({
           id: makeId("cap", capId, node.id),
           feature: capId.split(".")[0]!,
           capability: capId,
-          constraints: [],
+          constraints: extractCodeConstraints(capId, source),
           nodes: reachable,
           closure: ClosureState.Partial,
           evidence,

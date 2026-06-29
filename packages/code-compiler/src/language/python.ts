@@ -1,6 +1,6 @@
 import Parser from "tree-sitter";
 import Python from "tree-sitter-python";
-import type { LanguageAdapter, ParseResult, SymbolFact, ImportFact, CallFact } from "../index.js";
+import type { LanguageAdapter, ParseResult, SymbolFact, ImportFact, CallFact, RouteFact } from "../index.js";
 import type { CompilationContext } from "@rir/core";
 import type { ArtifactIR, Span } from "@rir/ir";
 import { makeId, hash64 } from "@rir/common";
@@ -155,6 +155,54 @@ function extractCalls(root: Parser.SyntaxNode): CallFact[] {
   return calls;
 }
 
+const PY_HTTP_VERBS = new Set(["get", "post", "put", "patch", "delete"]);
+
+function stripPyString(text: string): string {
+  return text.replace(/^[a-zA-Z]*['"]+/, "").replace(/['"]+$/, "");
+}
+
+/** FastAPI / Flask decorator routes: @router.post("/login") on a def (TSPEC-A021). */
+function extractRoutes(root: Parser.SyntaxNode): RouteFact[] {
+  const routes: RouteFact[] = [];
+  const visit = (node: Parser.SyntaxNode): void => {
+    if (node.type === "decorated_definition") {
+      const fn =
+        node.childForFieldName("definition") ??
+        node.namedChildren.find((c) => c.type === "function_definition");
+      const handler = fn?.childForFieldName("name")?.text ?? "handler";
+      for (const dec of node.namedChildren) {
+        if (dec.type !== "decorator") continue;
+        const expr = dec.namedChild(0);
+        if (!expr) continue;
+        let method: string | undefined;
+        let path = "";
+        if (expr.type === "call") {
+          const f = expr.childForFieldName("function");
+          method = f?.type === "attribute" ? f.childForFieldName("attribute")?.text : f?.text;
+          const first = expr.childForFieldName("arguments")?.namedChild(0);
+          if (first?.type === "string") path = stripPyString(first.text);
+        } else if (expr.type === "attribute") {
+          method = expr.childForFieldName("attribute")?.text;
+        }
+        if (method && PY_HTTP_VERBS.has(method.toLowerCase())) {
+          routes.push({
+            method: method.toUpperCase(),
+            path: path || "/",
+            handler,
+            span: getSpan(fn ?? node),
+          });
+        }
+      }
+    }
+    for (let i = 0; i < node.childCount; i++) {
+      const child = node.child(i);
+      if (child) visit(child);
+    }
+  };
+  visit(root);
+  return routes;
+}
+
 const parser = new Parser();
 parser.setLanguage(Python as unknown as Parser.Language);
 
@@ -181,7 +229,7 @@ export class PythonAdapter implements LanguageAdapter {
       imports: extractImports(tree.rootNode),
       exports: extractExports(tree.rootNode),
       calls: extractCalls(tree.rootNode),
-      routes: [],
+      routes: extractRoutes(tree.rootNode),
     };
   }
 }

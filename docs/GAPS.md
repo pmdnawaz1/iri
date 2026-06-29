@@ -94,3 +94,26 @@ real)**. Everything else is coverage and breadth.
 
 > Note (per the owner): these are captured now; the architect will close remaining design
 > gaps as the repo approaches 100%. This document is the running checklist.
+
+---
+
+## Pending-engineering batch closed (2026-06-28, `gaps-v2`)
+
+- **G1 · Code constraint extraction (P10) — DONE.** `CapabilityPass` now reads the capability's
+  artifact source and extracts ontology-typed constraints (e.g. `req.body.email` →
+  `LOGIN_IDENTIFIER=EMAIL`), symmetric with the document normalizer. The cross engine's
+  `CONSTRAINT_MISMATCH`/`MISSING_CONSTRAINT` are now real — the "consistent" axis is whole.
+- **CLI `query`/`graph`/`snapshot` — DONE.** `rir query <cap> <ir.json>` (chain + constraints +
+  closure + confidence), `rir graph <ir.json>` (Mermaid, `--capability` to scope), `rir snapshot`
+  (content-addressed IR). `diff` shipped earlier (V11).
+- **A021 parity — DONE.** Route detection added to the Python (FastAPI/Flask decorators), Go
+  (`r.GET`/`HandleFunc`), and Java (Spring `@RequestMapping`/`@GetMapping`) adapters; each had
+  `routes: []` before. Fixtures + tests for all four languages.
+- **G8 · Tests typechecked — DONE.** `tsconfig.tests.json` + `pnpm typecheck:tests` + a CI step.
+  Surfaced pre-existing type debt in 10 legacy test files (partial `NodeIR` factories, a reference
+  to a non-existent `@rir/worker`, missing import extensions); those are quarantined via `exclude`
+  with a TODO so the gate is green for all clean + future tests.
+
+> Deferred (needs external repos, not closable in-tree): **Graduation #3** evidence backfill for
+> PRODUCT/DISCOUNT/SHIPPING/CALENDAR — now *enabled* by A021 parity, but requires cloning and
+> compiling cal.com/medusa/vendure, which is the self-evolution seam's job, not a code change.

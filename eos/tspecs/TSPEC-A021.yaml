@@ -3,7 +3,7 @@
 id: "TSPEC-A021"
 title: "Adapter route detection: NestJS decorators + file-based route.ts"
 owner: "ROLE_IMPLEMENTER"
-state: "DRAFT"
+state: "COMPLETE"
 package: "code-compiler"
 module: "typescript-adapter"
 repository_path: "packages/code-compiler"

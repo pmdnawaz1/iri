@@ -1,6 +1,6 @@
 import Parser from "tree-sitter";
 import Go from "tree-sitter-go";
-import type { LanguageAdapter, ParseResult, SymbolFact, ImportFact, CallFact } from "../index.js";
+import type { LanguageAdapter, ParseResult, SymbolFact, ImportFact, CallFact, RouteFact } from "../index.js";
 import type { CompilationContext } from "@rir/core";
 import type { ArtifactIR, Span } from "@rir/ir";
 import { makeId, hash64 } from "@rir/common";
@@ -151,6 +151,39 @@ function extractCalls(root: Parser.SyntaxNode): CallFact[] {
   visit(root, undefined);
   return calls;
 }
+const GO_VERB_METHODS = new Set(["GET", "POST", "PUT", "PATCH", "DELETE", "HANDLE", "HANDLEFUNC"]);
+
+function stripGoString(text: string): string {
+  return text.replace(/^[`"]/, "").replace(/[`"]$/, "");
+}
+
+/** Go router routes: r.GET("/x", h), e.POST(...), mux.HandleFunc("/x", h) (TSPEC-A021). */
+function extractRoutes(root: Parser.SyntaxNode): RouteFact[] {
+  const routes: RouteFact[] = [];
+  const visit = (node: Parser.SyntaxNode): void => {
+    if (node.type === "call_expression") {
+      const fn = node.childForFieldName("function");
+      if (fn?.type === "selector_expression") {
+        const field = fn.childForFieldName("field")?.text ?? "";
+        const args = node.childForFieldName("arguments");
+        const first = args?.namedChild(0);
+        if (GO_VERB_METHODS.has(field.toUpperCase()) && first?.type === "interpreted_string_literal") {
+          const verb = field.toUpperCase();
+          const method = verb === "HANDLE" || verb === "HANDLEFUNC" ? "ALL" : verb;
+          const handler = args?.namedChild(1)?.text ?? field;
+          routes.push({ method, path: stripGoString(first.text), handler, span: getSpan(node) });
+        }
+      }
+    }
+    for (let i = 0; i < node.childCount; i++) {
+      const child = node.child(i);
+      if (child) visit(child);
+    }
+  };
+  visit(root);
+  return routes;
+}
+
 const parser = new Parser();
 parser.setLanguage(Go as unknown as Parser.Language);
 export class GoAdapter implements LanguageAdapter {
@@ -174,7 +207,7 @@ export class GoAdapter implements LanguageAdapter {
       imports: extractImports(tree.rootNode),
       exports: extractExports(tree.rootNode),
       calls: extractCalls(tree.rootNode),
-      routes: [],
+      routes: extractRoutes(tree.rootNode),
     };
   }
 }

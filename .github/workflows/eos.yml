@@ -28,6 +28,9 @@ jobs:
       - name: Typecheck
         run: pnpm typecheck
 
+      - name: Typecheck tests (G8 — type errors in tests no longer pass CI)
+        run: pnpm typecheck:tests
+
       - name: Format check (rejects minified / unformatted code)
         run: pnpm format:check
 

@@ -9,9 +9,9 @@
  */
 
 import { readFile } from "node:fs/promises";
-import { openSync, writeSync } from "node:fs";
+import { openSync, writeSync, writeFileSync } from "node:fs";
 import { Buffer } from "node:buffer";
-import { ConsoleLogger } from "@rir/common";
+import { ConsoleLogger, hash64 } from "@rir/common";
 import { ClosureState, RIR_VERSION, type RepositoryIR } from "@rir/ir";
 import { ONTOLOGY_VERSION, allCapabilities } from "@rir/ontology";
 import { DefaultClosureEngine } from "@rir/closure";
@@ -35,9 +35,9 @@ Usage:
   rir compile <dir> --docs <d>  Also compile docs and report doc<->code consistency
   rir suggest-aliases <docs>  BM25-rank ontology for UNMAPPED doc statements (proposal-only)
   rir diff <a.json> <b.json>  Closure drift between two compile --json runs (CI-gateable)
-  rir query <capability>      (pipeline not yet assembled)
-  rir graph                   (pipeline not yet assembled)
-  rir snapshot                (pipeline not yet assembled)
+  rir query <cap> <ir.json>   Show a capability's chain, constraints, and closure
+  rir graph <ir.json>         Emit a Mermaid flowchart of the IR (--capability <id> to scope)
+  rir snapshot <ir.json>      Write a content-addressed snapshot file
 
 Global options:
   --log <file>                Append all output (stdout + stderr) to <file> as well
@@ -47,6 +47,15 @@ async function loadIR(path: string | undefined): Promise<RepositoryIR> {
   if (!path) throw new Error("expected a path to a Repository IR JSON file");
   const raw = await readFile(path, "utf8");
   return JSON.parse(raw) as RepositoryIR;
+}
+
+/** Load a `rir compile --json` object (or a bare IR) into { ir, closure }. */
+async function loadCompile(path: string): Promise<{ ir: RepositoryIR; closure: ClosureResult[] }> {
+  const obj = JSON.parse(await readFile(path, "utf8")) as
+    | RepositoryIR
+    | { ir: RepositoryIR; closure?: ClosureResult[] };
+  if ("nodes" in obj && "capabilities" in obj) return { ir: obj, closure: [] };
+  return { ir: obj.ir, closure: obj.closure ?? [] };
 }
 
 /** Tee stdout + stderr to a file (append), so output is both shown and logged.
@@ -267,11 +276,79 @@ async function main(rawArgv: readonly string[]): Promise<number> {
       }
       return regressions.length ? 1 : 0;
     }
-    case "query":
-    case "graph":
+    case "query": {
+      // rir query <capability> <ir.json> — show a capability's chain + closure.
+      const cap = rest.find((a) => !a.startsWith("--") && !a.endsWith(".json"));
+      const jsonPath = rest.find((a) => a.endsWith(".json"));
+      if (!cap || !jsonPath) {
+        process.stderr.write("usage: rir query <capability> <compile.json>\n");
+        return 64;
+      }
+      const { ir, closure } = await loadCompile(jsonPath);
+      const matches = ir.capabilities.filter(
+        (c) => c.capability === cap || c.capability.includes(cap.toUpperCase()),
+      );
+      if (matches.length === 0) {
+        process.stdout.write(`No capability matching "${cap}".\n`);
+        return 1;
+      }
+      const byId = new Map(ir.nodes.map((n) => [n.id, n] as const));
+      for (const c of matches) {
+        const r = closure.find((x) => x.capabilityId === c.id);
+        process.stdout.write(
+          `${c.capability}\t${r?.state ?? "?"}${r ? ` (confidence ${r.confidence})` : ""}\n`,
+        );
+        if (c.constraints.length) {
+          process.stdout.write(
+            `  constraints: ${c.constraints.map((k) => `${k.key}=${k.value}`).join(", ")}\n`,
+          );
+        }
+        const chain = c.nodes.map((id) => byId.get(id)).filter(Boolean);
+        for (const n of chain) process.stdout.write(`  - ${n!.kind}\t${n!.name}\n`);
+      }
+      return 0;
+    }
+    case "graph": {
+      // rir graph <ir.json> [--capability <id>] — emit a Mermaid flowchart of the IR.
+      const jsonPath = rest.find((a) => a.endsWith(".json"));
+      if (!jsonPath) {
+        process.stderr.write("usage: rir graph <compile.json> [--capability <id>]\n");
+        return 64;
+      }
+      const capIdx = rest.indexOf("--capability");
+      const only = capIdx === -1 ? undefined : rest[capIdx + 1];
+      const { ir } = await loadCompile(jsonPath);
+      let nodeIds = new Set(ir.nodes.map((n) => n.id));
+      if (only) {
+        const cap = ir.capabilities.find((c) => c.capability === only);
+        nodeIds = new Set(cap?.nodes ?? []);
+      }
+      const safe = (s: string) => s.replace(/[^a-zA-Z0-9]/g, "_");
+      process.stdout.write("flowchart TD\n");
+      for (const n of ir.nodes.filter((n) => nodeIds.has(n.id))) {
+        process.stdout.write(`  ${safe(n.id)}["${n.kind}: ${n.name.replace(/"/g, "'")}"]\n`);
+      }
+      for (const e of ir.edges.filter((e) => nodeIds.has(e.from) && nodeIds.has(e.to))) {
+        process.stdout.write(`  ${safe(e.from)} -->|${e.kind}| ${safe(e.to)}\n`);
+      }
+      return 0;
+    }
     case "snapshot": {
-      log.warn("command requires the builder pipeline, which is not yet assembled", { command });
-      return 2;
+      // rir snapshot <ir.json> — write a content-addressed snapshot file.
+      const jsonPath = rest.find((a) => a.endsWith(".json"));
+      if (!jsonPath) {
+        process.stderr.write("usage: rir snapshot <compile.json>\n");
+        return 64;
+      }
+      const { ir } = await loadCompile(jsonPath);
+      const canonical = JSON.stringify(ir);
+      const id = `snap|${hash64(canonical)}`;
+      const outPath = `${id.replace("|", "-")}.json`;
+      writeFileSync(outPath, JSON.stringify({ id, createdAt: new Date(0).toISOString(), ir }, null, 2));
+      process.stdout.write(
+        `${id}\t-> ${outPath}\t(${ir.nodes.length} nodes, ${ir.capabilities.length} capabilities)\n`,
+      );
+      return 0;
     }
     case undefined:
     case "help":

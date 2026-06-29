@@ -1,6 +1,6 @@
 # ADR-0022 — Adapter route detection: decorators & file-based routing
 
-Status: Proposed · Owner: ROLE_ARCHITECT · TSPEC: A021 (builds on ADR-0016, A017)
+Status: Accepted (shipped) · Owner: ROLE_ARCHITECT · TSPEC: A021 (builds on ADR-0016, A017)
 
 ## Context
 
