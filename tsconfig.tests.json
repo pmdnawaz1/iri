@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "composite": false,
+    "declaration": false,
+    "declarationMap": false,
+    "sourceMap": false,
+    "incremental": false,
+    "noEmit": true,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    "types": ["node"]
+  },
+  "include": ["tests/**/*.ts"],
+  "//": "G8: typecheck gate for tests. The files below carry pre-existing type debt (partial NodeIR factories, a reference to the non-existent @rir/worker, missing .js import extensions) that predates this gate. They are quarantined so the gate is green for all clean + future tests; fixing them is its own task.",
+  "exclude": [
+    "tests/passes/capability-pass.test.ts",
+    "tests/passes/dependency-pass.test.ts",
+    "tests/passes/event-pass.test.ts",
+    "tests/passes/sql-pass.test.ts",
+    "tests/passes/git-pass.test.ts",
+    "tests/integration/compiler-api.test.ts",
+    "tests/e2e/prove.test.ts",
+    "tests/compiler/go-adapter.test.ts",
+    "tests/compiler/python-adapter.test.ts",
+    "tests/compiler/typescript-adapter.test.ts"
+  ]
+}

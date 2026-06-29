@@ -103,15 +103,22 @@ describe("Cross-consistency — docs vs code", () => {
     expect(loginUnimpl).toBeUndefined();
   });
 
-  it("reports that the code does not encode a documented constraint", async () => {
-    const { findings } = await compileWithDocuments(
+  it("matches the documented constraint to the code-extracted one (G1: no MISSING/MISMATCH)", async () => {
+    const { ir, findings } = await compileWithDocuments(
       "fixtures/fullstack-auth",
       "fixtures/fullstack-auth-docs",
       tsOnly(),
     );
 
-    const missing = findings.find((f) => f.capability === "AUTH.LOGIN" && f.code === "MISSING_CONSTRAINT");
-    expect(missing).toBeDefined();
-    expect(missing!.message).toContain("LOGIN_IDENTIFIER");
+    // G1: the code now declares LOGIN_IDENTIFIER=EMAIL (from `req.body.email`), matching the doc.
+    const login = ir.capabilities.find((c) => c.capability === "AUTH.LOGIN")!;
+    expect(login.constraints.find((c) => c.key === "LOGIN_IDENTIFIER")?.value).toBe("EMAIL");
+
+    const constraintFindings = findings.filter(
+      (f) =>
+        f.capability === "AUTH.LOGIN" &&
+        (f.code === "MISSING_CONSTRAINT" || f.code === "CONSTRAINT_MISMATCH"),
+    );
+    expect(constraintFindings).toHaveLength(0);
   });
 });

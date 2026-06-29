@@ -1,5 +1,11 @@
 import { describe, expect, it } from "vitest";
-import { AdapterRegistry, TypeScriptAdapter } from "@rir/code-compiler";
+import {
+  AdapterRegistry,
+  TypeScriptAdapter,
+  PythonAdapter,
+  GoAdapter,
+  JavaAdapter,
+} from "@rir/code-compiler";
 import { compileRepository } from "@rir/compiler";
 
 // TSPEC-A021 / ADR-0022: the TS adapter must see NestJS decorator routes and file-based
@@ -30,5 +36,31 @@ describe("Adapter route detection — file-based route.ts", () => {
     expect(methods).toEqual(["GET", "POST"]);
 
     expect(ir.capabilities.some((c) => c.capability === "WEBHOOK.CREATE")).toBe(true);
+  });
+});
+
+describe("Adapter route detection — parity across languages (A021)", () => {
+  it("Python: FastAPI @router.post/get decorators", async () => {
+    const reg = new AdapterRegistry().register(new PythonAdapter());
+    const { ir } = await compileRepository("fixtures/fastapi-auth", reg);
+    const caps = ir.capabilities.map((c) => c.capability);
+    expect(caps).toContain("AUTH.LOGIN");
+    expect(caps).toContain("TEAM.CREATE");
+  });
+
+  it("Go: router r.POST/r.GET calls", async () => {
+    const reg = new AdapterRegistry().register(new GoAdapter());
+    const { ir } = await compileRepository("fixtures/go-routes", reg);
+    const caps = ir.capabilities.map((c) => c.capability);
+    expect(caps).toContain("AUTH.LOGIN");
+    expect(caps).toContain("WEBHOOK.CREATE");
+  });
+
+  it("Java: Spring @RequestMapping + @PostMapping/@GetMapping", async () => {
+    const reg = new AdapterRegistry().register(new JavaAdapter());
+    const { ir } = await compileRepository("fixtures/spring-routes", reg);
+    const caps = ir.capabilities.map((c) => c.capability);
+    expect(caps).toContain("TEAM.CREATE");
+    expect(caps).toContain("TEAM.LIST_MEMBERS");
   });
 });
