@@ -220,6 +220,9 @@ importers:
       '@rir/passes':
         specifier: workspace:*
         version: link:../passes
+      '@rir/resolution':
+        specifier: workspace:*
+        version: link:../resolution
       yaml:
         specifier: ^2.9.0
         version: 2.9.0
@@ -305,6 +308,21 @@ importers:
       '@rir/common':
         specifier: workspace:*
         version: link:../common
+      '@rir/graph':
+        specifier: workspace:*
+        version: link:../graph
+      '@rir/ir':
+        specifier: workspace:*
+        version: link:../ir
+
+  packages/resolution:
+    dependencies:
+      '@rir/common':
+        specifier: workspace:*
+        version: link:../common
+      '@rir/core':
+        specifier: workspace:*
+        version: link:../core
       '@rir/graph':
         specifier: workspace:*
         version: link:../graph

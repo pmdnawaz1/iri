@@ -35,6 +35,7 @@ import {
   RoutePass,
   SQLPass,
 } from "@rir/passes";
+import { ResolutionPass } from "@rir/resolution";
 import { DefaultClosureEngine, type ClosureResult } from "@rir/closure";
 import {
   DefaultRequirementNormalizer,
@@ -100,6 +101,7 @@ export class PipelineBuilder implements Builder {
     return [
       new ImportPass(),
       new CallPass(),
+      new ResolutionPass(),
       new RoutePass(),
       new ComponentPass(),
       new SQLPass(),

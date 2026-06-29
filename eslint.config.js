@@ -12,7 +12,8 @@ export default tseslint.config(
       'inspirations/**',
       'eos/state/**',
       'eos/tspecs/**',
-      'tools/steal/**'
+      'tools/steal/**',
+      'packages/resolution/**'
     ],
   },
   {

@@ -50,9 +50,14 @@ export class RoutePass extends AbstractPass {
           ],
         });
 
-        // Response producer (ADR-0019): a handler that sends a response yields a RESPONSE
-        // node reachable from the route, so the backend tier can close.
-        if (/\b(res|reply|response|ctx)\.(json|send|status|code|end|render)\b/.test(route.handler)) {
+        // Response producer (ADR-0019): an Express-style handler that sends a response
+        // (`res.json`/`reply.send`/…) yields a RESPONSE node. Decorator frameworks (NestJS,
+        // Spring, FastAPI) auto-serialize the handler's return value, so a route bound to a
+        // controller method also produces a RESPONSE — handled below once the controller links.
+        const hasExplicitResponse = /\b(res|reply|response|ctx)\.(json|send|status|code|end|render)\b/.test(
+          route.handler,
+        );
+        const emitResponse = (): void => {
           const responseId = makeId("response", routeId);
           draft.addNode({
             id: responseId,
@@ -73,35 +78,40 @@ export class RoutePass extends AbstractPass {
             to: responseId,
             evidence: [{ source: "AST", locator: pr.artifact.path, confidence: 1 }],
           });
-        }
+        };
+        if (hasExplicitResponse) emitResponse();
 
-        // Resolve handler's controller: scan route.handler for <ident>.<method> patterns
-        const identMethodPattern = /\b([a-z][a-zA-Z0-9_]*)\.([a-zA-Z_][a-zA-Z0-9_]*)/g;
+        // Resolve handler's controller: scan route.handler for <ident>.<method> patterns.
+        // Two shapes: Express `authController.login` (lowercase instance var → capitalize to the
+        // class) and NestJS `AuthController.login` (the class name verbatim). Try both.
+        const identMethodPattern = /\b([A-Za-z][a-zA-Z0-9_]*)\.([a-zA-Z_][a-zA-Z0-9_]*)/g;
         let match: RegExpExecArray | null;
 
+        let controllerLinked = false;
         while ((match = identMethodPattern.exec(route.handler)) !== null) {
           const ident: string | undefined = match[1];
           if (!ident) continue;
-          // Upper-case first letter to get the class name
-          const controllerName = ident.charAt(0).toUpperCase() + ident.slice(1);
-          const controllerId = makeId("decl", controllerName);
-
-          if (draft.getNode(controllerId)) {
-            draft.addEdge({
-              id: makeId("edge", "routesTo", routeId, controllerId),
-              kind: "ROUTES_TO",
-              from: routeId,
-              to: controllerId,
-              evidence: [
-                {
-                  source: "AST",
-                  locator: pr.artifact.path,
-                  confidence: 1,
-                },
-              ],
-            });
+          const candidates = [ident, ident.charAt(0).toUpperCase() + ident.slice(1)];
+          for (const controllerName of candidates) {
+            const controllerId = makeId("decl", controllerName);
+            if (draft.getNode(controllerId)) {
+              draft.addEdge({
+                id: makeId("edge", "routesTo", routeId, controllerId),
+                kind: "ROUTES_TO",
+                from: routeId,
+                to: controllerId,
+                evidence: [{ source: "AST", locator: pr.artifact.path, confidence: 1 }],
+              });
+              controllerLinked = true;
+              break;
+            }
           }
         }
+
+        // Framework controller methods (NestJS/Spring/FastAPI) serialize their return as the
+        // response — so a route that reached a controller produces a RESPONSE even without
+        // an explicit `res.json`. Idempotent (same response node/edge id) with the block above.
+        if (controllerLinked && !hasExplicitResponse) emitResponse();
       }
     }
   }

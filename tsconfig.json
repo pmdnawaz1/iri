@@ -13,6 +13,7 @@
     { "path": "./packages/builder-engine" },
     { "path": "./packages/passes" },
     { "path": "./packages/closure" },
+    { "path": "./packages/resolution" },
     { "path": "./packages/coverage" },
     { "path": "./packages/consistency" },
     { "path": "./packages/query-engine" },
