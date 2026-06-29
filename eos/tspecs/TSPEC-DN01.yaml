@@ -16,7 +16,8 @@ estimated_effort: 4
 depends_on:
   - "TSPEC-A008"
   - "TSPEC-DF01"
-blocks: []
+blocks:
+  - "TSPEC-A031"
 references:
   - "https://github.com/remarkjs/remark"
 architecture_documents:

@@ -9,7 +9,7 @@
  * independently-tested adapters, passes, and the closure engine.
  */
 
-import { readFileSync, readdirSync, statSync } from "node:fs";
+import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
 import { extname, join } from "node:path";
 import { ConsoleLogger } from "@rir/common";
 import {
@@ -46,9 +46,15 @@ import {
   type DocumentStructure,
   type SuggestOptions,
 } from "@rir/document-compiler";
-import { CrossConsistencyEngine, type CrossFinding } from "@rir/consistency";
+import {
+  CrossConsistencyEngine,
+  GuardClosureEngine,
+  type CrossFinding,
+  type GuardFinding,
+} from "@rir/consistency";
+import { parse as parseYaml } from "yaml";
 import type { Builder, CompilationContext, Pass } from "@rir/core";
-import type { ClosureState, RepositoryIR, RequirementSet } from "@rir/ir";
+import type { ClosureState, RepositoryIR, RequirementSet, ScopeManifest } from "@rir/ir";
 
 const SOURCE_EXTENSIONS = new Set([
   ".ts",
@@ -200,12 +206,23 @@ export function suggestDocumentAliases(
 export interface ConsistencyResult extends CompileResult {
   readonly requirements: RequirementSet;
   readonly findings: readonly CrossFinding[];
+  /** Negative-space / guard-closure findings (GAPS-v2 V5). */
+  readonly guardFindings: readonly GuardFinding[];
+  /** The declared scope used to filter findings, if a `rir.scope.yaml` was found. */
+  readonly scope?: ScopeManifest;
+}
+
+/** Read `rir.scope.yaml` from a repo root, if present (GAPS-v2 V10). */
+export function readScope(dir: string): ScopeManifest | undefined {
+  const path = join(dir, "rir.scope.yaml");
+  if (!existsSync(path)) return undefined;
+  const parsed = parseYaml(readFileSync(path, "utf8")) as ScopeManifest | null;
+  return parsed ?? undefined;
 }
 
 /**
- * Compile code + docs and report doc↔code consistency (ADR-0020). The cross engine joins
- * the Requirement IR and the Repository IR by ontology id; closure state per ontology
- * capability decides whether a documented capability is actually CLOSED.
+ * Compile code + docs and report doc↔code consistency (ADR-0020) plus guard closure (ADR-0024).
+ * If `rir.scope.yaml` exists at the repo root, findings are filtered to the declared scope.
  */
 export async function compileWithDocuments(
   dir: string,
@@ -214,6 +231,7 @@ export async function compileWithDocuments(
 ): Promise<ConsistencyResult> {
   const { ir, closure } = await compileRepository(dir, registry);
   const requirements = compileDocuments(docsDir);
+  const scope = readScope(dir);
 
   const stateById = new Map(closure.map((c) => [c.capabilityId, c.state] as const));
   const closureByCapability = new Map<string, ClosureState>();
@@ -222,6 +240,58 @@ export async function compileWithDocuments(
     if (state) closureByCapability.set(cap.capability, state);
   }
 
-  const findings = new CrossConsistencyEngine().check(requirements, ir, closureByCapability);
-  return { ir, closure, requirements, findings };
+  const findings = new CrossConsistencyEngine().check(requirements, ir, closureByCapability, scope);
+  const guardFindings = new GuardClosureEngine().check(ir);
+  return { ir, closure, requirements, findings, guardFindings, scope };
+}
+
+// ---------------------------------------------------------------------------
+// Closure drift / diff (GAPS-v2 V11 / TSPEC-A026). Pure comparison of two closure runs.
+// ---------------------------------------------------------------------------
+
+/** Best→worst ordering of closure states; a move to a higher rank is a regression. */
+const CLOSURE_RANK: Record<string, number> = {
+  CLOSED: 0,
+  PARTIAL: 1,
+  UNREACHABLE: 2,
+  BROKEN: 3,
+  CONFLICTING: 4,
+  ORPHAN: 5,
+};
+
+export interface ClosureTransition {
+  readonly capabilityId: string;
+  readonly from: ClosureState | "ABSENT";
+  readonly to: ClosureState | "ABSENT";
+  /** "REGRESSED" = moved away from CLOSED, "IMPROVED" = toward it, "CHANGED" = lateral. */
+  readonly direction: "REGRESSED" | "IMPROVED" | "CHANGED";
+}
+
+export interface ClosureDiff {
+  readonly transitions: readonly ClosureTransition[];
+  readonly regressions: readonly ClosureTransition[];
+}
+
+function rank(state: ClosureState | "ABSENT"): number {
+  return state === "ABSENT" ? 6 : (CLOSURE_RANK[state] ?? 5);
+}
+
+/**
+ * Compare two closure runs (e.g. base vs PR). Deterministic. A capability that moved away from
+ * CLOSED — or disappeared — is a regression; gate CI on `regressions.length === 0`.
+ */
+export function diffClosures(before: readonly ClosureResult[], after: readonly ClosureResult[]): ClosureDiff {
+  const beforeById = new Map(before.map((c) => [c.capabilityId, c.state] as const));
+  const afterById = new Map(after.map((c) => [c.capabilityId, c.state] as const));
+  const ids = [...new Set([...beforeById.keys(), ...afterById.keys()])].sort();
+
+  const transitions: ClosureTransition[] = [];
+  for (const id of ids) {
+    const from = beforeById.get(id) ?? "ABSENT";
+    const to = afterById.get(id) ?? "ABSENT";
+    if (from === to) continue;
+    const direction = rank(to) > rank(from) ? "REGRESSED" : rank(to) < rank(from) ? "IMPROVED" : "CHANGED";
+    transitions.push({ capabilityId: id, from, to, direction });
+  }
+  return { transitions, regressions: transitions.filter((t) => t.direction === "REGRESSED") };
 }

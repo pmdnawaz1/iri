@@ -220,6 +220,9 @@ importers:
       '@rir/passes':
         specifier: workspace:*
         version: link:../passes
+      yaml:
+        specifier: ^2.9.0
+        version: 2.9.0
 
   packages/consistency:
     dependencies:

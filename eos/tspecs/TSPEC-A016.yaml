@@ -15,7 +15,11 @@ risk: "MEDIUM"
 estimated_effort: 4
 depends_on:
   - "TSPEC-A003"
-blocks: []
+blocks:
+  - "TSPEC-A024"
+  - "TSPEC-A025"
+  - "TSPEC-A030"
+  - "TSPEC-A032"
 references: []
 architecture_documents:
   - "docs/ADR-0018-ontology-evolution-and-discovery.md"

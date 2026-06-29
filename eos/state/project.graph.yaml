@@ -101,6 +101,22 @@ nodes:
     owner: "ROLE_ARCHITECT"
     wave: 3
     critical_path: false
+  - id: "TSPEC-A024"
+    owner: "ROLE_ARCHITECT"
+    wave: 3
+    critical_path: false
+  - id: "TSPEC-A025"
+    owner: "ROLE_ARCHITECT"
+    wave: 3
+    critical_path: false
+  - id: "TSPEC-A030"
+    owner: "ROLE_ARCHITECT"
+    wave: 3
+    critical_path: false
+  - id: "TSPEC-A032"
+    owner: "ROLE_ARCHITECT"
+    wave: 3
+    critical_path: false
   - id: "TSPEC-CI01"
     owner: "ROLE_IMPLEMENTER"
     wave: 3
@@ -153,6 +169,30 @@ nodes:
     owner: "ROLE_ARCHITECT"
     wave: 4
     critical_path: false
+  - id: "TSPEC-A022"
+    owner: "ROLE_ARCHITECT"
+    wave: 4
+    critical_path: false
+  - id: "TSPEC-A023"
+    owner: "ROLE_ARCHITECT"
+    wave: 4
+    critical_path: false
+  - id: "TSPEC-A026"
+    owner: "ROLE_ARCHITECT"
+    wave: 4
+    critical_path: false
+  - id: "TSPEC-A027"
+    owner: "ROLE_ARCHITECT"
+    wave: 4
+    critical_path: false
+  - id: "TSPEC-A028"
+    owner: "ROLE_ARCHITECT"
+    wave: 4
+    critical_path: false
+  - id: "TSPEC-A029"
+    owner: "ROLE_ARCHITECT"
+    wave: 4
+    critical_path: false
   - id: "TSPEC-DN01"
     owner: "ROLE_IMPLEMENTER"
     wave: 4
@@ -169,6 +209,10 @@ nodes:
     owner: "ROLE_IMPLEMENTER"
     wave: 4
     critical_path: true
+  - id: "TSPEC-A031"
+    owner: "ROLE_ARCHITECT"
+    wave: 5
+    critical_path: false
   - id: "TSPEC-AD01"
     owner: "ROLE_IMPLEMENTER"
     wave: 5
@@ -420,6 +464,14 @@ edges:
     to: "TSPEC-A020"
   - from: "TSPEC-A011"
     to: "TSPEC-A020"
+  - from: "TSPEC-A016"
+    to: "TSPEC-A024"
+  - from: "TSPEC-A016"
+    to: "TSPEC-A025"
+  - from: "TSPEC-A016"
+    to: "TSPEC-A030"
+  - from: "TSPEC-A016"
+    to: "TSPEC-A032"
   - from: "TSPEC-I001"
     to: "TSPEC-CI01"
   - from: "TSPEC-A008"
@@ -454,6 +506,18 @@ edges:
     to: "TSPEC-A018"
   - from: "TSPEC-A017"
     to: "TSPEC-A018"
+  - from: "TSPEC-A020"
+    to: "TSPEC-A022"
+  - from: "TSPEC-A019"
+    to: "TSPEC-A023"
+  - from: "TSPEC-A019"
+    to: "TSPEC-A026"
+  - from: "TSPEC-A024"
+    to: "TSPEC-A027"
+  - from: "TSPEC-A019"
+    to: "TSPEC-A028"
+  - from: "TSPEC-A019"
+    to: "TSPEC-A029"
   - from: "TSPEC-A008"
     to: "TSPEC-DN01"
   - from: "TSPEC-DF01"
@@ -470,6 +534,8 @@ edges:
     to: "TSPEC-I006"
   - from: "TSPEC-I005"
     to: "TSPEC-I006"
+  - from: "TSPEC-DN01"
+    to: "TSPEC-A031"
   - from: "TSPEC-A007"
     to: "TSPEC-AD01"
   - from: "TSPEC-I006"

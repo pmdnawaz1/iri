@@ -17,6 +17,7 @@
     "@rir/builder-engine": "workspace:*",
     "@rir/closure": "workspace:*",
     "@rir/document-compiler": "workspace:*",
-    "@rir/consistency": "workspace:*"
+    "@rir/consistency": "workspace:*",
+    "yaml": "^2.9.0"
   }
 }

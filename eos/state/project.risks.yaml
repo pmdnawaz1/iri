@@ -37,8 +37,28 @@ high_risk:
     title: "Requirement <-> Repository consistency rules"
     risk: "HIGH"
     critical_path: false
+  - id: "TSPEC-A024"
+    title: "Guard / negative-space closure (requiresAuth without a guard)"
+    risk: "HIGH"
+    critical_path: false
+  - id: "TSPEC-A032"
+    title: "Cross-repo IR linking by API/contract schema"
+    risk: "HIGH"
+    critical_path: false
   - id: "TSPEC-A018"
     title: "Ontology self-evolution loop (AI proposes, architect accepts)"
+    risk: "HIGH"
+    critical_path: false
+  - id: "TSPEC-A027"
+    title: "Executable probe: CLOSED -> EXECUTABLE via synthesized smoke test"
+    risk: "HIGH"
+    critical_path: false
+  - id: "TSPEC-A028"
+    title: "Behavioral closure: link capabilities to the tests/dataflow that exercise them"
+    risk: "HIGH"
+    critical_path: false
+  - id: "TSPEC-A029"
+    title: "Runtime evidence fusion (RUNTIME source; reconcile dynamic edges)"
     risk: "HIGH"
     critical_path: false
   - id: "TSPEC-A021"
@@ -49,4 +69,4 @@ high_risk:
     title: "Closure engine impl"
     risk: "HIGH"
     critical_path: true
-risk_score: 0.133
+risk_score: 0.168

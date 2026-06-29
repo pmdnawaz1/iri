@@ -10,6 +10,7 @@ import { type CapabilityIR, type ConstraintIR, type RepositoryIR } from "@rir/ir
 import { getCapability, type ConstraintType } from "@rir/ontology";
 
 export { CrossConsistencyEngine, CrossFindingCode, type CrossFinding } from "./cross.js";
+export { GuardClosureEngine, type GuardFinding } from "./guard.js";
 
 /** Severity of a consistency finding. */
 export const Severity = {

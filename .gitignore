@@ -22,3 +22,6 @@ rir.cmd
 # local throwaway scripts / logs
 create_prs*.ps1
 lint_output.txt
+
+# Claude Code worktrees (never commit)
+.claude/worktrees/

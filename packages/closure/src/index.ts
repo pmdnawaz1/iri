@@ -45,6 +45,22 @@ export interface ClosureResult {
   readonly present: readonly ExecutionStage[];
   /** Expected stages that are missing (ordered as in the expected chain). */
   readonly missing: readonly ExecutionStage[];
+  /**
+   * Weakest-link evidence confidence in [0,1] across the participating nodes (GAPS-v2 V3).
+   * A `CLOSED` built on inference (low confidence) is no longer indistinguishable from one
+   * proven by AST-grade facts. ORPHAN/no-evidence capabilities are 0.
+   */
+  readonly confidence: number;
+}
+
+/** The weakest (minimum) evidence confidence across a set of nodes; 0 when there is none. */
+function weakestConfidence(nodes: readonly NodeIR[]): number {
+  let min = nodes.length === 0 ? 0 : 1;
+  for (const node of nodes) {
+    for (const ev of node.evidence) min = Math.min(min, ev.confidence);
+    if (node.evidence.length === 0) min = Math.min(min, 0.5); // present but unevidenced
+  }
+  return min;
 }
 
 /**
@@ -74,6 +90,7 @@ export function evaluateClosure(
       expected: [],
       present: [],
       missing: [],
+      confidence: 0,
     };
   }
 
@@ -84,6 +101,7 @@ export function evaluateClosure(
       expected,
       present: [],
       missing: expected,
+      confidence: 0,
     };
   }
 
@@ -98,6 +116,7 @@ export function evaluateClosure(
       expected,
       present: [],
       missing: expected,
+      confidence: 0,
     };
   }
 
@@ -109,6 +128,7 @@ export function evaluateClosure(
       expected,
       present: [],
       missing: expected,
+      confidence: weakestConfidence(participating),
     };
   }
 
@@ -136,7 +156,14 @@ export function evaluateClosure(
     state = ClosureState.Partial;
   }
 
-  return { capabilityId: capability.id, state, expected, present, missing };
+  return {
+    capabilityId: capability.id,
+    state,
+    expected,
+    present,
+    missing,
+    confidence: weakestConfidence(reachable),
+  };
 }
 
 /** A chain is BROKEN (not merely PARTIAL) when a present stage follows a missing one,

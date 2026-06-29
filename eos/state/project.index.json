@@ -1,7 +1,7 @@
 {
   "version": "1.0.0",
   "generated_at": "2026-06-27T00:00:00Z",
-  "count": 90,
+  "count": 101,
   "tspecs": [
     {
       "priority": "P0",
@@ -974,7 +974,12 @@
       "repository_path": "packages/ontology",
       "branch": "feature/tspec-a016-ontology-expansion-commerce-profile-notification-features",
       "parent_branch": "main",
-      "blocks": [],
+      "blocks": [
+        "TSPEC-A024",
+        "TSPEC-A025",
+        "TSPEC-A030",
+        "TSPEC-A032"
+      ],
       "reviewers": [
         "ROLE_ARCHITECT"
       ],
@@ -1563,7 +1568,12 @@
       "repository_path": "packages/closure",
       "branch": "feature/tspec-a019-full-execution-closure-stage-producers-tiers",
       "parent_branch": "main",
-      "blocks": [],
+      "blocks": [
+        "TSPEC-A023",
+        "TSPEC-A026",
+        "TSPEC-A028",
+        "TSPEC-A029"
+      ],
       "reviewers": [
         "ROLE_ARCHITECT"
       ],
@@ -1622,6 +1632,7 @@
       "branch": "feature/tspec-a020-requirement-repository-consistency-rules",
       "parent_branch": "main",
       "blocks": [
+        "TSPEC-A022",
         "TSPEC-E07"
       ],
       "reviewers": [
@@ -1634,6 +1645,237 @@
       "critical_path": false,
       "parallel_group": "wave-3",
       "spec_path": "eos/specs/TSPEC-A020.spec.md",
+      "spec_required": false,
+      "spec_status": "MISSING"
+    },
+    {
+      "priority": "P1",
+      "complexity": "MEDIUM",
+      "risk": "HIGH",
+      "estimated_effort": 3,
+      "depends_on": [
+        "TSPEC-A016"
+      ],
+      "references": [],
+      "architecture_documents": [
+        "docs/ADR-0024-gaps-v2-program.md"
+      ],
+      "deliverables": [
+        "requiresAuth() policy",
+        "GuardClosureEngine",
+        "GUARD_MISSING finding"
+      ],
+      "outputs": [],
+      "tests": [
+        "ADR review",
+        "schema golden test"
+      ],
+      "acceptance_criteria": [
+        "ADR accepted",
+        "No ambiguity remains",
+        "Versioned"
+      ],
+      "forbidden_changes": [
+        "Implementation code beyond reference snippets",
+        "CRUD / boilerplate"
+      ],
+      "labels": [
+        "architecture",
+        "consistency"
+      ],
+      "id": "TSPEC-A024",
+      "title": "Guard / negative-space closure (requiresAuth without a guard)",
+      "owner": "ROLE_ARCHITECT",
+      "package": "consistency",
+      "module": "guard",
+      "state": "COMPLETE",
+      "repository_path": "packages/consistency",
+      "branch": "feature/tspec-a024-guard-negative-space-closure-requiresauth-without-a-guard",
+      "parent_branch": "main",
+      "blocks": [
+        "TSPEC-A027"
+      ],
+      "reviewers": [
+        "ROLE_ARCHITECT"
+      ],
+      "version": "1.0.0",
+      "created_at": "2026-06-27T00:00:00Z",
+      "updated_at": "2026-06-27T00:00:00Z",
+      "wave": 3,
+      "critical_path": false,
+      "parallel_group": "wave-3",
+      "spec_path": "eos/specs/TSPEC-A024.spec.md",
+      "spec_required": false,
+      "spec_status": "MISSING"
+    },
+    {
+      "priority": "P2",
+      "complexity": "MEDIUM",
+      "risk": "MEDIUM",
+      "estimated_effort": 1,
+      "depends_on": [
+        "TSPEC-A016"
+      ],
+      "references": [],
+      "architecture_documents": [
+        "docs/ADR-0024-gaps-v2-program.md"
+      ],
+      "deliverables": [
+        "Criticality + getCriticality()",
+        "criticality on cross/guard findings + sort"
+      ],
+      "outputs": [],
+      "tests": [
+        "ADR review",
+        "schema golden test"
+      ],
+      "acceptance_criteria": [
+        "ADR accepted",
+        "No ambiguity remains",
+        "Versioned"
+      ],
+      "forbidden_changes": [
+        "Implementation code beyond reference snippets",
+        "CRUD / boilerplate"
+      ],
+      "labels": [
+        "architecture",
+        "ontology"
+      ],
+      "id": "TSPEC-A025",
+      "title": "Capability criticality weighting on findings",
+      "owner": "ROLE_ARCHITECT",
+      "package": "ontology",
+      "module": "criticality",
+      "state": "COMPLETE",
+      "repository_path": "packages/ontology",
+      "branch": "feature/tspec-a025-capability-criticality-weighting-on-findings",
+      "parent_branch": "main",
+      "blocks": [],
+      "reviewers": [
+        "ROLE_ARCHITECT"
+      ],
+      "version": "1.0.0",
+      "created_at": "2026-06-27T00:00:00Z",
+      "updated_at": "2026-06-27T00:00:00Z",
+      "wave": 3,
+      "critical_path": false,
+      "parallel_group": "wave-3",
+      "spec_path": "eos/specs/TSPEC-A025.spec.md",
+      "spec_required": false,
+      "spec_status": "MISSING"
+    },
+    {
+      "priority": "P3",
+      "complexity": "MEDIUM",
+      "risk": "MEDIUM",
+      "estimated_effort": 5,
+      "depends_on": [
+        "TSPEC-A016"
+      ],
+      "references": [],
+      "architecture_documents": [
+        "docs/ADR-0024-gaps-v2-program.md"
+      ],
+      "deliverables": [
+        "ontology schema for alternate chains",
+        "closure coverage of required states"
+      ],
+      "outputs": [],
+      "tests": [
+        "ADR review",
+        "schema golden test"
+      ],
+      "acceptance_criteria": [
+        "ADR accepted",
+        "No ambiguity remains",
+        "Versioned"
+      ],
+      "forbidden_changes": [
+        "Implementation code beyond reference snippets",
+        "CRUD / boilerplate"
+      ],
+      "labels": [
+        "architecture",
+        "ontology"
+      ],
+      "id": "TSPEC-A030",
+      "title": "State-machine capability model (alternate / exception paths)",
+      "owner": "ROLE_ARCHITECT",
+      "package": "ontology",
+      "module": "altpaths",
+      "state": "DRAFT",
+      "repository_path": "packages/ontology",
+      "branch": "feature/tspec-a030-state-machine-capability-model-alternate-exception-paths",
+      "parent_branch": "main",
+      "blocks": [],
+      "reviewers": [
+        "ROLE_ARCHITECT"
+      ],
+      "version": "1.0.0",
+      "created_at": "2026-06-27T00:00:00Z",
+      "updated_at": "2026-06-27T00:00:00Z",
+      "wave": 3,
+      "critical_path": false,
+      "parallel_group": "wave-3",
+      "spec_path": "eos/specs/TSPEC-A030.spec.md",
+      "spec_required": false,
+      "spec_status": "MISSING"
+    },
+    {
+      "priority": "P3",
+      "complexity": "MEDIUM",
+      "risk": "HIGH",
+      "estimated_effort": 13,
+      "depends_on": [
+        "TSPEC-A016"
+      ],
+      "references": [],
+      "architecture_documents": [
+        "docs/ADR-0024-gaps-v2-program.md"
+      ],
+      "deliverables": [
+        "multi-repo IR index",
+        "stitch API_CALL(repoA) -> ROUTE(repoB)"
+      ],
+      "outputs": [],
+      "tests": [
+        "ADR review",
+        "schema golden test"
+      ],
+      "acceptance_criteria": [
+        "ADR accepted",
+        "No ambiguity remains",
+        "Versioned"
+      ],
+      "forbidden_changes": [
+        "Implementation code beyond reference snippets",
+        "CRUD / boilerplate"
+      ],
+      "labels": [
+        "architecture",
+        "compiler"
+      ],
+      "id": "TSPEC-A032",
+      "title": "Cross-repo IR linking by API/contract schema",
+      "owner": "ROLE_ARCHITECT",
+      "package": "compiler",
+      "module": "multi-repo",
+      "state": "DRAFT",
+      "repository_path": "packages/compiler",
+      "branch": "feature/tspec-a032-cross-repo-ir-linking-by-api-contract-schema",
+      "parent_branch": "main",
+      "blocks": [],
+      "reviewers": [
+        "ROLE_ARCHITECT"
+      ],
+      "version": "1.0.0",
+      "created_at": "2026-06-27T00:00:00Z",
+      "updated_at": "2026-06-27T00:00:00Z",
+      "wave": 3,
+      "critical_path": false,
+      "parallel_group": "wave-3",
+      "spec_path": "eos/specs/TSPEC-A032.spec.md",
       "spec_required": false,
       "spec_status": "MISSING"
     },
@@ -2504,6 +2746,352 @@
       "spec_status": "MISSING"
     },
     {
+      "priority": "P1",
+      "complexity": "MEDIUM",
+      "risk": "MEDIUM",
+      "estimated_effort": 2,
+      "depends_on": [
+        "TSPEC-A020"
+      ],
+      "references": [],
+      "architecture_documents": [
+        "docs/ADR-0024-gaps-v2-program.md"
+      ],
+      "deliverables": [
+        "ScopeManifest type",
+        "readScope()",
+        "cross-engine scope filter + OUT_OF_SCOPE"
+      ],
+      "outputs": [],
+      "tests": [
+        "ADR review",
+        "schema golden test"
+      ],
+      "acceptance_criteria": [
+        "ADR accepted",
+        "No ambiguity remains",
+        "Versioned"
+      ],
+      "forbidden_changes": [
+        "Implementation code beyond reference snippets",
+        "CRUD / boilerplate"
+      ],
+      "labels": [
+        "architecture",
+        "compiler"
+      ],
+      "id": "TSPEC-A022",
+      "title": "Scope manifest (rir.scope.yaml) filters consistency to declared scope",
+      "owner": "ROLE_ARCHITECT",
+      "package": "compiler",
+      "module": "scope",
+      "state": "COMPLETE",
+      "repository_path": "packages/compiler",
+      "branch": "feature/tspec-a022-scope-manifest-rir-scope-yaml-filters-consistency-to-declared-scope",
+      "parent_branch": "main",
+      "blocks": [],
+      "reviewers": [
+        "ROLE_ARCHITECT"
+      ],
+      "version": "1.0.0",
+      "created_at": "2026-06-27T00:00:00Z",
+      "updated_at": "2026-06-27T00:00:00Z",
+      "wave": 4,
+      "critical_path": false,
+      "parallel_group": "wave-4",
+      "spec_path": "eos/specs/TSPEC-A022.spec.md",
+      "spec_required": false,
+      "spec_status": "MISSING"
+    },
+    {
+      "priority": "P2",
+      "complexity": "MEDIUM",
+      "risk": "MEDIUM",
+      "estimated_effort": 2,
+      "depends_on": [
+        "TSPEC-A019"
+      ],
+      "references": [],
+      "architecture_documents": [
+        "docs/ADR-0024-gaps-v2-program.md"
+      ],
+      "deliverables": [
+        "ClosureResult.confidence = min evidence confidence over participating nodes"
+      ],
+      "outputs": [],
+      "tests": [
+        "ADR review",
+        "schema golden test"
+      ],
+      "acceptance_criteria": [
+        "ADR accepted",
+        "No ambiguity remains",
+        "Versioned"
+      ],
+      "forbidden_changes": [
+        "Implementation code beyond reference snippets",
+        "CRUD / boilerplate"
+      ],
+      "labels": [
+        "architecture",
+        "closure"
+      ],
+      "id": "TSPEC-A023",
+      "title": "Graded closure confidence (weakest-link evidence)",
+      "owner": "ROLE_ARCHITECT",
+      "package": "closure",
+      "module": "confidence",
+      "state": "COMPLETE",
+      "repository_path": "packages/closure",
+      "branch": "feature/tspec-a023-graded-closure-confidence-weakest-link-evidence",
+      "parent_branch": "main",
+      "blocks": [],
+      "reviewers": [
+        "ROLE_ARCHITECT"
+      ],
+      "version": "1.0.0",
+      "created_at": "2026-06-27T00:00:00Z",
+      "updated_at": "2026-06-27T00:00:00Z",
+      "wave": 4,
+      "critical_path": false,
+      "parallel_group": "wave-4",
+      "spec_path": "eos/specs/TSPEC-A023.spec.md",
+      "spec_required": false,
+      "spec_status": "MISSING"
+    },
+    {
+      "priority": "P1",
+      "complexity": "MEDIUM",
+      "risk": "MEDIUM",
+      "estimated_effort": 2,
+      "depends_on": [
+        "TSPEC-A019"
+      ],
+      "references": [],
+      "architecture_documents": [
+        "docs/ADR-0024-gaps-v2-program.md"
+      ],
+      "deliverables": [
+        "diffClosures()",
+        "rir diff CLI",
+        "regression exit code"
+      ],
+      "outputs": [],
+      "tests": [
+        "ADR review",
+        "schema golden test"
+      ],
+      "acceptance_criteria": [
+        "ADR accepted",
+        "No ambiguity remains",
+        "Versioned"
+      ],
+      "forbidden_changes": [
+        "Implementation code beyond reference snippets",
+        "CRUD / boilerplate"
+      ],
+      "labels": [
+        "architecture",
+        "compiler"
+      ],
+      "id": "TSPEC-A026",
+      "title": "Closure drift / rir diff (CI gate on CLOSED->BROKEN)",
+      "owner": "ROLE_ARCHITECT",
+      "package": "compiler",
+      "module": "diff",
+      "state": "COMPLETE",
+      "repository_path": "packages/compiler",
+      "branch": "feature/tspec-a026-closure-drift-rir-diff-ci-gate-on-closed-broken",
+      "parent_branch": "main",
+      "blocks": [],
+      "reviewers": [
+        "ROLE_ARCHITECT"
+      ],
+      "version": "1.0.0",
+      "created_at": "2026-06-27T00:00:00Z",
+      "updated_at": "2026-06-27T00:00:00Z",
+      "wave": 4,
+      "critical_path": false,
+      "parallel_group": "wave-4",
+      "spec_path": "eos/specs/TSPEC-A026.spec.md",
+      "spec_required": false,
+      "spec_status": "MISSING"
+    },
+    {
+      "priority": "P2",
+      "complexity": "MEDIUM",
+      "risk": "HIGH",
+      "estimated_effort": 8,
+      "depends_on": [
+        "TSPEC-A024"
+      ],
+      "references": [],
+      "architecture_documents": [
+        "docs/ADR-0024-gaps-v2-program.md",
+        "docs/GAPS.md"
+      ],
+      "deliverables": [
+        "probe synthesis from route+constraints+output",
+        "runner boundary",
+        "EXECUTABLE state"
+      ],
+      "outputs": [],
+      "tests": [
+        "ADR review",
+        "schema golden test"
+      ],
+      "acceptance_criteria": [
+        "ADR accepted",
+        "No ambiguity remains",
+        "Versioned"
+      ],
+      "forbidden_changes": [
+        "Implementation code beyond reference snippets",
+        "CRUD / boilerplate"
+      ],
+      "labels": [
+        "architecture",
+        "compiler"
+      ],
+      "id": "TSPEC-A027",
+      "title": "Executable probe: CLOSED -> EXECUTABLE via synthesized smoke test",
+      "owner": "ROLE_ARCHITECT",
+      "package": "compiler",
+      "module": "probe",
+      "state": "DRAFT",
+      "repository_path": "packages/compiler",
+      "branch": "feature/tspec-a027-executable-probe-closed-executable-via-synthesized-smoke-test",
+      "parent_branch": "main",
+      "blocks": [],
+      "reviewers": [
+        "ROLE_ARCHITECT"
+      ],
+      "version": "1.0.0",
+      "created_at": "2026-06-27T00:00:00Z",
+      "updated_at": "2026-06-27T00:00:00Z",
+      "wave": 4,
+      "critical_path": false,
+      "parallel_group": "wave-4",
+      "spec_path": "eos/specs/TSPEC-A027.spec.md",
+      "spec_required": false,
+      "spec_status": "MISSING"
+    },
+    {
+      "priority": "P2",
+      "complexity": "MEDIUM",
+      "risk": "HIGH",
+      "estimated_effort": 8,
+      "depends_on": [
+        "TSPEC-A019"
+      ],
+      "references": [],
+      "architecture_documents": [
+        "docs/ADR-0024-gaps-v2-program.md"
+      ],
+      "deliverables": [
+        "test->capability mapping",
+        "input->db dataflow check"
+      ],
+      "outputs": [],
+      "tests": [
+        "ADR review",
+        "schema golden test"
+      ],
+      "acceptance_criteria": [
+        "ADR accepted",
+        "No ambiguity remains",
+        "Versioned"
+      ],
+      "forbidden_changes": [
+        "Implementation code beyond reference snippets",
+        "CRUD / boilerplate"
+      ],
+      "labels": [
+        "architecture",
+        "passes"
+      ],
+      "id": "TSPEC-A028",
+      "title": "Behavioral closure: link capabilities to the tests/dataflow that exercise them",
+      "owner": "ROLE_ARCHITECT",
+      "package": "passes",
+      "module": "behavior",
+      "state": "DRAFT",
+      "repository_path": "packages/passes",
+      "branch": "feature/tspec-a028-behavioral-closure-link-capabilities-to-the-tests-dataflow-that-exercise-them",
+      "parent_branch": "main",
+      "blocks": [],
+      "reviewers": [
+        "ROLE_ARCHITECT"
+      ],
+      "version": "1.0.0",
+      "created_at": "2026-06-27T00:00:00Z",
+      "updated_at": "2026-06-27T00:00:00Z",
+      "wave": 4,
+      "critical_path": false,
+      "parallel_group": "wave-4",
+      "spec_path": "eos/specs/TSPEC-A028.spec.md",
+      "spec_required": false,
+      "spec_status": "MISSING"
+    },
+    {
+      "priority": "P3",
+      "complexity": "MEDIUM",
+      "risk": "HIGH",
+      "estimated_effort": 8,
+      "depends_on": [
+        "TSPEC-A019"
+      ],
+      "references": [],
+      "architecture_documents": [
+        "docs/ADR-0024-gaps-v2-program.md"
+      ],
+      "deliverables": [
+        "boot/trace ingestion",
+        "EvidenceSource.RUNTIME producer",
+        "static vs runtime reconcile"
+      ],
+      "outputs": [],
+      "tests": [
+        "ADR review",
+        "schema golden test"
+      ],
+      "acceptance_criteria": [
+        "ADR accepted",
+        "No ambiguity remains",
+        "Versioned"
+      ],
+      "forbidden_changes": [
+        "Implementation code beyond reference snippets",
+        "CRUD / boilerplate"
+      ],
+      "labels": [
+        "architecture",
+        "passes"
+      ],
+      "id": "TSPEC-A029",
+      "title": "Runtime evidence fusion (RUNTIME source; reconcile dynamic edges)",
+      "owner": "ROLE_ARCHITECT",
+      "package": "passes",
+      "module": "runtime",
+      "state": "DRAFT",
+      "repository_path": "packages/passes",
+      "branch": "feature/tspec-a029-runtime-evidence-fusion-runtime-source-reconcile-dynamic-edges",
+      "parent_branch": "main",
+      "blocks": [],
+      "reviewers": [
+        "ROLE_ARCHITECT"
+      ],
+      "version": "1.0.0",
+      "created_at": "2026-06-27T00:00:00Z",
+      "updated_at": "2026-06-27T00:00:00Z",
+      "wave": 4,
+      "critical_path": false,
+      "parallel_group": "wave-4",
+      "spec_path": "eos/specs/TSPEC-A029.spec.md",
+      "spec_required": false,
+      "spec_status": "MISSING"
+    },
+    {
       "priority": "P2",
       "complexity": "MEDIUM",
       "risk": "MEDIUM",
@@ -2554,7 +3142,9 @@
       "repository_path": "packages/document-compiler",
       "branch": "feature/tspec-dn01-requirementnormalizer-statements-requirement-ir",
       "parent_branch": "main",
-      "blocks": [],
+      "blocks": [
+        "TSPEC-A031"
+      ],
       "reviewers": [
         "ROLE_ARCHITECT"
       ],
@@ -2784,6 +3374,63 @@
       "parallel_group": "wave-4",
       "spec_path": "eos/specs/TSPEC-I006.spec.md",
       "spec_required": true,
+      "spec_status": "MISSING"
+    },
+    {
+      "priority": "P3",
+      "complexity": "MEDIUM",
+      "risk": "MEDIUM",
+      "estimated_effort": 3,
+      "depends_on": [
+        "TSPEC-DN01"
+      ],
+      "references": [],
+      "architecture_documents": [
+        "docs/ADR-0024-gaps-v2-program.md"
+      ],
+      "deliverables": [
+        "doc authority/freshness on RequirementIR",
+        "severity bends to source"
+      ],
+      "outputs": [],
+      "tests": [
+        "ADR review",
+        "schema golden test"
+      ],
+      "acceptance_criteria": [
+        "ADR accepted",
+        "No ambiguity remains",
+        "Versioned"
+      ],
+      "forbidden_changes": [
+        "Implementation code beyond reference snippets",
+        "CRUD / boilerplate"
+      ],
+      "labels": [
+        "architecture",
+        "document-compiler"
+      ],
+      "id": "TSPEC-A031",
+      "title": "Requirement authority / freshness weighting",
+      "owner": "ROLE_ARCHITECT",
+      "package": "document-compiler",
+      "module": "authority",
+      "state": "DRAFT",
+      "repository_path": "packages/document-compiler",
+      "branch": "feature/tspec-a031-requirement-authority-freshness-weighting",
+      "parent_branch": "main",
+      "blocks": [],
+      "reviewers": [
+        "ROLE_ARCHITECT"
+      ],
+      "version": "1.0.0",
+      "created_at": "2026-06-27T00:00:00Z",
+      "updated_at": "2026-06-27T00:00:00Z",
+      "wave": 5,
+      "critical_path": false,
+      "parallel_group": "wave-5",
+      "spec_path": "eos/specs/TSPEC-A031.spec.md",
+      "spec_required": false,
       "spec_status": "MISSING"
     },
     {

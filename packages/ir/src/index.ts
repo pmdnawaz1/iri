@@ -245,6 +245,18 @@ export interface RequirementSet {
   readonly requirements: readonly RequirementIR[];
 }
 
+/**
+ * What a repository claims to be (GAPS-v2 V10 / ADR-0024). Read from `rir.scope.yaml`.
+ * Consistency findings are only meaningful within the declared scope — a todo app should
+ * not be told it is "missing" PAYMENT. When absent, every ontology capability is in scope.
+ */
+export interface ScopeManifest {
+  /** Feature ids this product claims to implement, e.g. ["AUTH", "TEAM"]. */
+  readonly features?: readonly string[];
+  /** Specific capability ids in scope (additive to `features`), e.g. ["SEARCH.QUERY"]. */
+  readonly capabilities?: readonly string[];
+}
+
 // ---------------------------------------------------------------------------
 // Deterministic guards & helpers (no inference, no external deps)
 // ---------------------------------------------------------------------------
