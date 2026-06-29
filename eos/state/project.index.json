@@ -5058,7 +5058,7 @@
       "owner": "ROLE_IMPLEMENTER",
       "package": "code-compiler",
       "module": "typescript-adapter",
-      "state": "DRAFT",
+      "state": "COMPLETE",
       "repository_path": "packages/code-compiler",
       "branch": "feature/tspec-a021-adapter-route-detection-nestjs-decorators-file-based-route-ts",
       "parent_branch": "main",

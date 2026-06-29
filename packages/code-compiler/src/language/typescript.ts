@@ -159,9 +159,113 @@ function extractCalls(sf: import("typescript").SourceFile): CallFact[] {
   return calls;
 }
 
-function extractRoutes(sf: import("typescript").SourceFile): RouteFact[] {
+type TsNode = import("typescript").Node;
+type TsSourceFile = import("typescript").SourceFile;
+
+// TSPEC-A021: NestJS method decorators and file-based (route.ts) export verbs.
+const HTTP_VERB_DECORATORS = new Set(["Get", "Post", "Put", "Patch", "Delete", "Options", "Head", "All"]);
+const HTTP_VERB_EXPORTS = new Set(["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS", "HEAD"]);
+const ROUTING_ROOT_MARKERS = new Set(["api", "routes", "app", "pages", "handlers"]);
+
+function decoratorsOf(node: TsNode): readonly import("typescript").Decorator[] {
+  return ts.canHaveDecorators(node) ? (ts.getDecorators(node) ?? []) : [];
+}
+
+/** The decorator's identifier name and its first string-literal argument (or ""). */
+function decoratorNameAndArg(
+  dec: import("typescript").Decorator,
+): { name: string; path: string } | undefined {
+  const expr = dec.expression;
+  if (ts.isCallExpression(expr) && ts.isIdentifier(expr.expression)) {
+    const arg = expr.arguments[0];
+    return { name: expr.expression.text, path: arg && ts.isStringLiteral(arg) ? arg.text : "" };
+  }
+  if (ts.isIdentifier(expr)) return { name: expr.text, path: "" };
+  return undefined;
+}
+
+function joinRoutePath(base: string, sub: string): string {
+  const joined = [base.replace(/\/+$/, ""), sub.replace(/^\/+/, "")].filter(Boolean).join("/");
+  return "/" + joined.replace(/^\/+/, "");
+}
+
+/** NestJS-style: an `@Controller('base')` class whose methods carry `@Get(':id')` etc. */
+function extractDecoratorRoutes(sf: TsSourceFile): RouteFact[] {
   const routes: RouteFact[] = [];
-  const visit = (node: import("typescript").Node): void => {
+  const visit = (node: TsNode): void => {
+    if (ts.isClassDeclaration(node)) {
+      let base: string | undefined;
+      for (const dec of decoratorsOf(node)) {
+        const info = decoratorNameAndArg(dec);
+        if (info?.name === "Controller") base = info.path;
+      }
+      if (base !== undefined) {
+        const className = node.name?.text ?? "Controller";
+        for (const member of node.members) {
+          if (!ts.isMethodDeclaration(member) || !member.name) continue;
+          for (const dec of decoratorsOf(member)) {
+            const info = decoratorNameAndArg(dec);
+            if (!info || !HTTP_VERB_DECORATORS.has(info.name)) continue;
+            routes.push({
+              method: info.name === "All" ? "ALL" : info.name.toUpperCase(),
+              path: joinRoutePath(base, info.path),
+              handler: `${className}.${member.name.getText(sf)}`,
+              span: getSpan(sf, member),
+            });
+          }
+        }
+      }
+    }
+    ts.forEachChild(node, visit);
+  };
+  visit(sf);
+  return routes;
+}
+
+/** Derive an HTTP path from a `route.ts` file's directory (Medusa / Next.js App Router). */
+function fileBasedPath(dir: string): string {
+  const segments = dir.split("/").filter(Boolean);
+  let start = -1;
+  for (let i = segments.length - 1; i >= 0; i--) {
+    if (ROUTING_ROOT_MARKERS.has(segments[i]!.toLowerCase())) {
+      start = i + 1;
+      break;
+    }
+  }
+  const rel = start >= 0 ? segments.slice(start) : segments.slice(-1);
+  const conv = rel
+    .filter((s) => !/^\(.*\)$/.test(s)) // drop Next.js route groups, e.g. (auth)
+    .map((s) => s.replace(/^\[\.\.\.(.+)\]$/, "*").replace(/^\[(.+)\]$/, ":$1"));
+  return "/" + conv.join("/");
+}
+
+/** File-based routing: a `route.ts`/`route.js` that exports `GET`/`POST`/... functions. */
+function extractFileBasedRoutes(sf: TsSourceFile, path: string): RouteFact[] {
+  const norm = path.replace(/\\/g, "/");
+  const file = norm.slice(norm.lastIndexOf("/") + 1);
+  if (!/^route\.(t|j)sx?$/.test(file)) return [];
+  const routePath = fileBasedPath(norm.slice(0, norm.lastIndexOf("/")));
+
+  const routes: RouteFact[] = [];
+  const add = (name: string, node: TsNode): void => {
+    if (HTTP_VERB_EXPORTS.has(name))
+      routes.push({ method: name, path: routePath, handler: name, span: getSpan(sf, node) });
+  };
+  for (const stmt of sf.statements) {
+    const exported =
+      ts.canHaveModifiers(stmt) && ts.getModifiers(stmt)?.some((m) => m.kind === ts.SyntaxKind.ExportKeyword);
+    if (!exported) continue;
+    if (ts.isFunctionDeclaration(stmt) && stmt.name) add(stmt.name.text, stmt);
+    else if (ts.isVariableStatement(stmt)) {
+      for (const d of stmt.declarationList.declarations) if (ts.isIdentifier(d.name)) add(d.name.text, stmt);
+    }
+  }
+  return routes;
+}
+
+function extractRoutes(sf: TsSourceFile, path: string): RouteFact[] {
+  const routes: RouteFact[] = [];
+  const visit = (node: TsNode): void => {
     if (
       ts.isCallExpression(node) &&
       ts.isPropertyAccessExpression(node.expression) &&
@@ -182,7 +286,7 @@ function extractRoutes(sf: import("typescript").SourceFile): RouteFact[] {
     ts.forEachChild(node, visit);
   };
   visit(sf);
-  return routes;
+  return [...routes, ...extractDecoratorRoutes(sf), ...extractFileBasedRoutes(sf, path)];
 }
 
 export function extractParseResult(sf: import("typescript").SourceFile, path: string): ParseResult {
@@ -199,7 +303,7 @@ export function extractParseResult(sf: import("typescript").SourceFile, path: st
     imports: extractImports(sf),
     exports: extractExports(sf),
     calls: extractCalls(sf),
-    routes: extractRoutes(sf),
+    routes: extractRoutes(sf, path),
   };
 }
 
