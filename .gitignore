@@ -26,4 +26,7 @@ lint_output.txt
 # Claude Code worktrees (never commit)
 .claude/worktrees/
 
-inspirations/
+inspirations//calcom-*.json
+
+# Local-only reference repos for ADR-0025 steals (clone, do not commit)
+/inspirations/

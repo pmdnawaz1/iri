@@ -50,6 +50,37 @@ CodeGraph's structural fidelity underneath them. Two non-negotiables:
 | Full-text search | `search/query-parser.ts`, `search/query-utils.ts` | `rir search` CLI |
 | files[] metadata + schema versioning | `db/schema.sql` (files table), `db/migrations.ts` | IR `files[]` + `schemaVersion` header |
 
+## The executable steal: `tools/steal/codegraph-to-rir.mjs`
+
+The steal is not aspirational — it runs today. `tools/steal/codegraph-to-rir.mjs` reads a
+CodeGraph SQLite DB (`<repo>/.codegraph/codegraph.db`) and emits a RIR-shaped IR JSON, applying
+the schema mapping below. On `cal.com/.codegraph/codegraph.db` it produced **56,871 nodes /
+144,689 edges**, including **314 ROUTE** (RIR-native: 132), **46,659 CALLS** (RIR-native: 288),
+51,475 CONTAINS, 18,660 REFERENCES, 1,642 INSTANTIATES, 314 DECORATES, with
+signature/qualifiedName/decorators/visibility on nodes.
+
+This file is **mandatory in every steal TSPEC** (it is cited in each F0x work order) as:
+1. **the canonical mapping** — the exact RIR field/kind names the implementer's extractor must emit;
+2. **the validation oracle** — `node --experimental-sqlite tools/steal/codegraph-to-rir.mjs db ref.json`
+   produces the golden IR; a native `rir compile <repo>` must reproduce the same kind/field per
+   construct. (It also bootstraps RIR depth immediately on any repo CodeGraph can index.)
+
+### CG → RIR schema mapping (the transform table)
+
+| CodeGraph (SQLite) | RIR IR | Notes |
+| --- | --- | --- |
+| `nodes.kind` (file/class/method/route/property/constant/enum/type_alias…) | NodeKind = UPPERCASE(kind) | RIR gains the structural kinds (F05/F06/F07); domain roles (CONTROLLER/SERVICE…) layered by CapabilityPass |
+| `qualified_name` / `file_path` | NodeIR.qualifiedName / .filePath (F02) | |
+| `start/end_line`, `start/end_column` | NodeIR.span (F02) | |
+| `signature` / `return_type` / `type_parameters` | NodeIR.signature/returnType/typeParameters (F01) | |
+| `visibility` / `is_exported` / `is_async` / `is_static` / `is_abstract` | NodeIR.* modifiers (F01) | |
+| `decorators` (JSON) | NodeIR.decorators (F03) | |
+| `docstring` | NodeIR.docstring (F04) | |
+| `edges.kind` (contains/calls/extends/implements/instantiates/references/decorates) | EdgeKind = UPPERCASE(kind) (F08–F13) | |
+| `edges.provenance='heuristic'` | evidence.confidence 0.6 (synthesized) | mirrors F16 |
+| `files` table | RepositoryIR.files[] (F21) | |
+| (RIR-only) execution.*, evidence.confidence on nodes, capabilities, closure | **kept** | RIR's differentiator; transform leaves execution to ReachabilityPass |
+
 ## Workstreams & TSPECs
 
 **WS1 — Node enrichment** (feeds discovery + signatures):

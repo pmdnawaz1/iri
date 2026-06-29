@@ -1221,7 +1221,7 @@ const GAPS: TspecSource[] = [
   T({
     id: "TSPEC-F18",
     title: "Closure populates on the resolved DI graph (the headline fix)",
-    owner: Role.Architect,
+    owner: Role.Implementer,
     package: "closure",
     module: "real-closure",
     priority: Priority.P1,
@@ -1279,7 +1279,7 @@ const GAPS: TspecSource[] = [
   T({
     id: "TSPEC-F22",
     title: "IR schemaVersion header + migration discipline",
-    owner: Role.Architect,
+    owner: Role.Implementer,
     package: "ir",
     module: "schema-version",
     priority: Priority.P2,
@@ -1347,7 +1347,7 @@ const GAPS: TspecSource[] = [
   T({
     id: "TSPEC-F27",
     title: "Runtime-trace ingestion (execution.runtimeObserved via OTel)",
-    owner: Role.Architect,
+    owner: Role.Implementer,
     package: "passes",
     module: "runtime-ingest",
     priority: Priority.P3,

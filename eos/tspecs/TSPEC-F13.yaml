@@ -60,4 +60,4 @@ critical_path: true
 parallel_group: "wave-8"
 spec_path: "eos/specs/TSPEC-F13.spec.md"
 spec_required: true
-spec_status: "MISSING"
+spec_status: "WRITTEN"

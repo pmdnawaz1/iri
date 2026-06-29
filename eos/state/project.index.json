@@ -5675,7 +5675,7 @@
       "parallel_group": "wave-6",
       "spec_path": "eos/specs/TSPEC-F01.spec.md",
       "spec_required": true,
-      "spec_status": "MISSING"
+      "spec_status": "WRITTEN"
     },
     {
       "priority": "P2",
@@ -5739,7 +5739,7 @@
       "parallel_group": "wave-6",
       "spec_path": "eos/specs/TSPEC-F21.spec.md",
       "spec_required": true,
-      "spec_status": "MISSING"
+      "spec_status": "WRITTEN"
     },
     {
       "priority": "P2",
@@ -5760,25 +5760,31 @@
       ],
       "outputs": [],
       "tests": [
-        "ADR review",
-        "schema golden test"
+        "unit",
+        "integration",
+        "golden"
       ],
       "acceptance_criteria": [
-        "ADR accepted",
-        "No ambiguity remains",
-        "Versioned"
+        "Builds",
+        "Typechecks",
+        "Lint clean",
+        "Tests pass",
+        "Coverage >= 95%"
       ],
       "forbidden_changes": [
-        "Implementation code beyond reference snippets",
-        "CRUD / boilerplate"
+        "Repository IR schema",
+        "Requirement IR schema",
+        "Ontology ids / properties",
+        "Compiler pipeline / builder order",
+        "Closure / coverage / consistency rules"
       ],
       "labels": [
-        "architecture",
+        "implementation",
         "ir"
       ],
       "id": "TSPEC-F22",
       "title": "IR schemaVersion header + migration discipline",
-      "owner": "ROLE_ARCHITECT",
+      "owner": "ROLE_IMPLEMENTER",
       "package": "ir",
       "module": "schema-version",
       "state": "DRAFT",
@@ -5796,8 +5802,8 @@
       "critical_path": false,
       "parallel_group": "wave-6",
       "spec_path": "eos/specs/TSPEC-F22.spec.md",
-      "spec_required": false,
-      "spec_status": "MISSING"
+      "spec_required": true,
+      "spec_status": "WRITTEN"
     },
     {
       "priority": "P3",
@@ -5859,7 +5865,7 @@
       "parallel_group": "wave-6",
       "spec_path": "eos/specs/TSPEC-F28.spec.md",
       "spec_required": true,
-      "spec_status": "MISSING"
+      "spec_status": "WRITTEN"
     },
     {
       "priority": "P2",
@@ -6813,7 +6819,7 @@
       "parallel_group": "wave-7",
       "spec_path": "eos/specs/TSPEC-F02.spec.md",
       "spec_required": true,
-      "spec_status": "MISSING"
+      "spec_status": "WRITTEN"
     },
     {
       "priority": "P1",
@@ -6880,7 +6886,7 @@
       "parallel_group": "wave-7",
       "spec_path": "eos/specs/TSPEC-F03.spec.md",
       "spec_required": true,
-      "spec_status": "MISSING"
+      "spec_status": "WRITTEN"
     },
     {
       "priority": "P3",
@@ -6945,7 +6951,7 @@
       "parallel_group": "wave-7",
       "spec_path": "eos/specs/TSPEC-F04.spec.md",
       "spec_required": true,
-      "spec_status": "MISSING"
+      "spec_status": "WRITTEN"
     },
     {
       "priority": "P2",
@@ -7012,7 +7018,7 @@
       "parallel_group": "wave-7",
       "spec_path": "eos/specs/TSPEC-F05.spec.md",
       "spec_required": true,
-      "spec_status": "MISSING"
+      "spec_status": "WRITTEN"
     },
     {
       "priority": "P2",
@@ -7078,7 +7084,7 @@
       "parallel_group": "wave-7",
       "spec_path": "eos/specs/TSPEC-F06.spec.md",
       "spec_required": true,
-      "spec_status": "MISSING"
+      "spec_status": "WRITTEN"
     },
     {
       "priority": "P3",
@@ -7142,7 +7148,7 @@
       "parallel_group": "wave-7",
       "spec_path": "eos/specs/TSPEC-F07.spec.md",
       "spec_required": true,
-      "spec_status": "MISSING"
+      "spec_status": "WRITTEN"
     },
     {
       "priority": "P1",
@@ -7210,7 +7216,7 @@
       "parallel_group": "wave-7",
       "spec_path": "eos/specs/TSPEC-F08.spec.md",
       "spec_required": true,
-      "spec_status": "MISSING"
+      "spec_status": "WRITTEN"
     },
     {
       "priority": "P2",
@@ -7274,7 +7280,7 @@
       "parallel_group": "wave-7",
       "spec_path": "eos/specs/TSPEC-F09.spec.md",
       "spec_required": true,
-      "spec_status": "MISSING"
+      "spec_status": "WRITTEN"
     },
     {
       "priority": "P2",
@@ -7339,7 +7345,7 @@
       "parallel_group": "wave-7",
       "spec_path": "eos/specs/TSPEC-F10.spec.md",
       "spec_required": true,
-      "spec_status": "MISSING"
+      "spec_status": "WRITTEN"
     },
     {
       "priority": "P1",
@@ -7402,7 +7408,7 @@
       "parallel_group": "wave-7",
       "spec_path": "eos/specs/TSPEC-F20.spec.md",
       "spec_required": true,
-      "spec_status": "MISSING"
+      "spec_status": "WRITTEN"
     },
     {
       "priority": "P2",
@@ -7465,7 +7471,7 @@
       "parallel_group": "wave-8",
       "spec_path": "eos/specs/TSPEC-F11.spec.md",
       "spec_required": true,
-      "spec_status": "MISSING"
+      "spec_status": "WRITTEN"
     },
     {
       "priority": "P2",
@@ -7528,7 +7534,7 @@
       "parallel_group": "wave-8",
       "spec_path": "eos/specs/TSPEC-F12.spec.md",
       "spec_required": true,
-      "spec_status": "MISSING"
+      "spec_status": "WRITTEN"
     },
     {
       "priority": "P1",
@@ -7600,7 +7606,7 @@
       "parallel_group": "wave-8",
       "spec_path": "eos/specs/TSPEC-F13.spec.md",
       "spec_required": true,
-      "spec_status": "MISSING"
+      "spec_status": "WRITTEN"
     },
     {
       "priority": "P3",
@@ -7664,7 +7670,7 @@
       "parallel_group": "wave-8",
       "spec_path": "eos/specs/TSPEC-F19.spec.md",
       "spec_required": true,
-      "spec_status": "MISSING"
+      "spec_status": "WRITTEN"
     },
     {
       "priority": "P3",
@@ -7729,7 +7735,7 @@
       "parallel_group": "wave-8",
       "spec_path": "eos/specs/TSPEC-F23.spec.md",
       "spec_required": true,
-      "spec_status": "MISSING"
+      "spec_status": "WRITTEN"
     },
     {
       "priority": "P3",
@@ -7791,7 +7797,7 @@
       "parallel_group": "wave-8",
       "spec_path": "eos/specs/TSPEC-F24.spec.md",
       "spec_required": true,
-      "spec_status": "MISSING"
+      "spec_status": "WRITTEN"
     },
     {
       "priority": "P3",
@@ -7853,7 +7859,7 @@
       "parallel_group": "wave-8",
       "spec_path": "eos/specs/TSPEC-F25.spec.md",
       "spec_required": true,
-      "spec_status": "MISSING"
+      "spec_status": "WRITTEN"
     },
     {
       "priority": "P2",
@@ -8053,7 +8059,7 @@
       "parallel_group": "wave-9",
       "spec_path": "eos/specs/TSPEC-F14.spec.md",
       "spec_required": true,
-      "spec_status": "MISSING"
+      "spec_status": "WRITTEN"
     },
     {
       "priority": "P3",
@@ -8116,7 +8122,7 @@
       "parallel_group": "wave-9",
       "spec_path": "eos/specs/TSPEC-F16.spec.md",
       "spec_required": true,
-      "spec_status": "MISSING"
+      "spec_status": "WRITTEN"
     },
     {
       "priority": "P1",
@@ -8182,7 +8188,7 @@
       "parallel_group": "wave-9",
       "spec_path": "eos/specs/TSPEC-F17.spec.md",
       "spec_required": true,
-      "spec_status": "MISSING"
+      "spec_status": "WRITTEN"
     },
     {
       "priority": "P3",
@@ -8245,7 +8251,7 @@
       "parallel_group": "wave-9",
       "spec_path": "eos/specs/TSPEC-F29.spec.md",
       "spec_required": true,
-      "spec_status": "MISSING"
+      "spec_status": "WRITTEN"
     },
     {
       "priority": "P1",
@@ -8312,7 +8318,7 @@
       "parallel_group": "wave-10",
       "spec_path": "eos/specs/TSPEC-F15.spec.md",
       "spec_required": true,
-      "spec_status": "MISSING"
+      "spec_status": "WRITTEN"
     },
     {
       "priority": "P3",
@@ -8374,7 +8380,7 @@
       "parallel_group": "wave-10",
       "spec_path": "eos/specs/TSPEC-F26.spec.md",
       "spec_required": true,
-      "spec_status": "MISSING"
+      "spec_status": "WRITTEN"
     },
     {
       "priority": "P3",
@@ -8394,25 +8400,31 @@
       ],
       "outputs": [],
       "tests": [
-        "ADR review",
-        "schema golden test"
+        "unit",
+        "integration",
+        "golden"
       ],
       "acceptance_criteria": [
-        "ADR accepted",
-        "No ambiguity remains",
-        "Versioned"
+        "Builds",
+        "Typechecks",
+        "Lint clean",
+        "Tests pass",
+        "Coverage >= 95%"
       ],
       "forbidden_changes": [
-        "Implementation code beyond reference snippets",
-        "CRUD / boilerplate"
+        "Repository IR schema",
+        "Requirement IR schema",
+        "Ontology ids / properties",
+        "Compiler pipeline / builder order",
+        "Closure / coverage / consistency rules"
       ],
       "labels": [
-        "architecture",
+        "implementation",
         "passes"
       ],
       "id": "TSPEC-F27",
       "title": "Runtime-trace ingestion (execution.runtimeObserved via OTel)",
-      "owner": "ROLE_ARCHITECT",
+      "owner": "ROLE_IMPLEMENTER",
       "package": "passes",
       "module": "runtime-ingest",
       "state": "DRAFT",
@@ -8430,8 +8442,8 @@
       "critical_path": false,
       "parallel_group": "wave-10",
       "spec_path": "eos/specs/TSPEC-F27.spec.md",
-      "spec_required": false,
-      "spec_status": "MISSING"
+      "spec_required": true,
+      "spec_status": "WRITTEN"
     },
     {
       "priority": "P1",
@@ -8452,25 +8464,31 @@
       ],
       "outputs": [],
       "tests": [
-        "ADR review",
-        "schema golden test"
+        "unit",
+        "integration",
+        "golden"
       ],
       "acceptance_criteria": [
-        "ADR accepted",
-        "No ambiguity remains",
-        "Versioned"
+        "Builds",
+        "Typechecks",
+        "Lint clean",
+        "Tests pass",
+        "Coverage >= 95%"
       ],
       "forbidden_changes": [
-        "Implementation code beyond reference snippets",
-        "CRUD / boilerplate"
+        "Repository IR schema",
+        "Requirement IR schema",
+        "Ontology ids / properties",
+        "Compiler pipeline / builder order",
+        "Closure / coverage / consistency rules"
       ],
       "labels": [
-        "architecture",
+        "implementation",
         "closure"
       ],
       "id": "TSPEC-F18",
       "title": "Closure populates on the resolved DI graph (the headline fix)",
-      "owner": "ROLE_ARCHITECT",
+      "owner": "ROLE_IMPLEMENTER",
       "package": "closure",
       "module": "real-closure",
       "state": "DRAFT",
@@ -8488,8 +8506,8 @@
       "critical_path": true,
       "parallel_group": "wave-11",
       "spec_path": "eos/specs/TSPEC-F18.spec.md",
-      "spec_required": false,
-      "spec_status": "MISSING"
+      "spec_required": true,
+      "spec_status": "WRITTEN"
     }
   ]
 }

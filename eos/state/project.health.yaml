@@ -4,12 +4,17 @@ completion_pct: 61.5
 completed_tspecs: 80
 total_tspecs: 130
 coverage_target_pct: 95
-work_orders_written: 41
-work_orders_required: 96
-work_order_coverage_pct: 42.7
-ready_to_implement: 0
-ready_ids: []
-blocked_tspecs: 22
+work_orders_written: 70
+work_orders_required: 99
+work_order_coverage_pct: 70.7
+ready_to_implement: 5
+ready_ids:
+  - "TSPEC-F01"
+  - "TSPEC-F21"
+  - "TSPEC-F22"
+  - "TSPEC-F28"
+  - "TSPEC-F20"
+blocked_tspecs: 24
 critical_path_progress_pct: 50
 architecture_stability: "STABLE"
 compiler_health: "GREEN"

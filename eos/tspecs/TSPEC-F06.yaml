@@ -54,4 +54,4 @@ critical_path: false
 parallel_group: "wave-7"
 spec_path: "eos/specs/TSPEC-F06.spec.md"
 spec_required: true
-spec_status: "MISSING"
+spec_status: "WRITTEN"
