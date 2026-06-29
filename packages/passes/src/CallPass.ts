@@ -16,7 +16,8 @@ function classify(sym: SymbolFact): NodeKind {
     if (sym.name.endsWith("Controller")) return "CONTROLLER";
     if (sym.name.endsWith("Service")) return "SERVICE";
     if (sym.name.endsWith("Repository")) return "REPOSITORY";
-    if (sym.name.endsWith("Middleware") || sym.name.endsWith("Auth") || sym.name.endsWith("Guard")) return "MIDDLEWARE";
+    if (sym.name.endsWith("Middleware") || sym.name.endsWith("Auth") || sym.name.endsWith("Guard"))
+      return "MIDDLEWARE";
     return "CLASS";
   }
   if (sym.kind === "function") return "FUNCTION";
@@ -124,7 +125,7 @@ export class CallPass extends AbstractPass {
           let edgeKind: import("@rir/ir").EdgeKind = "CALLS";
           const fromNode = draft.getNode(from);
           const toNode = draft.getNode(to);
-          
+
           if (fromNode && toNode) {
             if (fromNode.kind === "CONTROLLER" && toNode.kind === "SERVICE") edgeKind = "ROUTES_TO";
             if (fromNode.kind === "SERVICE" && toNode.kind === "REPOSITORY") edgeKind = "ROUTES_TO";
@@ -156,7 +157,7 @@ export class CallPass extends AbstractPass {
 
         const parts = qName.split("::");
         const parentQName = parts.slice(0, -1).join("::");
-        
+
         const parentId = makeId("decl", parentQName);
         const childId = makeId("decl", qName);
 

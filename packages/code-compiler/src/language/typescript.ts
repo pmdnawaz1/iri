@@ -13,7 +13,9 @@ function getSpan(sf: import("typescript").SourceFile, node: import("typescript")
   return { startLine: start.line, startColumn: start.character, endLine: end.line, endColumn: end.character };
 }
 
-function extractNodeDecorators(node: import("typescript").Node): { name: string; args: string[] }[] | undefined {
+function extractNodeDecorators(
+  node: import("typescript").Node,
+): { name: string; args: string[] }[] | undefined {
   if (!ts.canHaveDecorators(node)) return undefined;
   const decs = ts.getDecorators(node);
   if (!decs || decs.length === 0) return undefined;
@@ -35,7 +37,12 @@ function extractNodeDecorators(node: import("typescript").Node): { name: string;
 
 function extractDocstring(node: import("typescript").Node): string | undefined {
   let target = node;
-  if (ts.isVariableDeclaration(node) && node.parent && node.parent.parent && ts.isVariableStatement(node.parent.parent)) {
+  if (
+    ts.isVariableDeclaration(node) &&
+    node.parent &&
+    node.parent.parent &&
+    ts.isVariableStatement(node.parent.parent)
+  ) {
     target = node.parent.parent;
   }
   const jsDocs = (target as any).jsDoc;
@@ -47,12 +54,15 @@ function extractDocstring(node: import("typescript").Node): string | undefined {
   return undefined;
 }
 
-function extractHeritage(node: import("typescript").ClassDeclaration | import("typescript").InterfaceDeclaration, sf: import("typescript").SourceFile): { extendsList?: string[], implementsList?: string[] } {
+function extractHeritage(
+  node: import("typescript").ClassDeclaration | import("typescript").InterfaceDeclaration,
+  sf: import("typescript").SourceFile,
+): { extendsList?: string[]; implementsList?: string[] } {
   let extendsList: string[] | undefined;
   let implementsList: string[] | undefined;
   if (node.heritageClauses) {
     for (const clause of node.heritageClauses) {
-      const types = clause.types.map(t => t.expression.getText(sf));
+      const types = clause.types.map((t) => t.expression.getText(sf));
       if (clause.token === ts.SyntaxKind.ExtendsKeyword) {
         extendsList = types;
       } else if (clause.token === ts.SyntaxKind.ImplementsKeyword) {
@@ -176,7 +186,10 @@ function extractSymbols(sf: import("typescript").SourceFile): SymbolFact[] {
       });
     } else if (ts.isVariableDeclaration(node) && ts.isIdentifier(node.name) && isTopLevel(node, sf)) {
       const qName = enclosing ? `${enclosing}::${node.name.text}` : node.name.text;
-      const isConst = node.parent && ts.isVariableDeclarationList(node.parent) && (node.parent.flags & ts.NodeFlags.Const) !== 0;
+      const isConst =
+        node.parent &&
+        ts.isVariableDeclarationList(node.parent) &&
+        (node.parent.flags & ts.NodeFlags.Const) !== 0;
       symbols.push({
         name: node.name.text,
         kind: isConst ? "constant" : "variable",
@@ -209,10 +222,7 @@ function isTopLevel(node: import("typescript").Node, sf: import("typescript").So
 }
 
 function hasModifier(node: import("typescript").Node, kind: import("typescript").SyntaxKind): boolean {
-  return (
-    ts.canHaveModifiers(node) &&
-    (ts.getModifiers(node) ?? []).some((m) => m.kind === kind)
-  );
+  return ts.canHaveModifiers(node) && (ts.getModifiers(node) ?? []).some((m) => m.kind === kind);
 }
 
 function hasExportModifier(node: import("typescript").Node): boolean {
@@ -226,7 +236,10 @@ function getVisibility(node: import("typescript").Node): "public" | "private" | 
   return undefined;
 }
 
-function getSignature(node: import("typescript").Node, sf: import("typescript").SourceFile): string | undefined {
+function getSignature(
+  node: import("typescript").Node,
+  sf: import("typescript").SourceFile,
+): string | undefined {
   if (ts.isFunctionDeclaration(node) || ts.isMethodDeclaration(node)) {
     const params = node.parameters.map((p) => p.getText(sf)).join(", ");
     const ret = node.type ? `: ${node.type.getText(sf)}` : "";
@@ -235,14 +248,20 @@ function getSignature(node: import("typescript").Node, sf: import("typescript").
   return undefined;
 }
 
-function getReturnType(node: import("typescript").Node, sf: import("typescript").SourceFile): string | undefined {
+function getReturnType(
+  node: import("typescript").Node,
+  sf: import("typescript").SourceFile,
+): string | undefined {
   if ((ts.isFunctionDeclaration(node) || ts.isMethodDeclaration(node)) && node.type) {
     return node.type.getText(sf);
   }
   return undefined;
 }
 
-function getTypeParameters(node: import("typescript").Node, sf: import("typescript").SourceFile): string | undefined {
+function getTypeParameters(
+  node: import("typescript").Node,
+  sf: import("typescript").SourceFile,
+): string | undefined {
   if (
     (ts.isFunctionDeclaration(node) ||
       ts.isMethodDeclaration(node) ||

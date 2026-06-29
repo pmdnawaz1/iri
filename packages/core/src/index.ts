@@ -20,7 +20,16 @@ import type { ArtifactIR, CapabilityIR, EdgeIR, NodeIR, RepositoryIR, Span } fro
 /** A raw symbol declared in a source file (syntactic; no role classification). */
 export interface SymbolFact {
   readonly name: string;
-  readonly kind: "function" | "class" | "method" | "variable" | "type" | "interface" | "property" | "enum" | "constant";
+  readonly kind:
+    | "function"
+    | "class"
+    | "method"
+    | "variable"
+    | "type"
+    | "interface"
+    | "property"
+    | "enum"
+    | "constant";
   readonly exported: boolean;
   readonly span: Span;
   readonly signature?: string;
