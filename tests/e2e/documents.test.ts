@@ -70,12 +70,12 @@ describe("Cross-consistency — docs vs code", () => {
       tsOnly(),
     );
 
-    // The "audit log" requirement maps to no ontology capability — never dropped.
-    const unmapped = requirements.requirements.find((r) => r.capability === "UNMAPPED.AUDIT_LOG");
-    expect(unmapped).toBeDefined();
-    expect(unmapped!.feature).toBe("UNMAPPED");
+    // The "audit log" requirement maps to no ontology capability (before graduation)
+    // Now it maps to AUDIT.RECORD, so we should check for an UNIMPLEMENTED finding for it
+    const mapped = requirements.requirements.find((r) => r.capability === "AUDIT.RECORD" && r.feature === "AUDIT");
+    expect(mapped).toBeDefined();
 
-    const finding = findings.find((f) => f.code === "DOC_UNMAPPED" && f.capability === "UNMAPPED.AUDIT_LOG");
+    const finding = findings.find((f) => f.code === "UNIMPLEMENTED" && f.capability === "AUDIT.RECORD");
     expect(finding).toBeDefined();
   });
 
