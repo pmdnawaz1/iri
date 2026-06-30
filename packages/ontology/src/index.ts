@@ -9,7 +9,7 @@
  * is only valid because it is listed in `aliases`).
  */
 
-export const ONTOLOGY_VERSION = "1.3.0" as const;
+export const ONTOLOGY_VERSION = "1.4.0" as const;
 
 /**
  * Canonical execution stages. A capability's `expectedChain` is an ordered list of
@@ -521,6 +521,106 @@ const CALENDAR: FeatureDefinition = {
   ],
 };
 
+// ---------------------------------------------------------------------------
+// Self-evolution graduation #3. The features accepted from the
+// ontology-candidates review queue / expected-next: MESSAGE, COMMENT, TAG,
+// REVIEW, AUDIT, FEATURE_FLAG, EXPORT, IMPORT, ANALYTICS.
+// ---------------------------------------------------------------------------
+
+const MESSAGE: FeatureDefinition = {
+  id: "MESSAGE",
+  name: "Message",
+  capabilities: [
+    cap("MESSAGE.SEND", "SEND", ["message", "chat", "dm"]),
+    cap("MESSAGE.LIST", "LIST", ["messages", "chats"]),
+    cap("MESSAGE.READ", "READ", ["read", "read_receipt"]),
+  ],
+};
+
+const COMMENT: FeatureDefinition = {
+  id: "COMMENT",
+  name: "Comment",
+  capabilities: [
+    cap("COMMENT.CREATE", "CREATE", ["comment", "reply"]),
+    cap("COMMENT.UPDATE", "UPDATE", []),
+    cap("COMMENT.DELETE", "DELETE", []),
+    cap("COMMENT.LIST", "LIST", ["comments"]),
+  ],
+};
+
+const TAG: FeatureDefinition = {
+  id: "TAG",
+  name: "Tag",
+  capabilities: [
+    cap("TAG.CREATE", "CREATE", ["tag", "label"]),
+    cap("TAG.UPDATE", "UPDATE", []),
+    cap("TAG.DELETE", "DELETE", []),
+    cap("TAG.LIST", "LIST", ["tags", "labels"]),
+    cap("TAG.ASSIGN", "ASSIGN", ["assign_tag", "add_tag", "add_label"]),
+    cap("TAG.REMOVE", "REMOVE", ["remove_tag", "remove_label"]),
+  ],
+};
+
+const REVIEW: FeatureDefinition = {
+  id: "REVIEW",
+  name: "Review",
+  capabilities: [
+    cap("REVIEW.CREATE", "CREATE", ["review", "rating"]),
+    cap("REVIEW.UPDATE", "UPDATE", []),
+    cap("REVIEW.DELETE", "DELETE", []),
+    cap("REVIEW.LIST", "LIST", ["reviews", "ratings"]),
+  ],
+};
+
+const AUDIT: FeatureDefinition = {
+  id: "AUDIT",
+  name: "Audit",
+  capabilities: [
+    cap("AUDIT.RECORD", "RECORD", ["audit_log", "activity_log", "audit_trail"]),
+    cap("AUDIT.QUERY", "QUERY", ["audit_logs", "activity_logs"]),
+  ],
+};
+
+const FEATURE_FLAG: FeatureDefinition = {
+  id: "FEATURE_FLAG",
+  name: "FeatureFlag",
+  capabilities: [
+    cap("FEATURE_FLAG.CREATE", "CREATE", ["feature_flag", "flag"]),
+    cap("FEATURE_FLAG.UPDATE", "UPDATE", []),
+    cap("FEATURE_FLAG.DELETE", "DELETE", []),
+    cap("FEATURE_FLAG.LIST", "LIST", ["feature_flags", "flags"]),
+    cap("FEATURE_FLAG.EVALUATE", "EVALUATE", ["evaluate", "check_flag"]),
+  ],
+};
+
+const EXPORT: FeatureDefinition = {
+  id: "EXPORT",
+  name: "Export",
+  capabilities: [
+    cap("EXPORT.START", "START", ["export", "download_data"]),
+    cap("EXPORT.STATUS", "STATUS", ["export_status"]),
+    cap("EXPORT.DOWNLOAD", "DOWNLOAD", ["download_export"]),
+  ],
+};
+
+const IMPORT: FeatureDefinition = {
+  id: "IMPORT",
+  name: "Import",
+  capabilities: [
+    cap("IMPORT.START", "START", ["import", "upload_data"]),
+    cap("IMPORT.STATUS", "STATUS", ["import_status"]),
+  ],
+};
+
+const ANALYTICS: FeatureDefinition = {
+  id: "ANALYTICS",
+  name: "Analytics",
+  capabilities: [
+    cap("ANALYTICS.TRACK", "TRACK", ["track", "event"]),
+    cap("ANALYTICS.QUERY", "QUERY", ["analytics", "report", "reporting", "stats", "metrics"]),
+  ],
+};
+
 /** The complete ontology, keyed by feature id. Extend additively, never in place. */
 export const ONTOLOGY: readonly FeatureDefinition[] = [
   AUTH,
@@ -545,6 +645,15 @@ export const ONTOLOGY: readonly FeatureDefinition[] = [
   DISCOUNT,
   SHIPPING,
   CALENDAR,
+  MESSAGE,
+  COMMENT,
+  TAG,
+  REVIEW,
+  AUDIT,
+  FEATURE_FLAG,
+  EXPORT,
+  IMPORT,
+  ANALYTICS,
 ];
 
 // ---------------------------------------------------------------------------
