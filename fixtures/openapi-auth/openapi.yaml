@@ -13,8 +13,8 @@ paths:
       operationId: registerUser
       summary: Register a new user account
       tags: [Auth]
-  /audit-logs:
+  /loyalty-points:
     get:
-      operationId: listAuditLogs
-      summary: List audit log entries for administrative actions
-      tags: [Audit]
+      operationId: listLoyaltyPoints
+      summary: List loyalty points earned by a user
+      tags: [Loyalty]

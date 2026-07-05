@@ -9,7 +9,7 @@
  * is only valid because it is listed in `aliases`).
  */
 
-export const ONTOLOGY_VERSION = "1.3.0" as const;
+export const ONTOLOGY_VERSION = "1.4.0" as const;
 
 /**
  * Canonical execution stages. A capability's `expectedChain` is an ordered list of
@@ -365,7 +365,7 @@ const TEAM: FeatureDefinition = {
   id: "TEAM",
   name: "Team",
   capabilities: [
-    cap("TEAM.CREATE", "CREATE", ["team", "teams", "organization", "organizations"]),
+    cap("TEAM.CREATE", "CREATE", ["team", "teams", "organization", "organizations", "org", "orgs"]),
     cap("TEAM.UPDATE", "UPDATE", []),
     cap("TEAM.DELETE", "DELETE", []),
     cap("TEAM.LIST", "LIST", []),
@@ -522,6 +522,103 @@ const CALENDAR: FeatureDefinition = {
 };
 
 /** The complete ontology, keyed by feature id. Extend additively, never in place. */
+// ---------------------------------------------------------------------------
+// Platform / dev-tooling domains (1.4.0). Grounded in a real consumer
+// (project-os / CodeOrch: FastAPI backend — auth, orgs, billing, projects,
+// GitHub connect, tasks, comments, realtime, logs). Adds the features whose
+// routes were previously UNMAPPED. Aliases are domain-specific and unique.
+// ---------------------------------------------------------------------------
+
+const PROJECT: FeatureDefinition = {
+  id: "PROJECT",
+  name: "Project",
+  capabilities: [
+    cap("PROJECT.CREATE", "CREATE", ["project", "projects"]),
+    cap("PROJECT.UPDATE", "UPDATE", []),
+    cap("PROJECT.DELETE", "DELETE", []),
+    cap("PROJECT.LIST", "LIST", []),
+    cap("PROJECT.GET", "GET", []),
+    cap("PROJECT.GET_SETTINGS", "GET_SETTINGS", ["settings"]),
+    cap("PROJECT.GET_SUMMARY", "GET_SUMMARY", ["summary"]),
+    cap("PROJECT.SYNC", "SYNC", []),
+  ],
+};
+
+const VCS: FeatureDefinition = {
+  id: "VCS",
+  name: "Vcs",
+  capabilities: [
+    cap("VCS.CONNECT", "CONNECT", ["vcs", "git_connect"]),
+    cap("VCS.DISCONNECT", "DISCONNECT", ["disconnect"]),
+    cap("VCS.LIST_REPOS", "LIST_REPOS", ["repo", "repos", "repository", "repositories"]),
+    cap("VCS.LIST_BRANCHES", "LIST_BRANCHES", ["branch", "branches"]),
+    cap("VCS.LIST_PULLS", "LIST_PULLS", ["pull", "pulls", "pr", "pull_request"]),
+    cap("VCS.MERGE_PULL", "MERGE_PULL", ["merge_pull"]),
+    cap("VCS.LIST_ISSUES", "LIST_ISSUES", ["issue", "issues"]),
+    cap("VCS.SETUP_WEBHOOK", "SETUP_WEBHOOK", []),
+    cap("VCS.SYNC", "SYNC", []),
+  ],
+};
+
+const TASK: FeatureDefinition = {
+  id: "TASK",
+  name: "Task",
+  capabilities: [
+    cap("TASK.CREATE", "CREATE", ["task", "tasks"]),
+    cap("TASK.UPDATE", "UPDATE", []),
+    cap("TASK.DELETE", "DELETE", []),
+    cap("TASK.LIST", "LIST", []),
+    cap("TASK.GET", "GET", []),
+    cap("TASK.CLAIM", "CLAIM", ["claim"]),
+    cap("TASK.START", "START", []),
+    cap("TASK.COMPLETE", "COMPLETE", []),
+    cap("TASK.ASSIGN", "ASSIGN", ["assign"]),
+  ],
+};
+
+const COMMENT: FeatureDefinition = {
+  id: "COMMENT",
+  name: "Comment",
+  capabilities: [
+    cap("COMMENT.CREATE", "CREATE", ["comment", "comments"]),
+    cap("COMMENT.LIST", "LIST", []),
+    cap("COMMENT.UPDATE", "UPDATE", []),
+    cap("COMMENT.DELETE", "DELETE", []),
+  ],
+};
+
+const REALTIME: FeatureDefinition = {
+  id: "REALTIME",
+  name: "Realtime",
+  capabilities: [
+    cap("REALTIME.PUBLISH", "PUBLISH", ["publish"]),
+    cap("REALTIME.SUBSCRIBE", "SUBSCRIBE", []),
+    cap("REALTIME.PRESENCE", "PRESENCE", ["presence"]),
+    cap("REALTIME.ACTIVITY", "ACTIVITY", ["activity", "activity_feed"]),
+  ],
+};
+
+const BILLING: FeatureDefinition = {
+  id: "BILLING",
+  name: "Billing",
+  capabilities: [
+    cap("BILLING.CHECKOUT", "CHECKOUT", []),
+    cap("BILLING.CREATE_INVOICE", "CREATE_INVOICE", ["invoice", "invoices"]),
+    cap("BILLING.GET_PLAN", "GET_PLAN", ["plan", "plans"]),
+    cap("BILLING.GET_USAGE", "GET_USAGE", ["usage"]),
+    cap("BILLING.CANCEL", "CANCEL", []),
+  ],
+};
+
+const AUDIT: FeatureDefinition = {
+  id: "AUDIT",
+  name: "Audit",
+  capabilities: [
+    cap("AUDIT.RECORD", "RECORD", ["audit", "audit_log", "audit_trail"]),
+    cap("AUDIT.QUERY", "QUERY", ["logs"]),
+  ],
+};
+
 export const ONTOLOGY: readonly FeatureDefinition[] = [
   AUTH,
   PAYMENT,
@@ -545,6 +642,13 @@ export const ONTOLOGY: readonly FeatureDefinition[] = [
   DISCOUNT,
   SHIPPING,
   CALENDAR,
+  PROJECT,
+  VCS,
+  TASK,
+  COMMENT,
+  REALTIME,
+  BILLING,
+  AUDIT,
 ];
 
 // ---------------------------------------------------------------------------
@@ -609,6 +713,12 @@ const CRITICALITY_BY_FEATURE: Record<string, Criticality> = {
   SUBSCRIPTION: "HIGH",
   DISCOUNT: "HIGH",
   SHIPPING: "HIGH",
+  BILLING: "CRITICAL",
+  VCS: "HIGH",
+  PROJECT: "HIGH",
+  TASK: "NORMAL",
+  AUDIT: "HIGH",
+  REALTIME: "NORMAL",
 };
 
 /** Capability business criticality. Defaults to NORMAL when the feature is unlisted. */

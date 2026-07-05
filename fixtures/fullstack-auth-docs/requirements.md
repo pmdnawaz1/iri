@@ -11,6 +11,6 @@ On a successful login the system returns a JWT to the client.
 
 The system MUST allow a user to reset their password via an emailed link.
 
-## Audit Log
+## Loyalty
 
-The system MUST record an audit log entry for every administrative action.
+The system MUST award loyalty points to a user for every completed purchase.
