@@ -275,9 +275,20 @@ export const fastapiResolver: FrameworkResolver = {
       const result = resolveByNameAndKind(ref.referenceName, VARIABLE_KINDS, ROUTER_DIRS, context);
       if (result) return { original: ref, targetNodeId: result, confidence: 0.8, resolvedBy: "framework" };
     }
-    if (ref.referenceName.startsWith("get_") || ref.referenceName.startsWith("Depends")) {
+    // FastAPI DI: Depends(get_db) → resolve get_db; also resolve get_* factory functions
+    if (ref.referenceName.startsWith("get_") || ref.referenceName === "Depends") {
       const result = resolveByNameAndKind(ref.referenceName, FUNCTION_KINDS, DEP_DIRS, context);
       if (result) return { original: ref, targetNodeId: result, confidence: 0.75, resolvedBy: "framework" };
+    }
+    // SQLAlchemy session / ORM pattern: resolve Session, session, db, engine
+    if (
+      ref.referenceName === "Session" ||
+      ref.referenceName === "session" ||
+      ref.referenceName === "db" ||
+      ref.referenceName === "engine"
+    ) {
+      const result = resolveByNameAndKind(ref.referenceName, FUNCTION_KINDS.concat(VARIABLE_KINDS), ORM_DIRS, context);
+      if (result) return { original: ref, targetNodeId: result, confidence: 0.7, resolvedBy: "framework" };
     }
     return null;
   },
@@ -290,7 +301,8 @@ export const fastapiResolver: FrameworkResolver = {
       if (!filePath.endsWith(".py")) continue;
       const content = context.readFile(filePath);
       if (!content) continue;
-      const res = extractDecoratorRoutes(filePath, stripCommentsForRegex(content, "python"), {
+      const safe = stripCommentsForRegex(content, "python");
+      const res = extractDecoratorRoutes(filePath, safe, {
         // FastAPI: @x.METHOD('/path') -> handler on the next def line. Path may be
         // empty ("") for routes mounted at the router/prefix root.
         decoratorRegex: /@(\w+)\.(get|post|put|patch|delete|options|head)\s*\(\s*['"]([^'"]*)['"]/g,
@@ -302,6 +314,48 @@ export const fastapiResolver: FrameworkResolver = {
       });
       nodes.push(...res.nodes);
       references.push(...res.references);
+
+      // FastAPI DI: extract Depends(...) references from function parameters.
+      // Pattern: `def handler(dep: Type = Depends(get_dep))` or `def handler(dep = Depends(get_dep))`
+      const dependsRegex = /def\s+(\w+)\s*\([^)]*?(\w+)\s*(?::\s*\w+)?\s*=\s*Depends\s*\(\s*(\w+)\s*\)/g;
+      let depMatch: RegExpExecArray | null;
+      while ((depMatch = dependsRegex.exec(safe)) !== null) {
+        const handlerName = depMatch[1]!;
+        const depFunc = depMatch[3]!;
+        const line = safe.slice(0, depMatch.index).split("\n").length;
+        references.push({
+          fromNodeId: `decl:${handlerName}`,
+          referenceName: depFunc,
+          referenceKind: "references",
+          line,
+          column: 0,
+          filePath,
+          language: "python",
+        });
+      }
+
+      // SQLAlchemy ORM: detect session.query(), session.execute(), .add(), .commit()
+      // and query chain methods (.filter(), .all(), .first(), .one(), etc.)
+      const ormRegex = /\b(\w+)\.(query|execute|execute_statement|add|add_all|commit|rollback|flush|close|merge|delete|get|refresh|expunge)\s*\(/g;
+      let ormMatch: RegExpExecArray | null;
+      while ((ormMatch = ormRegex.exec(safe)) !== null) {
+        const sessionVar = ormMatch[1]!;
+        const method = ormMatch[2]!;
+        const line = safe.slice(0, ormMatch.index).split("\n").length;
+        // Find the enclosing function
+        const enclosing = findEnclosingFunction(safe, ormMatch.index);
+        if (enclosing) {
+          references.push({
+            fromNodeId: `decl:${enclosing}`,
+            referenceName: `${sessionVar}.${method}`,
+            referenceKind: "references",
+            line,
+            column: 0,
+            filePath,
+            language: "python",
+          });
+        }
+      }
     }
     return { nodes, references };
   },
@@ -428,6 +482,22 @@ const VIEW_DIRS = ["views", "app/views", "src/views", "api/views"];
 const FORM_DIRS = ["forms", "app/forms", "src/forms"];
 const ROUTER_DIRS = ["/routers/", "/api/", "/routes/", "/endpoints/"];
 const DEP_DIRS = ["/dependencies/", "/deps/", "/core/"];
+const ORM_DIRS = ["/models/", "/db/", "/database/", "/repositories/", "/repos/", "/dal/"];
+
+/**
+ * Find the enclosing function name for a given offset in source text.
+ * Walks backwards from `offset` to find the nearest `def` or `function` keyword.
+ */
+function findEnclosingFunction(source: string, offset: number): string | null {
+  const before = source.slice(0, offset);
+  const defMatch = /\b(?:async\s+)?def\s+(\w+)\s*\(/g;
+  let lastMatch: RegExpExecArray | null = null;
+  let m: RegExpExecArray | null;
+  while ((m = defMatch.exec(before)) !== null) {
+    lastMatch = m;
+  }
+  return lastMatch ? lastMatch[1]! : null;
+}
 
 const CLASS_KINDS = new Set(["class"]);
 const VIEW_KINDS = new Set(["class", "function"]);

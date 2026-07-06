@@ -47,6 +47,7 @@ export const NodeKind = {
   Event: "EVENT",
   EventConsumer: "EVENT_CONSUMER",
   Entrypoint: "ENTRYPOINT",
+  Worker: "WORKER",
   Test: "TEST",
   Document: "DOCUMENT",
   Response: "RESPONSE",
@@ -81,6 +82,7 @@ export const EdgeKind = {
   Wraps: "WRAPS",
   Tests: "TESTS",
   Documents: "DOCUMENTS",
+  CrossTier: "CROSS_TIER",
 } as const;
 export type EdgeKind = (typeof EdgeKind)[keyof typeof EdgeKind];
 

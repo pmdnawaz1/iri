@@ -189,6 +189,38 @@ function extractRoutes(root: Parser.SyntaxNode): RouteFact[] {
   return routes;
 }
 
+/** Detect worker/task patterns: functions named Handle/Process/Run/Execute/Task or
+ *  with worker-like suffixes (e.g. SendEmailWorker, ProcessPaymentTask).
+ *  These become WORKER entrypoints for async/background processing (W1). */
+function extractWorkerPatterns(root: Parser.SyntaxNode): SymbolFact[] {
+  const workers: SymbolFact[] = [];
+  const WORKER_NAMES = /^(handle|process|run|execute|task|job|worker|consume|enqueue|dispatch|schedule|cron|process_|handle_|run_|execute_)/i;
+  const WORKER_SUFFIXES = /(worker|task|job|handler|consumer|processor)$/i;
+
+  const visit = (node: Parser.SyntaxNode): void => {
+    if (node.type === "function_declaration") {
+      const nameNode = node.childForFieldName("name");
+      if (nameNode) {
+        const name = nameNode.text;
+        if (WORKER_NAMES.test(name) || WORKER_SUFFIXES.test(name)) {
+          workers.push({
+            name,
+            kind: "function",
+            exported: isExported(name),
+            span: getSpan(node),
+          });
+        }
+      }
+    }
+    for (let i = 0; i < node.childCount; i++) {
+      const child = node.child(i);
+      if (child) visit(child);
+    }
+  };
+  visit(root);
+  return workers;
+}
+
 const parser = new Parser();
 parser.setLanguage(Go as unknown as Parser.Language);
 export class GoAdapter implements LanguageAdapter {

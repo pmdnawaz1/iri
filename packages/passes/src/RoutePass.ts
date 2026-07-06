@@ -112,6 +112,29 @@ export class RoutePass extends AbstractPass {
         // response — so a route that reached a controller produces a RESPONSE even without
         // an explicit `res.json`. Idempotent (same response node/edge id) with the block above.
         if (controllerLinked && !hasExplicitResponse) emitResponse();
+
+        // FastAPI path-operation fallback: when the route handler is a plain function (not
+        // controller.method), link the route directly to the function declaration. This
+        // bridges the gap for FastAPI where path operations are standalone functions, not
+        // controller methods. Without this, the route has no ROUTES_TO edge and the
+        // capability can never close beyond BACKEND_ROUTE.
+        if (!controllerLinked) {
+          const handlerFn = route.handler.trim();
+          if (handlerFn && !handlerFn.includes(".")) {
+            const fnId = makeId("decl", handlerFn);
+            if (draft.getNode(fnId)) {
+              draft.addEdge({
+                id: makeId("edge", "routesTo", routeId, fnId),
+                kind: "ROUTES_TO",
+                from: routeId,
+                to: fnId,
+                evidence: [{ source: "AST", locator: pr.artifact.path, confidence: 1 }],
+              });
+              controllerLinked = true;
+              if (!hasExplicitResponse) emitResponse();
+            }
+          }
+        }
       }
     }
   }

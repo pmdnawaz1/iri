@@ -34,6 +34,7 @@ import {
   ReachabilityPass,
   RoutePass,
   SQLPass,
+  StitchPass,
 } from "@rir/passes";
 import { ResolutionPass } from "@rir/resolution";
 import { DefaultClosureEngine, type ClosureResult } from "@rir/closure";
@@ -103,6 +104,7 @@ export class PipelineBuilder implements Builder {
       new CallPass(),
       new ResolutionPass(),
       new RoutePass(),
+      new StitchPass(),
       new ComponentPass(),
       new SQLPass(),
       new EventPass(),

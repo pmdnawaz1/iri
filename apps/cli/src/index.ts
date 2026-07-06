@@ -9,8 +9,9 @@
  */
 
 import { readFile } from "node:fs/promises";
-import { openSync, writeSync, writeFileSync } from "node:fs";
+import { mkdirSync, openSync, writeSync, writeFileSync } from "node:fs";
 import { Buffer } from "node:buffer";
+import { join as joinPath } from "node:path";
 import { ConsoleLogger, hash64 } from "@rir/common";
 import { ClosureState, RIR_VERSION, type RepositoryIR } from "@rir/ir";
 import { ONTOLOGY_VERSION, allCapabilities } from "@rir/ontology";
@@ -33,11 +34,12 @@ Usage:
   rir prove <dir>             Parse a TS backend dir and report AUTH.LOGIN closure (legacy slice)
   rir compile <dir>           Compile a repo (adapters -> passes -> IR -> closure)
   rir compile <dir> --docs <d>  Also compile docs and report doc<->code consistency
+  rir compile <dir> --out-dir <d>  Write separate artifact files to <d>/
   rir suggest-aliases <docs>  BM25-rank ontology for UNMAPPED doc statements (proposal-only)
   rir diff <a.json> <b.json>  Closure drift between two compile --json runs (CI-gateable)
   rir query <cap> <ir.json>   Show a capability's chain, constraints, and closure
   rir graph <ir.json>         Emit a Mermaid flowchart of the IR (--capability <id> to scope)
-  rir snapshot <ir.json>      Write a content-addressed snapshot file
+  rir snapshot <ir.json> [--out-dir <dir>]  Write a content-addressed snapshot file to snapshots/{sha}.json
 
 Global options:
   --log <file>                Append all output (stdout + stderr) to <file> as well
@@ -180,22 +182,40 @@ async function main(rawArgv: readonly string[]): Promise<number> {
     }
     case "compile": {
       const positionals = rest.filter(
-        (a, i) => !a.startsWith("--") && rest[i - 1] !== "--docs" && rest[i - 1] !== "--log",
+        (a, i) => !a.startsWith("--") && rest[i - 1] !== "--docs" && rest[i - 1] !== "--log" && rest[i - 1] !== "--out-dir",
       );
       const dir = positionals[0];
       if (!dir) {
-        process.stderr.write("usage: rir compile <dir> [--docs <dir>] [--json]\n");
+        process.stderr.write("usage: rir compile <dir> [--docs <dir>] [--json] [--out-dir <dir>]\n");
         return 64;
       }
 
       const docsIdx = rest.indexOf("--docs");
       const docsDir = docsIdx === -1 ? undefined : rest[docsIdx + 1];
+      const outDirIdx = rest.indexOf("--out-dir");
+      const outDir = outDirIdx === -1 ? undefined : rest[outDirIdx + 1];
+
       if (docsDir) {
         const { ir, closure, requirements, findings, guardFindings, scope } = await compileWithDocuments(
           dir,
           docsDir,
         );
         const failed = [...findings, ...guardFindings].some((f) => f.severity === "ERROR");
+
+        if (outDir) {
+          mkdirSync(outDir, { recursive: true });
+          const coverage = new DefaultCoverageEngine().compute(ir, requirements);
+          writeFileSync(joinPath(outDir, "repository-ir.json"), JSON.stringify(ir, null, 2));
+          writeFileSync(joinPath(outDir, "graph.json"), JSON.stringify({ nodes: ir.nodes, edges: ir.edges }, null, 2));
+          writeFileSync(joinPath(outDir, "closure.json"), JSON.stringify(closure, null, 2));
+          writeFileSync(joinPath(outDir, "coverage.json"), JSON.stringify(coverage, null, 2));
+          writeFileSync(joinPath(outDir, "consistency.json"), JSON.stringify({ findings, guardFindings }, null, 2));
+          process.stdout.write(
+            `Wrote 5 artifact files to ${outDir}/ (${ir.capabilities.length} capabilities, ${closure.filter((c) => c.state === "CLOSED").length} closed)\n`,
+          );
+          return failed ? 1 : 0;
+        }
+
         if (rest.includes("--json")) {
           process.stdout.write(
             JSON.stringify(
@@ -229,6 +249,21 @@ async function main(rawArgv: readonly string[]): Promise<number> {
       }
 
       const { ir, closure } = await compileRepository(dir);
+
+      if (outDir) {
+        mkdirSync(outDir, { recursive: true });
+        const requirements = emptyRequirementSet();
+        const coverage = new DefaultCoverageEngine().compute(ir, requirements);
+        writeFileSync(joinPath(outDir, "repository-ir.json"), JSON.stringify(ir, null, 2));
+        writeFileSync(joinPath(outDir, "graph.json"), JSON.stringify({ nodes: ir.nodes, edges: ir.edges }, null, 2));
+        writeFileSync(joinPath(outDir, "closure.json"), JSON.stringify(closure, null, 2));
+        writeFileSync(joinPath(outDir, "coverage.json"), JSON.stringify(coverage, null, 2));
+        process.stdout.write(
+          `Wrote 4 artifact files to ${outDir}/ (${ir.capabilities.length} capabilities, ${closure.filter((c) => c.state === "CLOSED").length} closed)\n`,
+        );
+        return closure.every((c) => c.state === ClosureState.Closed) ? 0 : 1;
+      }
+
       if (rest.includes("--json")) {
         // Full IR + closure for downstream analysis (e.g. ontology self-evolution).
         const routes = ir.nodes.filter((n) => n.kind === "ROUTE").map((n) => n.name);
@@ -334,17 +369,22 @@ async function main(rawArgv: readonly string[]): Promise<number> {
       return 0;
     }
     case "snapshot": {
-      // rir snapshot <ir.json> — write a content-addressed snapshot file.
-      const jsonPath = rest.find((a) => a.endsWith(".json"));
+      // rir snapshot <ir.json> [--out-dir <dir>] — write a content-addressed snapshot file.
+      const jsonPath = rest.find((a) => a.endsWith(".json") && !a.startsWith("--"));
       if (!jsonPath) {
-        process.stderr.write("usage: rir snapshot <compile.json>\n");
+        process.stderr.write("usage: rir snapshot <compile.json> [--out-dir <dir>]\n");
         return 64;
       }
+      const snapOutIdx = rest.indexOf("--out-dir");
+      const snapOutDir = snapOutIdx === -1 ? undefined : rest[snapOutIdx + 1];
       const { ir } = await loadCompile(jsonPath);
       const canonical = JSON.stringify(ir);
-      const id = `snap|${hash64(canonical)}`;
-      const outPath = `${id.replace("|", "-")}.json`;
-      writeFileSync(outPath, JSON.stringify({ id, createdAt: new Date(0).toISOString(), ir }, null, 2));
+      const sha = hash64(canonical);
+      const id = `snap|${sha}`;
+      const dir = snapOutDir ?? "snapshots";
+      mkdirSync(dir, { recursive: true });
+      const outPath = joinPath(dir, `${sha}.json`);
+      writeFileSync(outPath, JSON.stringify({ id, createdAt: new Date().toISOString(), repositoryHash: sha, ir }, null, 2));
       process.stdout.write(
         `${id}\t-> ${outPath}\t(${ir.nodes.length} nodes, ${ir.capabilities.length} capabilities)\n`,
       );

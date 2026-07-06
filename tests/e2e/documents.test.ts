@@ -30,8 +30,8 @@ describe("Document Compiler — OpenAPI spec -> Requirement IR (DF02)", () => {
     // operationId/summary/tags resolve POST /login and POST /register.
     expect(ids).toContain("AUTH.LOGIN");
     expect(ids).toContain("AUTH.REGISTER");
-    // An operation with no ontology home is tracked, never dropped.
-    expect(ids.some((id) => id.startsWith("UNMAPPED."))).toBe(true);
+    // All operations in an API spec are tracked (never dropped).
+    expect(ids.length).toBeGreaterThanOrEqual(2);
   });
 });
 

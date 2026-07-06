@@ -14,6 +14,7 @@ export const PASS_NAMES = [
   "ImportPass",
   "CallPass",
   "RoutePass",
+  "StitchPass",
   "ComponentPass",
   "SQLPass",
   "EventPass",

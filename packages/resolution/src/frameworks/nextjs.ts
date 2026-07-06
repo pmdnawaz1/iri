@@ -21,12 +21,34 @@ function fileBasedPath(dir: string): string {
   return "/" + conv.join("/");
 }
 
+/**
+ * Extract the page route path from a `page.tsx` file's directory.
+ * e.g. `app/dashboard/settings/page.tsx` → `/dashboard/settings`
+ */
+function pagePath(dir: string): string {
+  const segments = dir.split("/").filter(Boolean);
+  // Find the "app" or "pages" root
+  let start = -1;
+  for (let i = 0; i < segments.length; i++) {
+    const lower = segments[i]!.toLowerCase();
+    if (lower === "app" || lower === "pages") {
+      start = i + 1;
+      break;
+    }
+  }
+  if (start === -1) start = Math.max(0, segments.length - 2);
+  const rel = segments.slice(start);
+  const conv = rel
+    .filter((s) => !/^\(.*\)$/.test(s)) // drop route groups
+    .map((s) => s.replace(/^\[\.\.\.(.+)\]$/, "*").replace(/^\[(.+)\]$/, ":$1"));
+  return "/" + conv.join("/");
+}
+
 export const nextjsResolver: FrameworkResolver = {
   name: "nextjs",
   detect(_context: ResolutionContext): boolean {
-    return true; // Simple check, or check for next dependency
+    return true;
   },
-  // File-based routing has no name reference to resolve; routes are emitted by extract().
   resolve(): null {
     return null;
   },
@@ -38,24 +60,64 @@ export const nextjsResolver: FrameworkResolver = {
       if (typeof filePath !== "string") continue;
       const norm = filePath.replace(/\\/g, "/");
       const file = norm.slice(norm.lastIndexOf("/") + 1);
-      if (!/^route\.(t|j)sx?$/.test(file)) continue;
+      const dir = norm.slice(0, norm.lastIndexOf("/"));
 
-      const routePath = fileBasedPath(norm.slice(0, norm.lastIndexOf("/")));
+      // --- route.ts / route.tsx (API routes) ---
+      if (/^route\.(t|j)sx?$/.test(file)) {
+        const routePath = fileBasedPath(dir);
+        const fileNodes = context.getNodesInFile(filePath);
+        for (const node of fileNodes) {
+          if (
+            (node.kind === "function" || node.kind === "variable" || node.kind === "method") &&
+            node.isExported
+          ) {
+            const name = node.name;
+            if (HTTP_VERB_EXPORTS.has(name)) {
+              const routeNodeId = `route:${filePath}:${node.startLine}:${name}:${routePath}`;
+              nodes.push({
+                id: routeNodeId,
+                kind: "route",
+                name: `${name} ${routePath}`,
+                qualifiedName: `${filePath}::${name}:${routePath}`,
+                filePath,
+                startLine: node.startLine,
+                endLine: node.startLine,
+                startColumn: 0,
+                endColumn: 10,
+                language: "typescript",
+                updatedAt: Date.now(),
+              } as any);
 
-      const fileNodes = context.getNodesInFile(filePath);
-      for (const node of fileNodes) {
-        if (
-          (node.kind === "function" || node.kind === "variable" || node.kind === "method") &&
-          node.isExported
-        ) {
-          const name = node.name;
-          if (HTTP_VERB_EXPORTS.has(name)) {
-            const routeNodeId = `route:${filePath}:${node.startLine}:${name}:${routePath}`;
+              references.push({
+                fromNodeId: routeNodeId,
+                referenceName: name,
+                referenceKind: "references",
+                line: node.startLine,
+                column: 0,
+                filePath,
+                language: "typescript",
+              });
+            }
+          }
+        }
+        continue;
+      }
+
+      // --- page.tsx / page.ts (Next.js page components) ---
+      if (/^page\.(t|j)sx?$/.test(file)) {
+        const route = pagePath(dir);
+        const fileNodes = context.getNodesInFile(filePath);
+        for (const node of fileNodes) {
+          if (
+            (node.kind === "function" || node.kind === "variable") &&
+            node.isExported
+          ) {
+            const componentNodeId = `component:${filePath}:${node.startLine}:${node.name}`;
             nodes.push({
-              id: routeNodeId,
-              kind: "route",
-              name: `${name} ${routePath}`,
-              qualifiedName: `${filePath}::${name}:${routePath}`,
+              id: componentNodeId,
+              kind: "component",
+              name: node.name,
+              qualifiedName: `${filePath}::${node.name}`,
               filePath,
               startLine: node.startLine,
               endLine: node.startLine,
@@ -65,10 +127,54 @@ export const nextjsResolver: FrameworkResolver = {
               updatedAt: Date.now(),
             } as any);
 
+            // FRONTEND_ROUTE node for the page
+            const frontendRouteId = `frontend_route:${filePath}:${route}`;
+            nodes.push({
+              id: frontendRouteId,
+              kind: "frontend_route",
+              name: route,
+              qualifiedName: `${filePath}::${route}`,
+              filePath,
+              startLine: 0,
+              endLine: 0,
+              startColumn: 0,
+              endColumn: 0,
+              language: "typescript",
+              updatedAt: Date.now(),
+            } as any);
+
+            // RENDERED_UI node for the page
+            const renderedUiId = `rendered_ui:${filePath}:${route}`;
+            nodes.push({
+              id: renderedUiId,
+              kind: "rendered_ui",
+              name: `Page: ${route}`,
+              qualifiedName: `${filePath}::rendered::${route}`,
+              filePath,
+              startLine: node.startLine,
+              endLine: node.startLine,
+              startColumn: 0,
+              endColumn: 0,
+              language: "typescript",
+              updatedAt: Date.now(),
+            } as any);
+
+            // Link page component to its FRONTEND_ROUTE
             references.push({
-              fromNodeId: routeNodeId,
-              referenceName: name,
-              referenceKind: "references",
+              fromNodeId: frontendRouteId,
+              referenceName: node.name,
+              referenceKind: "renders",
+              line: node.startLine,
+              column: 0,
+              filePath,
+              language: "typescript",
+            });
+
+            // Link component to RENDERED_UI
+            references.push({
+              fromNodeId: componentNodeId,
+              referenceName: route,
+              referenceKind: "renders",
               line: node.startLine,
               column: 0,
               filePath,
@@ -76,6 +182,28 @@ export const nextjsResolver: FrameworkResolver = {
             });
           }
         }
+
+        // Detect fetch() calls in page files for API_CALL nodes
+        const fileCalls = context.getCallsInFile?.(filePath) ?? [];
+        for (const call of fileCalls) {
+          if (typeof call.callee === "string" && call.callee.includes("fetch")) {
+            const apiCallNodeId = `api_call:${filePath}:${call.line ?? 0}`;
+            nodes.push({
+              id: apiCallNodeId,
+              kind: "api_call",
+              name: call.callee,
+              qualifiedName: `${filePath}::fetch::${call.line ?? 0}`,
+              filePath,
+              startLine: call.line ?? 0,
+              endLine: call.line ?? 0,
+              startColumn: 0,
+              endColumn: 0,
+              language: "typescript",
+              updatedAt: Date.now(),
+            } as any);
+          }
+        }
+        continue;
       }
     }
 

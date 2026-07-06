@@ -13,9 +13,81 @@ const SQL_METHODS = new Set([
   "find",
   "findone",
   "save",
+  // SQLAlchemy ORM session methods
+  "execute_statement",
+  "add",
+  "add_all",
+  "commit",
+  "rollback",
+  "flush",
+  "merge",
+  "get",
+  "refresh",
+  "expunge",
+  "bulk_save_objects",
+  "bulk_insert_mappings",
+  "bulk_update_mappings",
+  // SQLAlchemy query chain methods (produce SQL when terminal)
+  "filter",
+  "filter_by",
+  "where",
+  "order_by",
+  "group_by",
+  "having",
+  "limit",
+  "offset",
+  "join",
+  "outerjoin",
+  "subquery",
+  "all",
+  "first",
+  "one",
+  "one_or_none",
+  "count",
+  "exists",
+  "scalar",
+  "distinct",
+  "union",
+  "union_all",
+  // Pydantic / SQLModel
+  "from_query",
+  "from_attributes",
 ]);
 
-const WRITES_METHODS = new Set(["insert", "update", "delete", "save", "exec", "execute"]);
+const WRITES_METHODS = new Set([
+  "insert",
+  "update",
+  "delete",
+  "save",
+  "exec",
+  "execute",
+  "execute_statement",
+  "add",
+  "add_all",
+  "commit",
+  "flush",
+  "merge",
+  "bulk_save_objects",
+  "bulk_insert_mappings",
+  "bulk_update_mappings",
+]);
+
+const QUERY_CHAIN_METHODS = new Set([
+  "filter",
+  "filter_by",
+  "where",
+  "order_by",
+  "group_by",
+  "having",
+  "limit",
+  "offset",
+  "join",
+  "outerjoin",
+  "subquery",
+  "distinct",
+  "union",
+  "union_all",
+]);
 
 export class SQLPass extends AbstractPass {
   readonly name = "SQLPass";
@@ -28,6 +100,25 @@ export class SQLPass extends AbstractPass {
 
         if (method && SQL_METHODS.has(method)) {
           const sqlId = makeId("sql", pr.artifact.path, String(call.span.startLine));
+
+          // Query chain methods (.filter(), .all(), etc.) link to the parent query/session
+          // rather than creating standalone SQL_QUERY nodes — they are part of the same
+          // SQL operation, not a new one.
+          if (method && QUERY_CHAIN_METHODS.has(method)) {
+            if (call.enclosing) {
+              const fromId = makeId("decl", call.enclosing);
+              if (draft.getNode(fromId)) {
+                draft.addEdge({
+                  id: makeId("edge", "sql_chain", fromId, sqlId),
+                  kind: "CALLS",
+                  from: fromId,
+                  to: sqlId,
+                  evidence: [{ source: "AST", locator: pr.artifact.path, confidence: 1 }],
+                });
+              }
+            }
+            continue;
+          }
 
           draft.addNode({
             id: sqlId,

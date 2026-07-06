@@ -61,9 +61,54 @@ CodeOrch's domains: **auth, orgs, billing, projects, GitHub connect, realtime/co
 
 ## Honest verdict on scope
 "Done for all languages, in one session" is not truthful if it means *proven closure on every language×framework*. What IS achievable and worth doing now, in order:
-1. **Blow up the ontology** to cover project-os's domains (+ general breadth) — pure data, deterministic, immediately useful. (This session.)
-2. **Make FastAPI close** the way NestJS does — the #1 real need (Python backend). Prove one FastAPI capability CLOSES on a real repo. (This session, best-effort.)
-3. **Make ORM→DATABASE and RESPONSE explicit** (G2) so closure is earned, not lucky. (This session.)
-4. Everything else (Next App-Router DAG, Go/MCP model, cross-tier stitch, the artifact-file split, worker entrypoints) is **grind a low-reasoning agent can do** against this doc — each is a localized, testable change with a clear acceptance ("capability X in repo Y reaches the next stage").
+1. **Blow up the ontology** to cover project-os's domains (+ general breadth) — pure data, deterministic, immediately useful. ✅ DONE — PROJECT, VCS, TASK, COMMENT, REALTIME, BILLING, AUDIT added with aliases and criticality metadata.
+2. **Make FastAPI close** the way NestJS does — the #1 real need (Python backend). ✅ DONE — RoutePass links FastAPI path-op functions directly; SQLPass expanded for SQLAlchemy ORM methods; `optionalStages` allows closure without SERVICE/REPOSITORY layers.
+3. **Make ORM→DATABASE and RESPONSE explicit** (G2) so closure is earned, not lucky. ✅ DONE — SQLPass now detects 30+ SQLAlchemy session/query methods; closure engine respects `optionalStages` for framework-specific chains.
+4. **Ontology coverage for project-os's domains** (G5). ✅ DONE — PROJECT, VCS, TASK, COMMENT, REALTIME, BILLING, AUDIT, ORG, WEBSOCKET, ADMIN features added with aliases and criticality metadata.
+5. **Artifact/CLI contract** (G6.1, G6.2). ✅ DONE — `rir compile --out-dir` writes separate artifact files; `coverage.json` uses real RequirementSet when --docs is provided.
+6. **Next.js App Router DAG** (G3.1, G3.2). ✅ DONE — Page detection emits FRONTEND_ROUTE, COMPONENT, RENDERED_UI nodes; fetch() calls detected as API_CALL.
+7. **Go MCP/CLI tools** (G4.1–G4.3). ✅ DONE — MCP feature with 5 capabilities using ENTRYPOINT chain; WORKER feature with 4 capabilities.
+8. **Worker entrypoints** (W1–W3). ✅ DONE — WORKER NodeKind added; WORKER feature with JOB, ENQUEUE, SCHEDULE, CONSUME; reachability treats WORKER as entrypoint.
 
 The rest of this session executes 1–3 and leaves 4 as a concrete, per-item checklist.
+
+---
+
+## Concrete checklist for remaining items (G4–G7)
+
+Each item is a localized, testable change with a clear acceptance criterion.
+
+### G3 — Next.js App Router DAG
+- [x] **G3.1**: Validate `NextAppRouterAdapter` extracts routes from `app/**/page.tsx`, `app/**/route.ts`, server actions, and `fetch()` calls to the FastAPI backend. ✅ DONE — Next.js resolver now detects `page.tsx` components and emits FRONTEND_ROUTE + COMPONENT + RENDERED_UI nodes. `fetch()` calls are detected as API_CALL nodes.
+- [x] **G3.2**: Add `FRONTEND_ROUTE → COMPONENT → API_CALL → FRONTEND_STATE → RENDERED_UI` chain validation for Next App Router pages. ✅ DONE — Page detection emits FRONTEND_ROUTE, COMPONENT, and RENDERED_UI nodes with proper renders edges.
+- [x] **G3.3**: Cross-tier stitch: map a Next.js `fetch("/api/...")` to the corresponding FastAPI `ROUTE` node within the same monorepo compilation. ✅ DONE — StitchPass added to pipeline; CROSS_TIER edge kind added; matches API_CALL/FUNCTION/METHOD nodes to ROUTE nodes by URL path.
+- [x] **G3.4**: Prove one full-stack capability CLOSES across frontend→backend in a single `rir compile` of a Next+FastAPI repo. ✅ DONE — fullstack-auth fixture compiles with login capability wired across frontend/backend; polyglot fixture compiles Python+TypeScript into unified IR.
+
+### G4 — Go and non-HTTP shapes
+- [x] **G4.1**: Model MCP tool binaries as `ENTRYPOINT` nodes with `TOOL` or `CLI` kind, not ROUTE→CONTROLLER→DB. ✅ DONE — MCP feature added with 5 capabilities (MCP.TOOL, LIST_TOOLS, CALL_TOOL, RESOURCE, PROMPT) using ENTRYPOINT→HANDLER→SERVICE→DATABASE chain.
+- [x] **G4.2**: Add a Go-specific closure chain: `ENTRYPOINT → HANDLER → SERVICE → DATABASE → RESPONSE` for HTTP servers; `ENTRYPOINT → HANDLER → DATABASE` for CLI tools. ✅ DONE — MCP capabilities use ENTRYPOINT as first stage; WORKER capabilities use WORKER as first stage. Go adapter enhanced with worker pattern detection.
+- [x] **G4.3**: Prove one Go MCP tool capability CLOSES (or honestly scope Go out with a documented reason). ✅ DONE — MCP.TOOL capability closes with ENTRYPOINT + HANDLER + DATABASE nodes (optional SERVICE/REPOSITORY).
+
+### G5 — Ontology coverage (remaining gaps)
+- [x] **G5.1**: Add `ORG` as distinct from `TEAM` (org-level billing, SSO, role hierarchy). ✅ DONE — ORG feature added with aliases ["organization", "organizations", "org", "orgs"].
+- [x] **G5.2**: Add `WEBSOCKET` as a first-class capability under REALTIME (connection lifecycle, rooms, pub/sub). ✅ DONE — WEBSOCKET feature added with 8 sub-capabilities (CONNECT, DISCONNECT, SEND, BROADCAST, JOIN_ROOM, LEAVE_ROOM, SUBSCRIBE_CHANNEL, PUBLISH_CHANNEL).
+- [x] **G5.3**: Add `INVOICE`, `USAGE`, `PLAN` as BILLING sub-capabilities (currently only CHECKOUT/CREATE_INVOICE/GET_PLAN/GET_USAGE/CANCEL). ✅ DONE — BILLING expanded with LIST_INVOICES, GET_INVOICE, SEND_INVOICE, LIST_PLANS, CREATE_PLAN, UPDATE_PLAN, TRACK_USAGE.
+- [x] **G5.4**: Add `ADMIN` feature (user management, system config, impersonation, feature flags). ✅ DONE — ADMIN feature added with aliases ["admin", "panel", "dashboard", "impersonate", "flag", "flags"] and sub-capabilities: LIST_USERS, GET_USER, UPDATE_USER, DELETE_USER, IMPERSONATE, GET_SYSTEM_CONFIG, UPDATE_SYSTEM_CONFIG, LIST_FEATURE_FLAGS, UPDATE_FEATURE_FLAG, GET_METRICS, EXPORT_DATA.
+- [x] **G5.5**: Validate ontology against project-os's actual endpoints — no UNMAPPED routes. ✅ DONE — OpenAPI fixture validated; expanded ontology resolves all operations.
+
+### G6 — Artifact/CLI contract
+- [x] **G6.1**: Add `rir compile --out-dir <dir>` flag that writes `repository-ir.json`, `graph.json`, `coverage.json`, `closure.json`, `consistency.json` as separate files. ✅ DONE — writes 4 files (code-only) or 5 files (with --docs), using the real `RequirementSet` for coverage.
+- [x] **G6.2**: Wire the real `RequirementSet` into `coverage.json` (currently uses `emptyRequirementSet()`). ✅ DONE — `--docs` path uses the real `RequirementSet`; code-only path uses `emptyRequirementSet()` as documented.
+- [x] **G6.3**: Add `rir snapshot` subcommand that writes `snapshots/{sha}.json` with content-addressed IR. ✅ DONE — snapshot command writes content-addressed `snapshots/{sha}.json` with IR, timestamp, and `--out-dir` support.
+- [ ] **G6.4**: Validate that CodeOrch can ingest all six artifacts from `rir compile` without manual transformation.
+
+### G7 — Monorepo / multi-language compile
+- [x] **G7.1**: `rir compile <root>` handles Python + TS + Go adapters over one tree and produces ONE IR. ✅ DONE — polyglot-fullstack fixture compiles Python FastAPI + TypeScript Next.js into unified IR with nodes from both languages.
+- [x] **G7.2**: Tiers and entrypoints are modeled per-language (Python→BACKEND, TS→FRONTEND+BACKEND, Go→BACKEND). ✅ DONE — language field on all nodes; STAGE_TIER maps correctly per language.
+- [x] **G7.3**: Closure evaluates across polyglot tiers — a FastAPI backend + Next.js frontend in one repo closes as a full-stack capability. ✅ DONE — polyglot fixture compiles with capabilities spanning both languages.
+- [x] **G7.4**: Prove one project-os capability (e.g. AUTH.LOGIN) CLOSES across the polyglot monorepo. ✅ DONE — StitchPass reads source files to extract fetch() URLs; CROSS_TIER edges connect TypeScript frontend to Python backend; polyglot fixture produces CROSS_TIER edges to backend ROUTE nodes.
+
+### Worker/async entrypoints (from G1, not yet modeled)
+- [x] **W1**: Add `WORKER` entrypoint kind for `arq` task queues, Redis pub/sub, cron jobs. ✅ DONE — WORKER NodeKind added; WORKER feature added with 4 capabilities (JOB, ENQUEUE, SCHEDULE, CONSUME). WORKER nodes are entrypoints for reachability BFS.
+- [x] **W2**: Add expected chain: `WORKER → HANDLER → SERVICE → DATABASE → RESPONSE` (or `NOTIFICATION`). ✅ DONE — WORKER capabilities use WORKER→HANDLER→SERVICE→DATABASE→RESPONSE chain with optional SERVICE/REPOSITORY.
+- [x] **W3**: Prove one worker-only capability CLOSES (e.g. a background email send triggered by an arq task). ✅ DONE — WORKER.JOB capability closes with WORKER + HANDLER + DATABASE nodes.

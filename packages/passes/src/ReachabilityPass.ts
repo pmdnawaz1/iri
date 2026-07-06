@@ -34,9 +34,9 @@ export class ReachabilityPass extends AbstractPass {
       graph.addEdge(edge.from, edge.to);
     }
 
-    // Entrypoints: backend ROUTE, FRONTEND_ROUTE (browser entry), or explicit ENTRYPOINT.
+    // Entrypoints: backend ROUTE, FRONTEND_ROUTE (browser entry), explicit ENTRYPOINT, or WORKER.
     const entrypointIds = nodes
-      .filter((n) => n.kind === "ROUTE" || n.kind === "FRONTEND_ROUTE" || n.kind === "ENTRYPOINT")
+      .filter((n) => n.kind === "ROUTE" || n.kind === "FRONTEND_ROUTE" || n.kind === "ENTRYPOINT" || n.kind === "WORKER")
       .map((n) => n.id);
 
     // BFS distances from all entrypoints

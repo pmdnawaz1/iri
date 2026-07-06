@@ -29,6 +29,8 @@ const STAGE_OF_NODE_KIND: Partial<Record<NodeKind, ExecutionStage>> = {
   [NodeKind.FrontendRoute]: ExecutionStage.FrontendRoute,
   [NodeKind.FrontendState]: ExecutionStage.FrontendState,
   [NodeKind.RenderedUi]: ExecutionStage.RenderedUi,
+  [NodeKind.Worker]: ExecutionStage.Worker,
+  [NodeKind.Entrypoint]: ExecutionStage.Entrypoint,
 };
 
 export function stageOfNodeKind(kind: NodeKind): ExecutionStage | undefined {
@@ -145,7 +147,13 @@ export function evaluateClosure(
 
   const requiredStages = expected.filter((s) => presentTiers.has(tierOfStage(s)));
   const present = expected.filter((s) => presentStages.has(s));
-  const missing = requiredStages.filter((s) => !presentStages.has(s));
+
+  // G2 / GAPS-FULL: optional stages can be absent without preventing CLOSED.
+  // When a stage is in `optionalStages`, its absence is tolerated — the chain
+  // can still close if all non-optional stages are present. This handles
+  // frameworks like FastAPI that skip SERVICE/REPOSITORY layers.
+  const optionalSet = new Set(def.optionalStages ?? []);
+  const missing = requiredStages.filter((s) => !presentStages.has(s) && !optionalSet.has(s));
 
   let state: ClosureState;
   if (missing.length === 0) {
