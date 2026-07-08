@@ -17,6 +17,9 @@ export const CrossFindingCode = {
   DocUnmapped: "DOC_UNMAPPED",
   /** Implemented + CLOSED but outside the declared scope (scope creep). */
   OutOfScope: "OUT_OF_SCOPE",
+  /** All requirements from the document set are UNIMPLEMENTED or UNMAPPED —
+   *  the entire doc surface has zero code backing. */
+  DocEntirelyDead: "DOC_ENTIRELY_DEAD",
 } as const;
 export type CrossFindingCode = (typeof CrossFindingCode)[keyof typeof CrossFindingCode];
 
@@ -129,6 +132,19 @@ export class CrossConsistencyEngine {
           "implemented but outside the declared scope (rir.scope.yaml)",
         );
       }
+    }
+
+    // DOC_ENTIRELY_DEAD: every requirement is unimplemented or unmapped
+    const unimplementedCount = findings.filter(
+      (f) => f.code === "UNIMPLEMENTED" || f.code === "DOC_UNMAPPED",
+    ).length;
+    if (unimplementedCount > 0 && unimplementedCount === requirements.requirements.length) {
+      add(
+        "DOC_ENTIRELY_DEAD",
+        "WARNING",
+        "*",
+        "All documented requirements are unimplemented or unmapped — the doc surface has zero code backing",
+      );
     }
 
     return findings;

@@ -19,7 +19,7 @@ import { DefaultClosureEngine } from "@rir/closure";
 import { DefaultCoverageEngine } from "@rir/coverage";
 import { emptyRequirementSet } from "@rir/ir";
 import { compileRepository, compileWithDocuments, diffClosures, suggestDocumentAliases } from "@rir/compiler";
-import { GuardClosureEngine } from "@rir/consistency";
+import { DeadCodeEngine, GuardClosureEngine } from "@rir/consistency";
 import type { ClosureResult } from "@rir/closure";
 import { prove } from "./prove.js";
 
@@ -158,6 +158,7 @@ async function main(rawArgv: readonly string[]): Promise<number> {
       }
       const { ir, closure } = await compileRepository(dir);
       const guardFindings = new GuardClosureEngine().check(ir);
+      const deadCodeFindings = new DeadCodeEngine().check(ir);
 
       let failed = 0;
       for (const r of closure) {
@@ -170,7 +171,11 @@ async function main(rawArgv: readonly string[]): Promise<number> {
         process.stdout.write(`${f.severity}\t${f.code}\t${f.capability}\t${f.message}\n`);
         failed++;
       }
-      if (failed === 0) process.stdout.write("All capabilities CLOSED, no guard findings.\n");
+      for (const f of deadCodeFindings) {
+        process.stdout.write(`${f.severity}\t${f.code}\t${f.capability ?? "*"}\t${f.message}\n`);
+        if (f.severity === "ERROR") failed++;
+      }
+      if (failed === 0) process.stdout.write("All capabilities CLOSED, no findings.\n");
       return failed > 0 ? 1 : 0;
     }
     case "suggest-aliases": {
@@ -226,11 +231,11 @@ async function main(rawArgv: readonly string[]): Promise<number> {
       const outDir = outDirIdx === -1 ? undefined : rest[outDirIdx + 1];
 
       if (docsDir) {
-        const { ir, closure, requirements, findings, guardFindings, scope } = await compileWithDocuments(
+        const { ir, closure, requirements, findings, guardFindings, deadCodeFindings, scope } = await compileWithDocuments(
           dir,
           docsDir,
         );
-        const failed = [...findings, ...guardFindings].some((f) => f.severity === "ERROR");
+        const failed = [...findings, ...guardFindings, ...deadCodeFindings].some((f) => f.severity === "ERROR");
 
         if (outDir) {
           mkdirSync(outDir, { recursive: true });
@@ -239,7 +244,7 @@ async function main(rawArgv: readonly string[]): Promise<number> {
           writeFileSync(joinPath(outDir, "graph.json"), JSON.stringify({ nodes: ir.nodes, edges: ir.edges }, null, 2));
           writeFileSync(joinPath(outDir, "closure.json"), JSON.stringify(closure, null, 2));
           writeFileSync(joinPath(outDir, "coverage.json"), JSON.stringify(coverage, null, 2));
-          writeFileSync(joinPath(outDir, "consistency.json"), JSON.stringify({ findings, guardFindings }, null, 2));
+          writeFileSync(joinPath(outDir, "consistency.json"), JSON.stringify({ findings, guardFindings, deadCodeFindings }, null, 2));
           process.stdout.write(
             `Wrote 5 artifact files to ${outDir}/ (${ir.capabilities.length} capabilities, ${closure.filter((c) => c.state === "CLOSED").length} closed)\n`,
           );
@@ -249,7 +254,7 @@ async function main(rawArgv: readonly string[]): Promise<number> {
         if (rest.includes("--json")) {
           process.stdout.write(
             JSON.stringify(
-              { dir, docsDir, scope, ir, closure, requirements, findings, guardFindings },
+              { dir, docsDir, scope, ir, closure, requirements, findings, guardFindings, deadCodeFindings },
               null,
               2,
             ) + "\n",
@@ -259,7 +264,7 @@ async function main(rawArgv: readonly string[]): Promise<number> {
         process.stdout.write(
           `Compiled ${dir} + docs ${docsDir}: ${ir.capabilities.length} code capabilities, ${requirements.requirements.length} documented${scope ? " (scoped)" : ""}\n`,
         );
-        const all = [...findings, ...guardFindings];
+        const all = [...findings, ...guardFindings, ...deadCodeFindings];
         if (all.length === 0) {
           process.stdout.write("  doc<->code consistency + guard closure: OK (no findings)\n");
         } else {
@@ -284,12 +289,14 @@ async function main(rawArgv: readonly string[]): Promise<number> {
         mkdirSync(outDir, { recursive: true });
         const requirements = emptyRequirementSet();
         const coverage = new DefaultCoverageEngine().compute(ir, requirements);
+        const deadCodeFindings = new DeadCodeEngine().check(ir);
         writeFileSync(joinPath(outDir, "repository-ir.json"), JSON.stringify(ir, null, 2));
         writeFileSync(joinPath(outDir, "graph.json"), JSON.stringify({ nodes: ir.nodes, edges: ir.edges }, null, 2));
         writeFileSync(joinPath(outDir, "closure.json"), JSON.stringify(closure, null, 2));
         writeFileSync(joinPath(outDir, "coverage.json"), JSON.stringify(coverage, null, 2));
+        writeFileSync(joinPath(outDir, "consistency.json"), JSON.stringify({ findings: [], guardFindings: [], deadCodeFindings }, null, 2));
         process.stdout.write(
-          `Wrote 4 artifact files to ${outDir}/ (${ir.capabilities.length} capabilities, ${closure.filter((c) => c.state === "CLOSED").length} closed)\n`,
+          `Wrote 5 artifact files to ${outDir}/ (${ir.capabilities.length} capabilities, ${closure.filter((c) => c.state === "CLOSED").length} closed, ${deadCodeFindings.length} dead code findings)\n`,
         );
         return closure.every((c) => c.state === ClosureState.Closed) ? 0 : 1;
       }

@@ -52,8 +52,10 @@ import {
 } from "@rir/document-compiler";
 import {
   CrossConsistencyEngine,
+  DeadCodeEngine,
   GuardClosureEngine,
   type CrossFinding,
+  type DeadCodeFinding,
   type GuardFinding,
 } from "@rir/consistency";
 import { parse as parseYaml } from "yaml";
@@ -305,6 +307,8 @@ export interface ConsistencyResult extends CompileResult {
   readonly findings: readonly CrossFinding[];
   /** Negative-space / guard-closure findings (GAPS-v2 V5). */
   readonly guardFindings: readonly GuardFinding[];
+  /** Dead-code findings — exports with zero incoming edges, unreachable nodes, dead files. */
+  readonly deadCodeFindings: readonly DeadCodeFinding[];
   /** The declared scope used to filter findings, if a `rir.scope.yaml` was found. */
   readonly scope?: ScopeManifest;
 }
@@ -339,7 +343,8 @@ export async function compileWithDocuments(
 
   const findings = new CrossConsistencyEngine().check(requirements, ir, closureByCapability, scope);
   const guardFindings = new GuardClosureEngine().check(ir);
-  return { ir, closure, requirements, findings, guardFindings, scope };
+  const deadCodeFindings = new DeadCodeEngine().check(ir);
+  return { ir, closure, requirements, findings, guardFindings, deadCodeFindings, scope };
 }
 
 // ---------------------------------------------------------------------------
