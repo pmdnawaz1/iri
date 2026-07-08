@@ -10,14 +10,16 @@
  */
 
 import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
-import { extname, join } from "node:path";
+import { extname, join, relative } from "node:path";
 import { ConsoleLogger } from "@rir/common";
 import {
   AdapterRegistry,
   CSharpAdapter,
+  CSSAdapter,
   GoAdapter,
   JavaAdapter,
   JavaScriptAdapter,
+  PrismaAdapter,
   PythonAdapter,
   RustAdapter,
   TypeScriptAdapter,
@@ -70,6 +72,10 @@ const SOURCE_EXTENSIONS = new Set([
   ".go",
   ".rs",
   ".cs",
+  ".css",
+  ".scss",
+  ".sass",
+  ".prisma",
 ]);
 
 const DOC_EXTENSIONS = new Set([".md", ".markdown", ".yaml", ".yml", ".json"]);
@@ -88,7 +94,9 @@ export function defaultAdapters(): AdapterRegistry {
     .register(new JavaAdapter())
     .register(new GoAdapter())
     .register(new RustAdapter())
-    .register(new CSharpAdapter());
+    .register(new CSharpAdapter())
+    .register(new CSSAdapter())
+    .register(new PrismaAdapter());
 }
 
 /** The full pass pipeline as a Builder. BuilderEngine orders passes by PASS_PRIORITY. */
@@ -152,7 +160,10 @@ export async function compileRepository(
   for (const file of listSourceFiles(dir)) {
     const adapter = registry.select(file);
     if (!adapter) continue;
-    parseResults.push(adapter.parse(file, readFileSync(file, "utf8"), baseCtx));
+    // Store paths relative to repo root with forward slashes for cross-platform consistency.
+    // The absolute path is only used to read the file; the IR carries the relative path.
+    const relPath = relative(dir, file).replace(/\\/g, "/");
+    parseResults.push(adapter.parse(relPath, readFileSync(file, "utf8"), baseCtx));
   }
 
   // Stage 2 — passes: lift parse results into the Repository IR.
@@ -164,9 +175,91 @@ export async function compileRepository(
   };
   const ir = await BuilderEngine.fromBuilders([new PipelineBuilder()]).compile(ctx);
 
+  // Stage 2.5 — detect frameworks/tech stack from config files.
+  const frameworks = detectFrameworks(dir);
+
   // Stage 3 — closure.
   const closure = new DefaultClosureEngine().evaluate(ir);
-  return { ir, closure };
+  return { ir: { ...ir, frameworks }, closure };
+}
+
+/** Parse package.json, requirements.txt, go.mod to detect the tech stack. */
+function detectFrameworks(dir: string): string[] {
+  const frameworks = new Set<string>();
+
+  // package.json → Next.js, React, Tailwind, Prisma, Express, NestJS, etc.
+  const pkgPath = join(dir, "package.json");
+  if (existsSync(pkgPath)) {
+    try {
+      const pkg = JSON.parse(readFileSync(pkgPath, "utf8")) as Record<string, any>;
+      const deps = { ...pkg.dependencies, ...pkg.devDependencies };
+      const depNames = new Set(Object.keys(deps || {}).map((d) => d.toLowerCase()));
+      if (depNames.has("next")) frameworks.add("next.js");
+      if (depNames.has("react")) frameworks.add("react");
+      if (depNames.has("vue")) frameworks.add("vue");
+      if (depNames.has("tailwindcss") || depNames.has("@tailwindcss/postcss")) frameworks.add("tailwind");
+      if (depNames.has("prisma") || depNames.has("@prisma/client")) frameworks.add("prisma");
+      if (depNames.has("express")) frameworks.add("express");
+      if (depNames.has("@nestjs/core")) frameworks.add("nestjs");
+      if (depNames.has("fastify")) frameworks.add("fastify");
+      if (depNames.has("trpc")) frameworks.add("trpc");
+      if (depNames.has("zod")) frameworks.add("zod");
+      if (depNames.has("@tanstack/react-query")) frameworks.add("react-query");
+      if (depNames.has("sonner") || depNames.has("react-hot-toast")) frameworks.add("toast");
+      if (depNames.has("lucide-react")) frameworks.add("lucide-icons");
+      if (depNames.has("@radix-ui/react-dialog")) frameworks.add("radix-ui");
+      if (depNames.has("framer-motion") || depNames.has("motion")) frameworks.add("framer-motion");
+    } catch { /* ignore */ }
+  }
+
+  // requirements.txt → FastAPI, SQLAlchemy, Pydantic, etc.
+  const reqPath = join(dir, "requirements.txt");
+  if (existsSync(reqPath)) {
+    try {
+      const reqs = readFileSync(reqPath, "utf8");
+      const reqLower = reqs.toLowerCase();
+      if (reqLower.includes("fastapi")) frameworks.add("fastapi");
+      if (reqLower.includes("flask")) frameworks.add("flask");
+      if (reqLower.includes("django")) frameworks.add("django");
+      if (reqLower.includes("sqlalchemy")) frameworks.add("sqlalchemy");
+      if (reqLower.includes("pydantic")) frameworks.add("pydantic");
+      if (reqLower.includes("asyncpg")) frameworks.add("asyncpg");
+      if (reqLower.includes("psycopg2")) frameworks.add("psycopg2");
+      if (reqLower.includes("redis")) frameworks.add("redis");
+      if (reqLower.includes("arq")) frameworks.add("arq");
+      if (reqLower.includes("alembic")) frameworks.add("alembic");
+      if (reqLower.includes("uvicorn")) frameworks.add("uvicorn");
+      if (reqLower.includes("httpx")) frameworks.add("httpx");
+      if (reqLower.includes("razorpay")) frameworks.add("razorpay");
+    } catch { /* ignore */ }
+  }
+
+  // go.mod → Gin, Echo, GORM, etc.
+  const goModPath = join(dir, "go.mod");
+  if (existsSync(goModPath)) {
+    try {
+      const goMod = readFileSync(goModPath, "utf8").toLowerCase();
+      if (goMod.includes("gin-gonic/gin")) frameworks.add("gin");
+      if (goMod.includes("labstack/echo")) frameworks.add("echo");
+      if (goMod.includes("gorm.io/gorm")) frameworks.add("gorm");
+      if (goMod.includes("mark3labs/mcp-go")) frameworks.add("mcp-go");
+    } catch { /* ignore */ }
+  }
+
+  // Cargo.toml → Axum, Actix, Tokio, etc.
+  const cargoPath = join(dir, "Cargo.toml");
+  if (existsSync(cargoPath)) {
+    try {
+      const cargo = readFileSync(cargoPath, "utf8").toLowerCase();
+      if (cargo.includes("axum")) frameworks.add("axum");
+      if (cargo.includes("actix-web")) frameworks.add("actix-web");
+      if (cargo.includes("tokio")) frameworks.add("tokio");
+      if (cargo.includes("sqlx")) frameworks.add("sqlx");
+      if (cargo.includes("sea-orm")) frameworks.add("sea-orm");
+    } catch { /* ignore */ }
+  }
+
+  return [...frameworks].sort();
 }
 
 /** Extract structure (headings + statements) from every supported document in a directory. */

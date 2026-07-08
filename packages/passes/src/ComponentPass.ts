@@ -86,8 +86,13 @@ export class ComponentPass extends AbstractPass {
         } else if (ROUTER_FNS.has(method)) {
           const frId = makeId("frontendroute", pr.artifact.path, line);
           mk(frId, "FRONTEND_ROUTE", method, pr.artifact.path, pr.artifact.language);
+          // Link to all COMPONENT nodes from any frontend parse result — a router
+          // file imports and renders page components from sibling files. We check
+          // the draft because Phase 1 already ran and created COMPONENT nodes.
           for (const n of draft.getNodes()) {
-            if (n.kind === "COMPONENT") edge("RENDERS", frId, n.id, pr.artifact.path);
+            if (n.kind === "COMPONENT") {
+              edge("RENDERS", frId, n.id, pr.artifact.path);
+            }
           }
         }
       }

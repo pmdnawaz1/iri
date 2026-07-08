@@ -107,6 +107,12 @@ export interface ResolutionContext {
    * without it.
    */
   getNodeById?(id: string): Node | null;
+  /**
+   * Call sites recorded for a file (callee name + line). Used by the Next.js
+   * stitcher to synthesize API_CALL nodes from fetch() calls. Optional so
+   * external/test contexts compile without it.
+   */
+  getCallsInFile?(filePath: string): Array<{ callee?: unknown; line?: number }>;
   /** Get cached import mappings for a file */
   getImportMappings(filePath: string, language: Language): ImportMapping[];
   /**

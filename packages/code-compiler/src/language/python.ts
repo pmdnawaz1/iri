@@ -32,6 +32,16 @@ function hasMethodAncestor(node: Parser.SyntaxNode): boolean {
   return false;
 }
 
+function extractPythonDocstring(node: Parser.SyntaxNode): string | undefined {
+  const block = node.childForFieldName("body");
+  if (!block) return undefined;
+  const first = block.namedChild(0);
+  if (first && first.type === "string") {
+    return first.text.replace(/^[a-zA-Z]*['"]{1,3}|['"]{1,3}$/g, "").trim() || undefined;
+  }
+  return undefined;
+}
+
 function extractSymbols(root: Parser.SyntaxNode): SymbolFact[] {
   const symbols: SymbolFact[] = [];
   const visit = (node: Parser.SyntaxNode): void => {
@@ -43,6 +53,7 @@ function extractSymbols(root: Parser.SyntaxNode): SymbolFact[] {
           kind: "class",
           exported: isTopLevel(node, root),
           span: getSpan(node),
+          docstring: extractPythonDocstring(node),
         });
       }
     } else if (node.type === "function_definition") {
@@ -54,6 +65,7 @@ function extractSymbols(root: Parser.SyntaxNode): SymbolFact[] {
           kind,
           exported: isTopLevel(node, root),
           span: getSpan(node),
+          docstring: extractPythonDocstring(node),
         });
       }
     }
@@ -121,6 +133,17 @@ function extractExports(root: Parser.SyntaxNode): string[] {
   return exports;
 }
 
+function extractStringArgs(argsNode: Parser.SyntaxNode | null): string[] {
+  if (!argsNode) return [];
+  const strArgs: string[] = [];
+  for (const child of argsNode.namedChildren) {
+    if (!child.type.includes("string")) break;
+    strArgs.push(child.text.replace(/^[a-zA-Z@]*['"`]+/, "").replace(/['"`]+$/, ""));
+    if (strArgs.length >= 5) break;
+  }
+  return strArgs;
+}
+
 function extractCalls(root: Parser.SyntaxNode): CallFact[] {
   const calls: CallFact[] = [];
   const visit = (node: Parser.SyntaxNode, enclosing?: string): void => {
@@ -137,10 +160,12 @@ function extractCalls(root: Parser.SyntaxNode): CallFact[] {
     if (node.type === "call") {
       const funcNode = node.childForFieldName("function");
       if (funcNode) {
+        const strArgs = extractStringArgs(node.childForFieldName("arguments"));
         calls.push({
           callee: funcNode.text,
           enclosing: childEnclosing,
           span: getSpan(node),
+          arguments: strArgs.length > 0 ? strArgs : undefined,
         });
       }
     }
@@ -232,6 +257,7 @@ export class PythonAdapter implements LanguageAdapter {
       calls: extractCalls(tree.rootNode),
       routes: extractRoutes(tree.rootNode),
       controlFlows: [],
+      source,
     };
   }
 }

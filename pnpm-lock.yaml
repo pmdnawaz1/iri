@@ -47,6 +47,9 @@ importers:
       '@rir/compiler':
         specifier: workspace:*
         version: link:../../packages/compiler
+      '@rir/consistency':
+        specifier: workspace:*
+        version: link:../../packages/consistency
       '@rir/core':
         specifier: workspace:*
         version: link:../../packages/core

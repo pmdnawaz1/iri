@@ -35,7 +35,7 @@ function extractNodeDecorators(
     .filter((d): d is { name: string; args: string[] } => d !== null);
 }
 
-function extractDocstring(node: import("typescript").Node): string | undefined {
+export function extractDocstring(node: import("typescript").Node): string | undefined {
   let target = node;
   if (
     ts.isVariableDeclaration(node) &&
@@ -386,6 +386,17 @@ function extractExports(sf: import("typescript").SourceFile): string[] {
   return exports;
 }
 
+function extractStringArgs(args: readonly TsNode[] | undefined): string[] {
+  if (!args) return [];
+  const out: string[] = [];
+  for (const arg of args) {
+    if (ts.isStringLiteral(arg)) out.push(arg.text);
+    else break;
+    if (out.length >= 5) break;
+  }
+  return out;
+}
+
 function extractCalls(sf: import("typescript").SourceFile): CallFact[] {
   const calls: CallFact[] = [];
   const visit = (node: import("typescript").Node, enclosing?: string): void => {
@@ -398,17 +409,21 @@ function extractCalls(sf: import("typescript").SourceFile): CallFact[] {
     }
 
     if (ts.isCallExpression(node)) {
+      const strArgs = extractStringArgs(node.arguments);
       calls.push({
         callee: node.expression.getText(sf),
         enclosing: childEnclosing,
         span: getSpan(sf, node),
+        arguments: strArgs.length > 0 ? strArgs : undefined,
       });
     } else if (ts.isNewExpression(node)) {
+      const strArgs = extractStringArgs(node.arguments);
       calls.push({
         callee: node.expression.getText(sf),
         enclosing: childEnclosing,
         span: getSpan(sf, node),
         isNew: true,
+        arguments: strArgs.length > 0 ? strArgs : undefined,
       });
     }
 
@@ -617,6 +632,7 @@ export function extractParseResult(sf: import("typescript").SourceFile, path: st
     calls: extractCalls(sf),
     routes: extractRoutes(sf, path),
     controlFlows: extractControlFlows(sf),
+    source: sf.getFullText(),
   };
 }
 

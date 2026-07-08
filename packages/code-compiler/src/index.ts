@@ -43,3 +43,5 @@ export { JavaAdapter } from "./language/java.js";
 export { GoAdapter } from "./language/go.js";
 export { RustAdapter } from "./language/rust.js";
 export { CSharpAdapter } from "./language/csharp.js";
+export { CSSAdapter } from "./language/css.js";
+export { PrismaAdapter } from "./language/prisma.js";

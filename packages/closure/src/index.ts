@@ -47,6 +47,8 @@ export interface ClosureResult {
   readonly present: readonly ExecutionStage[];
   /** Expected stages that are missing (ordered as in the expected chain). */
   readonly missing: readonly ExecutionStage[];
+  /** Required ontology constraints missing from the capability IR (G-2). */
+  readonly missingConstraints: readonly string[];
   /**
    * Weakest-link evidence confidence in [0,1] across the participating nodes (GAPS-v2 V3).
    * A `CLOSED` built on inference (low confidence) is no longer indistinguishable from one
@@ -92,6 +94,7 @@ export function evaluateClosure(
       expected: [],
       present: [],
       missing: [],
+      missingConstraints: [],
       confidence: 0,
     };
   }
@@ -103,6 +106,7 @@ export function evaluateClosure(
       expected,
       present: [],
       missing: expected,
+      missingConstraints: [],
       confidence: 0,
     };
   }
@@ -118,6 +122,7 @@ export function evaluateClosure(
       expected,
       present: [],
       missing: expected,
+      missingConstraints: [],
       confidence: 0,
     };
   }
@@ -130,6 +135,7 @@ export function evaluateClosure(
       expected,
       present: [],
       missing: expected,
+      missingConstraints: [],
       confidence: weakestConfidence(participating),
     };
   }
@@ -155,8 +161,16 @@ export function evaluateClosure(
   const optionalSet = new Set(def.optionalStages ?? []);
   const missing = requiredStages.filter((s) => !presentStages.has(s) && !optionalSet.has(s));
 
+  // Enforce required constraint declarations (G-2). If the ontology says a constraint
+  // is required (e.g. AUTH.LOGIN needs LOGIN_IDENTIFIER), the capability IR must carry
+  // it. Missing required constraints downgrade CLOSED → PARTIAL.
+  const presentConstraintKeys = new Set(capability.constraints.map((c) => c.key));
+  const missingConstraints = def.constraints
+    .filter((c) => c.required && !presentConstraintKeys.has(c.key))
+    .map((c) => c.key);
+
   let state: ClosureState;
-  if (missing.length === 0) {
+  if (missing.length === 0 && missingConstraints.length === 0) {
     state = ClosureState.Closed;
   } else if (isChainInterrupted(requiredStages, presentStages)) {
     state = ClosureState.Broken;
@@ -170,6 +184,7 @@ export function evaluateClosure(
     expected,
     present,
     missing,
+    missingConstraints,
     confidence: weakestConfidence(reachable),
   };
 }

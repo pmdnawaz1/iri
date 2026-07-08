@@ -9,7 +9,7 @@
  * is only valid because it is listed in `aliases`).
  */
 
-export const ONTOLOGY_VERSION = "1.4.0" as const;
+export const ONTOLOGY_VERSION = "1.5.0" as const;
 
 /**
  * Canonical execution stages. A capability's `expectedChain` is an ordered list of
@@ -771,6 +771,34 @@ const WORKER: FeatureDefinition = {
   ],
 };
 
+// ---------------------------------------------------------------------------
+// DOCUMENT — structured design docs, ADRs, runbooks (1.5.0).
+// Distinct from FILE (raw blob storage): documents have title, content, doc_type,
+// tags, and branch. Uses the standard backend chain.
+// ---------------------------------------------------------------------------
+
+const DOCUMENT_CHAIN: readonly ExecutionStage[] = [
+  ExecutionStage.BackendRoute,
+  ExecutionStage.Controller,
+  ExecutionStage.Service,
+  ExecutionStage.Repository,
+  ExecutionStage.Database,
+  ExecutionStage.Response,
+];
+const DOCUMENT_OPTIONAL: readonly ExecutionStage[] = [ExecutionStage.Service, ExecutionStage.Repository];
+
+const DOCUMENT: FeatureDefinition = {
+  id: "DOCUMENT",
+  name: "Document",
+  capabilities: [
+    cap("DOCUMENT.CREATE", "CREATE", ["doc", "docs", "document", "documents"], DOCUMENT_CHAIN, DOCUMENT_OPTIONAL),
+    cap("DOCUMENT.UPDATE", "UPDATE", [], DOCUMENT_CHAIN, DOCUMENT_OPTIONAL),
+    cap("DOCUMENT.LIST", "LIST", [], DOCUMENT_CHAIN, DOCUMENT_OPTIONAL),
+    cap("DOCUMENT.GET", "GET", [], DOCUMENT_CHAIN, DOCUMENT_OPTIONAL),
+    cap("DOCUMENT.DELETE", "DELETE", [], DOCUMENT_CHAIN, DOCUMENT_OPTIONAL),
+  ],
+};
+
 export const ONTOLOGY: readonly FeatureDefinition[] = [
   AUTH,
   PAYMENT,
@@ -806,6 +834,7 @@ export const ONTOLOGY: readonly FeatureDefinition[] = [
   ADMIN,
   MCP,
   WORKER,
+  DOCUMENT,
 ];
 
 // ---------------------------------------------------------------------------
@@ -881,6 +910,7 @@ const CRITICALITY_BY_FEATURE: Record<string, Criticality> = {
   ADMIN: "CRITICAL",
   MCP: "HIGH",
   WORKER: "HIGH",
+  DOCUMENT: "NORMAL",
 };
 
 /** Capability business criticality. Defaults to NORMAL when the feature is unlisted. */

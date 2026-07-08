@@ -188,6 +188,8 @@ export interface NodeIR {
   readonly filePath?: string;
   readonly decorators?: { readonly name: string; readonly args: readonly string[] }[];
   readonly docstring?: string;
+  /** Source text of this node (function/class body, capped at 2000 chars). */
+  readonly sourceText?: string;
 }
 
 /** Execution-related facts attached to a node. */
@@ -252,6 +254,8 @@ export interface RepositoryIR {
     readonly nodeCount?: number;
   }[];
   readonly capabilities: readonly CapabilityIR[];
+  /** Detected frameworks/tech stack (e.g. ["next.js", "tailwind", "prisma", "fastapi"]). */
+  readonly frameworks?: readonly string[];
 }
 
 /** An immutable, content-addressed snapshot of a Repository IR. */

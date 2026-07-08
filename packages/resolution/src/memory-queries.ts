@@ -17,7 +17,8 @@ export type ReferenceKind =
   | "instantiates"
   | "overrides"
   | "decorates"
-  | "function_ref";
+  | "function_ref"
+  | "renders";
 
 export interface Node {
   id: string;

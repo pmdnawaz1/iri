@@ -16,6 +16,7 @@
     "@rir/ontology": "workspace:*",
     "@rir/storage": "workspace:*",
     "@rir/closure": "workspace:*",
+    "@rir/consistency": "workspace:*",
     "@rir/coverage": "workspace:*",
     "@rir/query-engine": "workspace:*",
     "@rir/graph": "workspace:*",

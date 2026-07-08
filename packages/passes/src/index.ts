@@ -25,3 +25,8 @@ export { SQLPass } from "./SQLPass.js";
 export { EventPass } from "./EventPass.js";
 export { StitchPass } from "./StitchPass.js";
 export { GitPass, type GitRunner } from "./GitPass.js";
+export { OwnershipPass } from "./OwnershipPass.js";
+export { ConstraintPass } from "./ConstraintPass.js";
+export { FlowPass } from "./FlowPass.js";
+export { DocumentationPass } from "./DocumentationPass.js";
+export { RuntimePass } from "./RuntimePass.js";

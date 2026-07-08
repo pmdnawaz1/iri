@@ -4,12 +4,17 @@
  * Execution closure proves a capability's path is connected; it cannot express what MUST be
  * present for SECURITY: a capability that requires authentication must traverse an auth/
  * authorization guard before it reaches data. This engine checks that policy deterministically
- * over the Repository IR. First cut: a guard is recognized by node naming (no AI). It reports
- * the *absence* of a required guard — the one class of finding execution closure structurally
- * cannot produce.
+ * over the Repository IR.
+ *
+ * Guard detection (G-3 improvement):
+ *   1. Name-based: node name matched against known auth/guard patterns (regex).
+ *   2. Kind-based: node kind is MIDDLEWARE (CallPass classifies *Middleware, *Auth, *Guard as
+ *      MIDDLEWARE nodes).
+ *   3. Edge-based: a WRAPS edge exists involving a node in the capability's subgraph (a
+ *      middleware wrapping a route/handler).
  */
 
-import type { NodeIR, RepositoryIR } from "@rir/ir";
+import type { EdgeIR, NodeIR, RepositoryIR } from "@rir/ir";
 import { Criticality, getCriticality, requiresAuth } from "@rir/ontology";
 
 export interface GuardFinding {
@@ -29,6 +34,23 @@ function hasGuardSignal(nodes: readonly NodeIR[]): boolean {
   return nodes.some((n) => GUARD_PATTERN.test(n.name));
 }
 
+/** Check for MIDDLEWARE node kind (CallPass classifies *Auth, *Guard, *Middleware as MIDDLEWARE). */
+function hasMiddlewareKind(nodes: readonly NodeIR[]): boolean {
+  return nodes.some((n) => n.kind === "MIDDLEWARE");
+}
+
+/** Check for WRAPS edges connecting a middleware to any node in the capability. Handles the
+ *  case where the middleware node itself isn't in the capability's direct node list but wraps
+ *  a route/controller that is (e.g. a global guard). */
+function hasWrapsEdge(nodes: readonly NodeIR[], edges: readonly EdgeIR[]): boolean {
+  const nodeIds = new Set(nodes.map((n) => n.id));
+  return edges.some(
+    (e) =>
+      e.kind === "WRAPS" &&
+      (nodeIds.has(e.from) || nodeIds.has(e.to)),
+  );
+}
+
 export class GuardClosureEngine {
   /**
    * Report capabilities that are implemented (have a backend route) and require auth by policy,
@@ -46,7 +68,11 @@ export class GuardClosureEngine {
       const hasRoute = nodes.some((n) => n.kind === "ROUTE" || n.kind === "FRONTEND_ROUTE");
       if (!hasRoute) continue; // not actually exposed in this repo — nothing to guard
 
-      if (!hasGuardSignal(nodes)) {
+      // Multi-method guard detection (G-3): name pattern, node kind, WRAPS edges
+      const hasGuard =
+        hasGuardSignal(nodes) || hasMiddlewareKind(nodes) || hasWrapsEdge(nodes, ir.edges);
+
+      if (!hasGuard) {
         const criticality = getCriticality(cap.capability);
         findings.push({
           code: "GUARD_MISSING",

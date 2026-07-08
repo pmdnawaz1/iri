@@ -3,6 +3,7 @@ import type { LanguageAdapter, ParseResult, SymbolFact, ImportFact, CallFact, Ro
 import type { CompilationContext } from "@rir/core";
 import type { ArtifactIR, Span } from "@rir/ir";
 import { makeId, hash64 } from "@rir/common";
+import { extractDocstring } from "./typescript.js";
 
 const require = createRequire(import.meta.url);
 const ts = require("typescript") as typeof import("typescript");
@@ -22,6 +23,7 @@ function extractSymbols(sf: import("typescript").SourceFile): SymbolFact[] {
         kind: "class",
         exported: hasExportModifier(node),
         span: getSpan(sf, node),
+        docstring: extractDocstring(node),
       });
     } else if (ts.isFunctionDeclaration(node) && node.name && isTopLevel(node, sf)) {
       symbols.push({
@@ -29,15 +31,17 @@ function extractSymbols(sf: import("typescript").SourceFile): SymbolFact[] {
         kind: "function",
         exported: hasExportModifier(node),
         span: getSpan(sf, node),
+        docstring: extractDocstring(node),
       });
     } else if (ts.isMethodDeclaration(node) && node.name) {
-      symbols.push({ name: node.name.getText(sf), kind: "method", exported: false, span: getSpan(sf, node) });
+      symbols.push({ name: node.name.getText(sf), kind: "method", exported: false, span: getSpan(sf, node), docstring: extractDocstring(node) });
     } else if (ts.isInterfaceDeclaration(node) && node.name && isTopLevel(node, sf)) {
       symbols.push({
         name: node.name.text,
         kind: "interface",
         exported: hasExportModifier(node),
         span: getSpan(sf, node),
+        docstring: extractDocstring(node),
       });
     } else if (ts.isTypeAliasDeclaration(node) && node.name && isTopLevel(node, sf)) {
       symbols.push({
@@ -45,6 +49,7 @@ function extractSymbols(sf: import("typescript").SourceFile): SymbolFact[] {
         kind: "type",
         exported: hasExportModifier(node),
         span: getSpan(sf, node),
+        docstring: extractDocstring(node),
       });
     } else if (ts.isVariableDeclaration(node) && ts.isIdentifier(node.name) && isTopLevel(node, sf)) {
       symbols.push({
@@ -52,6 +57,7 @@ function extractSymbols(sf: import("typescript").SourceFile): SymbolFact[] {
         kind: "variable",
         exported: hasExportModifier(node),
         span: getSpan(sf, node),
+        docstring: extractDocstring(node),
       });
     }
     ts.forEachChild(node, visit);
@@ -134,6 +140,16 @@ function extractExports(sf: import("typescript").SourceFile): string[] {
   return exports;
 }
 
+function extractStringArgs(args: readonly import("typescript").Node[]): string[] {
+  const out: string[] = [];
+  for (const arg of args) {
+    if (ts.isStringLiteral(arg)) out.push(arg.text);
+    else break;
+    if (out.length >= 5) break;
+  }
+  return out;
+}
+
 function extractCalls(sf: import("typescript").SourceFile): CallFact[] {
   const calls: CallFact[] = [];
   const visit = (node: import("typescript").Node, enclosing?: string): void => {
@@ -146,10 +162,12 @@ function extractCalls(sf: import("typescript").SourceFile): CallFact[] {
     }
 
     if (ts.isCallExpression(node)) {
+      const strArgs = extractStringArgs(node.arguments);
       calls.push({
         callee: node.expression.getText(sf),
         enclosing: childEnclosing,
         span: getSpan(sf, node),
+        arguments: strArgs.length > 0 ? strArgs : undefined,
       });
     }
 
@@ -211,6 +229,7 @@ export class JavaScriptAdapter implements LanguageAdapter {
       calls: extractCalls(sf),
       routes: extractRoutes(sf),
       controlFlows: [],
+      source,
     };
   }
 }

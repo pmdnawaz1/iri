@@ -9,9 +9,9 @@
  * Reads source code to extract fetch URLs from function bodies.
  */
 
-import { readFileSync } from "node:fs";
 import type { CompilationContext, IRDraft } from "@rir/core";
 import type { NodeIR } from "@rir/ir";
+import { EdgeKind } from "@rir/ir";
 import { AbstractPass, PASS_PRIORITY } from "./base.js";
 
 /** Regex to extract fetch() URL from source code. */
@@ -60,7 +60,7 @@ function stitchToRoute(
       if (!alreadyExists) {
         draft.addEdge({
           id: `stitch|${node.id}|${routeNode.id}`,
-          kind: "CROSS_TIER" as any,
+          kind: EdgeKind.CrossTier,
           from: node.id,
           to: routeNode.id,
           evidence: [{ source: "AST" as const, locator: "stitch-pass", confidence: 0.9 }],
@@ -97,10 +97,10 @@ export class StitchPass extends AbstractPass {
 
     if (routeByPath.size === 0) return;
 
-    // Build a map from artifactId to source file path.
-    const artifactPaths = new Map<string, string>();
-    for (const a of ctx.artifacts) {
-      artifactPaths.set(a.id, a.path);
+    // Build a map from artifactId to source text (from parse results, no file I/O).
+    const sourceByArtifact = new Map<string, string>();
+    for (const pr of ctx.parseResults ?? []) {
+      if (pr.source) sourceByArtifact.set(pr.artifact.id, pr.source);
     }
 
     // Phase 1: Stitch API_CALL nodes by name.
@@ -110,22 +110,14 @@ export class StitchPass extends AbstractPass {
       }
     }
 
-    // Phase 2: For FUNCTION/METHOD nodes, read source and look for fetch() calls.
+    // Phase 2: For FUNCTION/METHOD nodes, scan source for fetch() calls.
     // If a function body contains fetch("/path"), stitch it to the matching route.
     for (const node of nodes) {
       if (node.kind !== "FUNCTION" && node.kind !== "METHOD") continue;
       if (node.language !== "typescript" && node.language !== "javascript") continue;
 
-      // Read source file.
-      const filePath = artifactPaths.get(node.artifactId) ?? node.filePath;
-      if (!filePath) continue;
-
-      let source: string;
-      try {
-        source = readFileSync(filePath, "utf8");
-      } catch {
-        continue;
-      }
+      const source = sourceByArtifact.get(node.artifactId);
+      if (!source) continue;
 
       // Extract all fetch() URLs from the source.
       const urls = new Set<string>();

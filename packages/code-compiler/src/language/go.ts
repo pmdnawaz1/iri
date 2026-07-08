@@ -15,6 +15,25 @@ function getSpan(node: Parser.SyntaxNode): Span {
 function isExported(name: string): boolean {
   return name.length > 0 && name[0] === name[0]!.toUpperCase();
 }
+function extractCommentDocstring(node: Parser.SyntaxNode): string | undefined {
+  const comments: string[] = [];
+  let sibling = node.previousSibling;
+  while (sibling) {
+    const t = sibling.type;
+    if (t === "comment" || t === "line_comment" || t === "block_comment" || t === "documentation_comment") {
+      comments.unshift(sibling.text);
+    } else if (sibling.text.trim() === "") {
+      // skip whitespace
+    } else {
+      break;
+    }
+    sibling = sibling.previousSibling;
+  }
+  if (comments.length === 0) return undefined;
+  let text = comments.join("\n");
+  text = text.replace(/^\/\*\*?/, "").replace(/\*\/$/s, "").replace(/^\s*\*\s?/gm, "").replace(/^\s*\/\/\/?\s?/gm, "").trim();
+  return text || undefined;
+}
 function extractSymbols(root: Parser.SyntaxNode): SymbolFact[] {
   const symbols: SymbolFact[] = [];
   const visit = (node: Parser.SyntaxNode): void => {
@@ -26,6 +45,7 @@ function extractSymbols(root: Parser.SyntaxNode): SymbolFact[] {
           kind: "function",
           exported: isExported(nameNode.text),
           span: getSpan(node),
+          docstring: extractCommentDocstring(node),
         });
       }
     } else if (node.type === "method_declaration") {
@@ -36,6 +56,7 @@ function extractSymbols(root: Parser.SyntaxNode): SymbolFact[] {
           kind: "method",
           exported: isExported(nameNode.text),
           span: getSpan(node),
+          docstring: extractCommentDocstring(node),
         });
       }
     } else if (node.type === "type_declaration") {
@@ -50,6 +71,7 @@ function extractSymbols(root: Parser.SyntaxNode): SymbolFact[] {
               kind: "class",
               exported: isExported(nameNode.text),
               span: getSpan(child),
+              docstring: extractCommentDocstring(node),
             });
           }
         }
@@ -104,6 +126,17 @@ function extractExports(root: Parser.SyntaxNode): string[] {
   visit(root);
   return exports;
 }
+function extractStringArgs(argsNode: Parser.SyntaxNode | null): string[] {
+  if (!argsNode) return [];
+  const strArgs: string[] = [];
+  for (const child of argsNode.namedChildren) {
+    if (!child.type.includes("string")) break;
+    strArgs.push(child.text.replace(/^[a-zA-Z@]*['"`]+/, "").replace(/['"`]+$/, ""));
+    if (strArgs.length >= 5) break;
+  }
+  return strArgs;
+}
+
 function extractCalls(root: Parser.SyntaxNode): CallFact[] {
   const calls: CallFact[] = [];
   const visit = (node: Parser.SyntaxNode, enclosing?: string): void => {
@@ -134,10 +167,12 @@ function extractCalls(root: Parser.SyntaxNode): CallFact[] {
     if (node.type === "call_expression") {
       const funcNode = node.childForFieldName("function");
       if (funcNode) {
+        const strArgs = extractStringArgs(node.childForFieldName("arguments"));
         calls.push({
           callee: funcNode.text,
           enclosing: childEnclosing,
           span: getSpan(node),
+          arguments: strArgs.length > 0 ? strArgs : undefined,
         });
       }
     }
@@ -191,8 +226,9 @@ function extractRoutes(root: Parser.SyntaxNode): RouteFact[] {
 
 /** Detect worker/task patterns: functions named Handle/Process/Run/Execute/Task or
  *  with worker-like suffixes (e.g. SendEmailWorker, ProcessPaymentTask).
- *  These become WORKER entrypoints for async/background processing (W1). */
-function extractWorkerPatterns(root: Parser.SyntaxNode): SymbolFact[] {
+ *  These become WORKER entrypoints for async/background processing (W1).
+ *  Exported but not yet wired into the extraction pipeline. */
+export function extractWorkerPatterns(root: Parser.SyntaxNode): SymbolFact[] {
   const workers: SymbolFact[] = [];
   const WORKER_NAMES = /^(handle|process|run|execute|task|job|worker|consume|enqueue|dispatch|schedule|cron|process_|handle_|run_|execute_)/i;
   const WORKER_SUFFIXES = /(worker|task|job|handler|consumer|processor)$/i;
@@ -246,6 +282,7 @@ export class GoAdapter implements LanguageAdapter {
       calls: extractCalls(tree.rootNode),
       routes: extractRoutes(tree.rootNode),
       controlFlows: [],
+      source,
     };
   }
 }

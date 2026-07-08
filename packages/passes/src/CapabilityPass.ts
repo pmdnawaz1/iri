@@ -1,4 +1,3 @@
-import { readFileSync } from "node:fs";
 import { AbstractPass, PASS_PRIORITY } from "./base.js";
 import { makeId } from "@rir/common";
 import type { IRDraft, CompilationContext } from "@rir/core";
@@ -52,6 +51,41 @@ function resolveRoute(routeName: string, controllerName: string | undefined): st
 }
 
 /**
+ * Derive a route name from a frontend file path for ontology matching.
+ * e.g. "app/projects/[id]/page.tsx" → "GET /projects/:id"
+ *      "app/settings/page.tsx" → "GET /settings"
+ */
+function deriveFrontendRouteName(filePath: string): string {
+  const norm = filePath.replace(/\\/g, "/");
+  // Walk up from the file to find the app/pages directory root
+  const parts = norm.split("/").filter(Boolean);
+  // Find the page.tsx or layout.tsx and extract the route segments
+  const routeParts: string[] = [];
+  for (let i = 0; i < parts.length; i++) {
+    const p = parts[i]!.toLowerCase();
+    if (p === "app" || p === "pages" || p === "src") continue;
+    if (p.startsWith("(")) continue; // skip Next.js route groups
+    if (/^page\.(t|j)sx?$/.test(p)) break; // stop at page file
+    if (/^(layout|loading|error|not-found|template)\.(t|j)sx?$/.test(p)) continue;
+    // Convert [id] → :id, [...slug] → *slug
+    routeParts.push(p.replace(/^\[\.\.\.(.+)\]$/, "*$1").replace(/^\[(.+)\]$/, ":$1"));
+  }
+  if (routeParts.length === 0) return "";
+  return "GET /" + routeParts.join("/");
+}
+
+/**
+ * Resolve a frontend ROUTE to an ontology capability id.
+ * Tries the same cascade as resolveRoute but with a frontend-derived path.
+ */
+function resolveFrontendRoute(filePath: string): string | undefined {
+  const routePath = deriveFrontendRouteName(filePath);
+  if (!routePath) return undefined;
+  // Reuse the same ontology lookup logic as backend routes
+  return resolveRoute(routePath, undefined);
+}
+
+/**
  * Extract code-side constraints (TSPEC-P10 / G1) by scanning a capability's reachable node
  * names for the ontology's declared constraint signals. Deterministic and symmetric with the
  * document normalizer's `extractConstraints`: a constraint is only asserted when a key token is
@@ -99,26 +133,12 @@ export class CapabilityPass extends AbstractPass {
     const nodes = draft.getNodes();
     const edges = draft.getEdges();
 
-    // Source text per artifact, read once and cached (G1 constraint extraction needs the
-    // identifiers/string-literals — e.g. `findByEmail` — that node names alone do not carry).
-    const artifactPath = new Map(
-      (ctx.parseResults ?? []).map((p) => [p.artifact.id, p.artifact.path] as const),
-    );
-    const sourceCache = new Map<string, string>();
-    const sourceFor = (artifactId: string): string => {
-      if (sourceCache.has(artifactId)) return sourceCache.get(artifactId)!;
-      const path = artifactPath.get(artifactId);
-      let text = "";
-      if (path) {
-        try {
-          text = readFileSync(path, "utf8");
-        } catch {
-          text = "";
-        }
-      }
-      sourceCache.set(artifactId, text);
-      return text;
-    };
+    // Source text per artifact, from parse results (no file I/O in passes).
+    const sourceByArtifact = new Map<string, string>();
+    for (const pr of ctx.parseResults ?? []) {
+      if (pr.source) sourceByArtifact.set(pr.artifact.id, pr.source);
+    }
+    const sourceFor = (artifactId: string): string => sourceByArtifact.get(artifactId) ?? "";
 
     // Undirected graph: a capability is the route plus everything connected to it (the
     // frontend subgraph reaches the route via API_CALL, the backend hangs off it). Closure
@@ -169,6 +189,49 @@ export class CapabilityPass extends AbstractPass {
             .toUpperCase() || "ROOT";
         const method = (node.name.split(" ")[0] ?? "GET").toUpperCase();
         const unmapped = `UNMAPPED.${method}_${sanitized}`;
+        draft.addCapability({
+          id: makeId("cap", unmapped, node.id),
+          feature: "UNMAPPED",
+          capability: unmapped,
+          constraints: [],
+          nodes: reachable,
+          closure: ClosureState.Orphan,
+          evidence,
+        });
+      }
+    }
+
+    // Phase 2: Frontend routes — create capabilities from FRONTEND_ROUTE nodes
+    // so that pure-frontend tasks (CSS, layout, client components) get file mappings.
+    for (const node of nodes) {
+      if (node.kind !== "FRONTEND_ROUTE") continue;
+      const reachable = [...reachableFrom(graph, [node.id])];
+      const evidence = [{ source: "AST" as const, locator: node.filePath ?? node.name, confidence: 0.8 }];
+
+      // Derive a route name from the file path of connected components
+      const capId = resolveFrontendRoute(node.filePath ?? "");
+      if (capId) {
+        const artifactIds = new Set(reachable.map((id) => byId.get(id)?.artifactId).filter(Boolean));
+        const source = [...artifactIds].map((aid) => sourceFor(aid as string)).join("\n");
+        draft.addCapability({
+          id: makeId("cap", capId, node.id),
+          feature: capId.split(".")[0]!,
+          capability: capId,
+          constraints: extractCodeConstraints(capId, source),
+          nodes: reachable,
+          closure: ClosureState.Partial,
+          evidence,
+        });
+      } else {
+        // Frontend route with no ontology match — derive an UNMAPPED capability
+        // from the file path so the task briefing still gets files.
+        const routePath = deriveFrontendRouteName(node.filePath ?? "");
+        const sanitized = routePath
+          .replace(/^GET\s+/, "")
+          .replace(/[^a-zA-Z0-9]+/g, "_")
+          .replace(/^_|_$/g, "")
+          .toUpperCase() || "ROOT";
+        const unmapped = `UNMAPPED.FRONTEND_${sanitized}`;
         draft.addCapability({
           id: makeId("cap", unmapped, node.id),
           feature: "UNMAPPED",

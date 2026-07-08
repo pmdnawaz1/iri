@@ -287,7 +287,7 @@ export const fastapiResolver: FrameworkResolver = {
       ref.referenceName === "db" ||
       ref.referenceName === "engine"
     ) {
-      const result = resolveByNameAndKind(ref.referenceName, FUNCTION_KINDS.concat(VARIABLE_KINDS), ORM_DIRS, context);
+      const result = resolveByNameAndKind(ref.referenceName, FN_OR_VAR_KINDS, ORM_DIRS, context);
       if (result) return { original: ref, targetNodeId: result, confidence: 0.7, resolvedBy: "framework" };
     }
     return null;
@@ -503,6 +503,7 @@ const CLASS_KINDS = new Set(["class"]);
 const VIEW_KINDS = new Set(["class", "function"]);
 const VARIABLE_KINDS = new Set(["variable"]);
 const FUNCTION_KINDS = new Set(["function"]);
+const FN_OR_VAR_KINDS = new Set(["function", "variable"]);
 
 /**
  * Resolve a symbol by name using indexed queries instead of scanning all files.

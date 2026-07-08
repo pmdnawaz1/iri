@@ -11,8 +11,27 @@ import type { NodeKind } from "@rir/ir";
 import { makeId } from "@rir/common";
 import { AbstractPass, PASS_PRIORITY } from "./base.js";
 
+const DECORATOR_KIND: Readonly<Record<string, NodeKind>> = {
+  Controller: "CONTROLLER",
+  RestController: "CONTROLLER",
+  Injectable: "SERVICE",
+  Service: "SERVICE",
+  Repository: "REPOSITORY",
+  Middleware: "MIDDLEWARE",
+  Guard: "MIDDLEWARE",
+  UseGuards: "MIDDLEWARE",
+};
+
 function classify(sym: SymbolFact): NodeKind {
   if (sym.kind === "class") {
+    // Decorator-based classification takes priority (explicit framework annotation).
+    if (sym.decorators) {
+      for (const dec of sym.decorators) {
+        const kind = DECORATOR_KIND[dec.name];
+        if (kind) return kind;
+      }
+    }
+    // Fall back to name suffix (convention-based frameworks like Express).
     if (sym.name.endsWith("Controller")) return "CONTROLLER";
     if (sym.name.endsWith("Service")) return "SERVICE";
     if (sym.name.endsWith("Repository")) return "REPOSITORY";
@@ -54,11 +73,23 @@ export class CallPass extends AbstractPass {
     for (const pr of ctx.parseResults ?? []) {
       draft.addArtifact(pr.artifact);
 
+      // Split source into lines for sourceText extraction (per-symbol code snippets).
+      const sourceLines = pr.source ? pr.source.split("\n") : null;
+
       for (const sym of pr.symbols) {
         const nodeId =
           sym.kind === "import"
             ? makeId("import", pr.artifact.id, sym.qualifiedName ?? sym.name)
             : makeId("decl", sym.qualifiedName ?? sym.name);
+
+        // Extract the symbol's source text from the file content using its span.
+        let sourceText: string | undefined;
+        if (sourceLines && sym.span) {
+          const s0 = Math.max(0, sym.span.startLine - 1);
+          const s1 = Math.min(sourceLines.length, sym.span.endLine);
+          const snippet = sourceLines.slice(s0, s1).join("\n");
+          sourceText = snippet.length > 2000 ? snippet.slice(0, 2000) + "\n// ..." : snippet;
+        }
 
         draft.addNode({
           id: nodeId,
@@ -93,6 +124,7 @@ export class CallPass extends AbstractPass {
           filePath: pr.artifact.path,
           decorators: sym.decorators,
           docstring: sym.docstring,
+          sourceText: sourceText ?? sym.sourceText,
         });
       }
     }
@@ -232,11 +264,26 @@ export class CallPass extends AbstractPass {
       }
     }
 
-    // Pre-compute name to ID map to resolve types
+    // Pre-compute name to ID map to resolve types.
+    // Keyed by name+kind to avoid collisions (e.g. SERVICE vs COMPONENT with same name).
+    // When multiple nodes share the same name+kind, only the first is kept.
+    const nameKindToId = new Map<string, string>();
     const nameToId = new Map<string, string>();
     for (const node of draft.getNodes()) {
-      if (node.name) nameToId.set(node.name, node.id);
+      if (node.name) {
+        if (!nameKindToId.has(`${node.name}:${node.kind}`)) {
+          nameKindToId.set(`${node.name}:${node.kind}`, node.id);
+        }
+        if (!nameToId.has(node.name)) nameToId.set(node.name, node.id);
+      }
     }
+    const resolveName = (name: string, kind?: string): string | undefined => {
+      if (kind) {
+        const composite = nameKindToId.get(`${name}:${kind}`);
+        if (composite) return composite;
+      }
+      return nameToId.get(name);
+    };
 
     // Phase 5 — REFERENCES edges
     for (const pr of ctx.parseResults ?? []) {
@@ -256,8 +303,8 @@ export class CallPass extends AbstractPass {
         }
 
         for (const refName of referencedNames) {
-          const to = nameToId.get(refName)!;
-          if (from !== to) {
+          const to = resolveName(refName);
+          if (to && from !== to) {
             draft.addEdge({
               id: makeId("edge", "references", from, to),
               kind: "REFERENCES",
@@ -278,7 +325,9 @@ export class CallPass extends AbstractPass {
         if (!draft.getNode(targetId)) continue;
 
         for (const dec of sym.decorators) {
-          const decoratorId = nameToId.get(dec.name);
+          // Decorators are classified as CLASS (no suffix match) or FUNCTION
+          let decoratorId = resolveName(dec.name, "CLASS");
+          if (!decoratorId) decoratorId = resolveName(dec.name, "FUNCTION");
           if (decoratorId) {
             draft.addEdge({
               id: makeId("edge", "decorates", decoratorId, targetId),
@@ -301,7 +350,8 @@ export class CallPass extends AbstractPass {
         if (!draft.getNode(from)) continue;
 
         // Find the node representing the error type (e.g. "SomeError")
-        const to = nameToId.get(flow.typeName);
+        // Error classes are typically classified as CLASS nodes
+        const to = resolveName(flow.typeName, "CLASS");
         if (!to) continue;
 
         const edgeKind = flow.kind === "THROW" ? "THROWS" : "CATCHES";

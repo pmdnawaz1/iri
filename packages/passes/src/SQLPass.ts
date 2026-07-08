@@ -101,22 +101,10 @@ export class SQLPass extends AbstractPass {
         if (method && SQL_METHODS.has(method)) {
           const sqlId = makeId("sql", pr.artifact.path, String(call.span.startLine));
 
-          // Query chain methods (.filter(), .all(), etc.) link to the parent query/session
-          // rather than creating standalone SQL_QUERY nodes — they are part of the same
-          // SQL operation, not a new one.
+          // Query chain methods (.filter(), .where(), etc.) don't execute SQL themselves
+          // — they're intermediate query builders. Skip them entirely; only terminal
+          // methods (.all(), .first(), .execute()) below produce SQL_QUERY nodes.
           if (method && QUERY_CHAIN_METHODS.has(method)) {
-            if (call.enclosing) {
-              const fromId = makeId("decl", call.enclosing);
-              if (draft.getNode(fromId)) {
-                draft.addEdge({
-                  id: makeId("edge", "sql_chain", fromId, sqlId),
-                  kind: "CALLS",
-                  from: fromId,
-                  to: sqlId,
-                  evidence: [{ source: "AST", locator: pr.artifact.path, confidence: 1 }],
-                });
-              }
-            }
             continue;
           }
 

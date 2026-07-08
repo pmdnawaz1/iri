@@ -27,6 +27,25 @@ function getChildByType(node: Parser.SyntaxNode, type: string): Parser.SyntaxNod
   }
   return null;
 }
+function extractCommentDocstring(node: Parser.SyntaxNode): string | undefined {
+  const comments: string[] = [];
+  let sibling = node.previousSibling;
+  while (sibling) {
+    const t = sibling.type;
+    if (t === "comment" || t === "line_comment" || t === "block_comment" || t === "documentation_comment") {
+      comments.unshift(sibling.text);
+    } else if (sibling.text.trim() === "") {
+      // skip whitespace
+    } else {
+      break;
+    }
+    sibling = sibling.previousSibling;
+  }
+  if (comments.length === 0) return undefined;
+  let text = comments.join("\n");
+  text = text.replace(/^\/\*\*?/, "").replace(/\*\/$/s, "").replace(/^\s*\*\s?/gm, "").replace(/^\s*\/\/\/?\s?/gm, "").trim();
+  return text || undefined;
+}
 function extractSymbols(root: Parser.SyntaxNode): SymbolFact[] {
   const symbols: SymbolFact[] = [];
   const visit = (node: Parser.SyntaxNode): void => {
@@ -38,6 +57,7 @@ function extractSymbols(root: Parser.SyntaxNode): SymbolFact[] {
           kind: "class",
           exported: hasPubModifier(node),
           span: getSpan(node),
+          docstring: extractCommentDocstring(node),
         });
       }
     } else if (node.type === "function_item") {
@@ -49,6 +69,7 @@ function extractSymbols(root: Parser.SyntaxNode): SymbolFact[] {
           kind: isMethod ? "method" : "function",
           exported: hasPubModifier(node),
           span: getSpan(node),
+          docstring: extractCommentDocstring(node),
         });
       }
     } else if (node.type === "trait_item") {
@@ -59,6 +80,7 @@ function extractSymbols(root: Parser.SyntaxNode): SymbolFact[] {
           kind: "interface",
           exported: hasPubModifier(node),
           span: getSpan(node),
+          docstring: extractCommentDocstring(node),
         });
       }
     }
@@ -104,6 +126,17 @@ function extractExports(root: Parser.SyntaxNode): string[] {
   visit(root);
   return exports;
 }
+function extractStringArgs(argsNode: Parser.SyntaxNode | null): string[] {
+  if (!argsNode) return [];
+  const strArgs: string[] = [];
+  for (const child of argsNode.namedChildren) {
+    if (!child.type.includes("string")) break;
+    strArgs.push(child.text.replace(/^[a-zA-Z@]*['"`]+/, "").replace(/['"`]+$/, ""));
+    if (strArgs.length >= 5) break;
+  }
+  return strArgs;
+}
+
 function extractCalls(root: Parser.SyntaxNode): CallFact[] {
   const calls: CallFact[] = [];
   const visit = (node: Parser.SyntaxNode, enclosing?: string): void => {
@@ -124,12 +157,14 @@ function extractCalls(root: Parser.SyntaxNode): CallFact[] {
     if (node.type === "call_expression") {
       const funcNode = getChildByType(node, "field_expression") ?? getChildByType(node, "identifier");
       if (funcNode) {
-        calls.push({ callee: funcNode.text, enclosing: childEnclosing, span: getSpan(node) });
+        const strArgs = extractStringArgs(node.childForFieldName("arguments"));
+        calls.push({ callee: funcNode.text, enclosing: childEnclosing, span: getSpan(node), arguments: strArgs.length > 0 ? strArgs : undefined });
       }
     } else if (node.type === "macro_invocation") {
       const macroNode = getChildByType(node, "identifier");
       if (macroNode) {
-        calls.push({ callee: macroNode.text + "!", enclosing: childEnclosing, span: getSpan(node) });
+        const strArgs = extractStringArgs(node.childForFieldName("arguments"));
+        calls.push({ callee: macroNode.text + "!", enclosing: childEnclosing, span: getSpan(node), arguments: strArgs.length > 0 ? strArgs : undefined });
       }
     }
     for (let i = 0; i < node.childCount; i++) {
@@ -165,6 +200,7 @@ export class RustAdapter implements LanguageAdapter {
       calls: extractCalls(tree.rootNode),
       routes: [],
       controlFlows: [],
+      source,
     };
   }
 }

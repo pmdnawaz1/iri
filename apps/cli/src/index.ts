@@ -19,6 +19,7 @@ import { DefaultClosureEngine } from "@rir/closure";
 import { DefaultCoverageEngine } from "@rir/coverage";
 import { emptyRequirementSet } from "@rir/ir";
 import { compileRepository, compileWithDocuments, diffClosures, suggestDocumentAliases } from "@rir/compiler";
+import { GuardClosureEngine } from "@rir/consistency";
 import type { ClosureResult } from "@rir/closure";
 import { prove } from "./prove.js";
 
@@ -31,7 +32,8 @@ Usage:
   rir ontology                List canonical ontology capabilities
   rir validate <ir.json>      Run closure over a Repository IR (JSON)
   rir coverage <ir.json>      Run coverage over a Repository IR (JSON)
-  rir prove <dir>             Parse a TS backend dir and report AUTH.LOGIN closure (legacy slice)
+  rir prove <dir>             Compile a dir and report closure for all capabilities
+  rir check <dir>             Compile, validate closure, and check guards (CI gate)
   rir compile <dir>           Compile a repo (adapters -> passes -> IR -> closure)
   rir compile <dir> --docs <d>  Also compile docs and report doc<->code consistency
   rir compile <dir> --out-dir <d>  Write separate artifact files to <d>/
@@ -112,7 +114,8 @@ async function main(rawArgv: readonly string[]): Promise<number> {
       const results = new DefaultClosureEngine().evaluate(ir);
       for (const r of results) {
         const missing = r.missing.length ? ` missing=[${r.missing.join(",")}]` : "";
-        process.stdout.write(`${r.capabilityId}\t${r.state}${missing}\n`);
+        const missingConstraints = r.missingConstraints.length ? ` missingConstraints=[${r.missingConstraints.join(",")}]` : "";
+        process.stdout.write(`${r.capabilityId}\t${r.state}${missing}${missingConstraints}\n`);
       }
       return results.every((r) => r.state === "CLOSED") ? 0 : 1;
     }
@@ -132,16 +135,43 @@ async function main(rawArgv: readonly string[]): Promise<number> {
         process.stderr.write("usage: rir prove <dir>\n");
         return 64;
       }
-      const { directory, fileCount, ir, result, reachableChain } = prove(dir);
+      const { directory, fileCount, ir, results, reachableChain } = await prove(dir);
       process.stdout.write(`Repository: ${directory}\n`);
       process.stdout.write(
         `Parsed ${fileCount} file(s) -> ${ir.nodes.length} nodes, ${ir.edges.length} edges\n`,
       );
-      process.stdout.write(`\nAUTH.LOGIN: ${result.state}\n`);
-      process.stdout.write(`  reachable chain: ${reachableChain.join(" -> ") || "(none)"}\n`);
-      process.stdout.write(`  present stages:  ${result.present.join(", ") || "(none)"}\n`);
-      process.stdout.write(`  missing stages:  ${result.missing.join(", ") || "(none)"}\n`);
-      return result.state === ClosureState.Closed ? 0 : 1;
+      for (const r of results) {
+        if (r.state === ClosureState.Orphan) continue;
+        const missing = r.missing.length ? ` missing=[${r.missing.join(",")}]` : "";
+        const missingConstraints = r.missingConstraints.length ? ` missingConstraints=[${r.missingConstraints.join(",")}]` : "";
+        process.stdout.write(`\n${r.capabilityId}: ${r.state}${missing}${missingConstraints}\n`);
+      }
+      process.stdout.write(`\n  reachable chain: ${reachableChain.join(" -> ") || "(none)"}\n`);
+      const best = results.find((r) => r.state === ClosureState.Closed);
+      return best ? 0 : 1;
+    }
+    case "check": {
+      const dir = rest[0];
+      if (!dir) {
+        process.stderr.write("usage: rir check <dir>\n");
+        return 64;
+      }
+      const { ir, closure } = await compileRepository(dir);
+      const guardFindings = new GuardClosureEngine().check(ir);
+
+      let failed = 0;
+      for (const r of closure) {
+        if (r.state === ClosureState.Orphan || r.state === ClosureState.Conflicting) continue;
+        const mc = r.missingConstraints.length > 0 ? ` +${r.missingConstraints.length} missing constraints` : "";
+        process.stdout.write(`${r.state}\t${r.capabilityId}${mc}\n`);
+        if (r.state !== ClosureState.Closed) failed++;
+      }
+      for (const f of guardFindings) {
+        process.stdout.write(`${f.severity}\t${f.code}\t${f.capability}\t${f.message}\n`);
+        failed++;
+      }
+      if (failed === 0) process.stdout.write("All capabilities CLOSED, no guard findings.\n");
+      return failed > 0 ? 1 : 0;
     }
     case "suggest-aliases": {
       const docsDir = rest.find((a) => !a.startsWith("--"));

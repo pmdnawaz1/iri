@@ -48,6 +48,8 @@ export interface SymbolFact {
   readonly docstring?: string;
   readonly extends?: readonly string[];
   readonly implements?: readonly string[];
+  /** Source text of this symbol (function/class body, capped at 2000 chars). */
+  readonly sourceText?: string;
 }
 
 /** A raw import as written in source (unresolved). */
@@ -68,6 +70,12 @@ export interface CallFact {
   readonly enclosing?: string;
   readonly span: Span;
   readonly isNew?: boolean;
+  /**
+   * String-literal arguments extracted from the call site (first N positional args
+   * that are string literals). Enables event-name matching (EventPass) and SQL
+   * table-name extraction (SQLPass) without re-reading source.
+   */
+  readonly arguments?: readonly string[];
 }
 
 /** A route declaration discovered syntactically (no semantic mapping). */
@@ -95,6 +103,8 @@ export interface ParseResult {
   readonly calls: readonly CallFact[];
   readonly routes: readonly RouteFact[];
   readonly controlFlows: readonly ControlFlowFact[];
+  /** Raw source text of the parsed file. Passes use this instead of re-reading from disk. */
+  readonly source?: string;
 }
 
 /** Immutable inputs handed to every pass during one compilation. */

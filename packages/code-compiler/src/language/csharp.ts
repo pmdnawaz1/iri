@@ -24,6 +24,25 @@ function hasPublicModifier(node: Node): boolean {
   }
   return false;
 }
+function extractCommentDocstring(node: Node): string | undefined {
+  const comments: string[] = [];
+  let sibling = node.previousSibling;
+  while (sibling) {
+    const t = sibling.type;
+    if (t === "comment" || t === "line_comment" || t === "block_comment" || t === "documentation_comment") {
+      comments.unshift(sibling.text);
+    } else if (sibling.text.trim() === "") {
+      // skip whitespace
+    } else {
+      break;
+    }
+    sibling = sibling.previousSibling;
+  }
+  if (comments.length === 0) return undefined;
+  let text = comments.join("\n");
+  text = text.replace(/^\/\*\*?/, "").replace(/\*\/$/s, "").replace(/^\s*\*\s?/gm, "").replace(/^\s*\/\/\/?\s?/gm, "").trim();
+  return text || undefined;
+}
 function extractSymbols(root: Node): SymbolFact[] {
   const symbols: SymbolFact[] = [];
   const visit = (node: Node): void => {
@@ -35,6 +54,7 @@ function extractSymbols(root: Node): SymbolFact[] {
           kind: "class",
           exported: hasPublicModifier(node),
           span: getSpan(node),
+          docstring: extractCommentDocstring(node),
         });
       }
     } else if (node.type === "interface_declaration") {
@@ -45,12 +65,13 @@ function extractSymbols(root: Node): SymbolFact[] {
           kind: "interface",
           exported: hasPublicModifier(node),
           span: getSpan(node),
+          docstring: extractCommentDocstring(node),
         });
       }
     } else if (node.type === "method_declaration") {
       const nameNode = node.childForFieldName("name");
       if (nameNode) {
-        symbols.push({ name: nameNode.text, kind: "method", exported: false, span: getSpan(node) });
+        symbols.push({ name: nameNode.text, kind: "method", exported: false, span: getSpan(node), docstring: extractCommentDocstring(node) });
       }
     }
     for (let i = 0; i < node.childCount; i++) {
@@ -97,6 +118,17 @@ function extractExports(root: Node): string[] {
   visit(root);
   return exports;
 }
+function extractStringArgs(argsNode: Node | null): string[] {
+  if (!argsNode) return [];
+  const strArgs: string[] = [];
+  for (const child of argsNode.namedChildren) {
+    if (!child.type.includes("string")) break;
+    strArgs.push(child.text.replace(/^[a-zA-Z@]*['"`]+/, "").replace(/['"`]+$/, ""));
+    if (strArgs.length >= 5) break;
+  }
+  return strArgs;
+}
+
 function extractCalls(root: Node): CallFact[] {
   const calls: CallFact[] = [];
   const visit = (node: Node, enclosing?: string): void => {
@@ -112,7 +144,8 @@ function extractCalls(root: Node): CallFact[] {
     if (node.type === "invocation_expression") {
       const funcNode = node.childForFieldName("function") ?? node.child(0);
       if (funcNode) {
-        calls.push({ callee: funcNode.text, enclosing: childEnclosing, span: getSpan(node) });
+        const strArgs = extractStringArgs(node.childForFieldName("arguments"));
+        calls.push({ callee: funcNode.text, enclosing: childEnclosing, span: getSpan(node), arguments: strArgs.length > 0 ? strArgs : undefined });
       }
     }
     for (let i = 0; i < node.childCount; i++) {
@@ -149,6 +182,7 @@ export class CSharpAdapter implements LanguageAdapter {
       calls: extractCalls(tree.rootNode),
       routes: [],
       controlFlows: [],
+      source,
     };
   }
 }
