@@ -18,8 +18,8 @@ import { ONTOLOGY_VERSION, allCapabilities } from "@rir/ontology";
 import { DefaultClosureEngine } from "@rir/closure";
 import { DefaultCoverageEngine } from "@rir/coverage";
 import { emptyRequirementSet } from "@rir/ir";
-import { compileRepository, compileWithDocuments, diffClosures, suggestDocumentAliases } from "@rir/compiler";
-import { DeadCodeEngine, GuardClosureEngine } from "@rir/consistency";
+import { compileRepository, compileRepositories, compileDocuments, readScope, diffClosures, suggestDocumentAliases } from "@rir/compiler";
+import { CrossConsistencyEngine, DeadCodeEngine, GuardClosureEngine } from "@rir/consistency";
 import type { ClosureResult } from "@rir/closure";
 import { prove } from "./prove.js";
 
@@ -34,7 +34,7 @@ Usage:
   rir coverage <ir.json>      Run coverage over a Repository IR (JSON)
   rir prove <dir>             Compile a dir and report closure for all capabilities
   rir check <dir>             Compile, validate closure, and check guards (CI gate)
-  rir compile <dir>           Compile a repo (adapters -> passes -> IR -> closure)
+  rir compile <dir> [<dir2>...]  Compile one or more repos (multi-repo supported)
   rir compile <dir> --docs <d>  Also compile docs and report doc<->code consistency
   rir compile <dir> --out-dir <d>  Write separate artifact files to <d>/
   rir suggest-aliases <docs>  BM25-rank ontology for UNMAPPED doc statements (proposal-only)
@@ -219,9 +219,9 @@ async function main(rawArgv: readonly string[]): Promise<number> {
       const positionals = rest.filter(
         (a, i) => !a.startsWith("--") && rest[i - 1] !== "--docs" && rest[i - 1] !== "--log" && rest[i - 1] !== "--out-dir",
       );
-      const dir = positionals[0];
-      if (!dir) {
-        process.stderr.write("usage: rir compile <dir> [--docs <dir>] [--json] [--out-dir <dir>]\n");
+      const dirs = positionals;
+      if (dirs.length === 0) {
+        process.stderr.write("usage: rir compile <dir> [<dir2>...] [--docs <dir>] [--json] [--out-dir <dir>]\n");
         return 64;
       }
 
@@ -231,10 +231,21 @@ async function main(rawArgv: readonly string[]): Promise<number> {
       const outDir = outDirIdx === -1 ? undefined : rest[outDirIdx + 1];
 
       if (docsDir) {
-        const { ir, closure, requirements, findings, guardFindings, deadCodeFindings, scope } = await compileWithDocuments(
-          dir,
-          docsDir,
-        );
+        // Multi-repo + docs: use the first dir as the primary for doc consistency
+        const { ir, closure } = await compileRepositories(dirs);
+        const requirements = compileDocuments(docsDir as string);
+        const scope = readScope(dirs[0] as string);
+
+        const stateById = new Map(closure.map((c) => [c.capabilityId, c.state] as const));
+        const closureByCapability = new Map<string, import("@rir/ir").ClosureState>();
+        for (const cap of ir.capabilities) {
+          const state = stateById.get(cap.id);
+          if (state) closureByCapability.set(cap.capability, state);
+        }
+
+        const findings = new CrossConsistencyEngine().check(requirements, ir, closureByCapability, scope);
+        const guardFindings = new GuardClosureEngine().check(ir);
+        const deadCodeFindings = new DeadCodeEngine().check(ir);
         const failed = [...findings, ...guardFindings, ...deadCodeFindings].some((f) => f.severity === "ERROR");
 
         if (outDir) {
@@ -254,7 +265,7 @@ async function main(rawArgv: readonly string[]): Promise<number> {
         if (rest.includes("--json")) {
           process.stdout.write(
             JSON.stringify(
-              { dir, docsDir, scope, ir, closure, requirements, findings, guardFindings, deadCodeFindings },
+              { dirs, docsDir, scope, ir, closure, requirements, findings, guardFindings, deadCodeFindings },
               null,
               2,
             ) + "\n",
@@ -262,13 +273,12 @@ async function main(rawArgv: readonly string[]): Promise<number> {
           return failed ? 1 : 0;
         }
         process.stdout.write(
-          `Compiled ${dir} + docs ${docsDir}: ${ir.capabilities.length} code capabilities, ${requirements.requirements.length} documented${scope ? " (scoped)" : ""}\n`,
+          `Compiled ${dirs.join(", ")} + docs ${docsDir}: ${ir.capabilities.length} code capabilities, ${requirements.requirements.length} documented${scope ? " (scoped)" : ""}\n`,
         );
         const all = [...findings, ...guardFindings, ...deadCodeFindings];
         if (all.length === 0) {
           process.stdout.write("  doc<->code consistency + guard closure: OK (no findings)\n");
         } else {
-          // Criticality first (CRITICAL→LOW), then ERROR before WARNING.
           const critRank: Record<string, number> = { CRITICAL: 0, HIGH: 1, NORMAL: 2, LOW: 3 };
           for (const f of [...all].sort(
             (a, b) =>
@@ -283,7 +293,7 @@ async function main(rawArgv: readonly string[]): Promise<number> {
         return failed ? 1 : 0;
       }
 
-      const { ir, closure } = await compileRepository(dir);
+      const { ir, closure } = await compileRepositories(dirs);
 
       if (outDir) {
         mkdirSync(outDir, { recursive: true });
@@ -302,16 +312,15 @@ async function main(rawArgv: readonly string[]): Promise<number> {
       }
 
       if (rest.includes("--json")) {
-        // Full IR + closure for downstream analysis (e.g. ontology self-evolution).
         const routes = ir.nodes.filter((n) => n.kind === "ROUTE").map((n) => n.name);
         const mapped = new Set(ir.capabilities.map((c) => c.capability));
         process.stdout.write(
-          JSON.stringify({ dir, ir, closure, routes, mappedCapabilities: [...mapped] }, null, 2) + "\n",
+          JSON.stringify({ dirs, ir, closure, routes, mappedCapabilities: [...mapped] }, null, 2) + "\n",
         );
         return 0;
       }
       process.stdout.write(
-        `Compiled ${dir}: ${ir.nodes.length} nodes, ${ir.edges.length} edges, ${ir.capabilities.length} capabilities\n`,
+        `Compiled ${dirs.join(", ")}: ${ir.nodes.length} nodes, ${ir.edges.length} edges, ${ir.capabilities.length} capabilities\n`,
       );
       for (const cap of ir.capabilities) {
         const r = closure.find((c) => c.capabilityId === cap.id);

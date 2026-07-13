@@ -146,6 +146,53 @@ export interface CompileResult {
 }
 
 /**
+ * Compile multiple repository directories into a single merged Repository IR.
+ * Useful for monorepos or multi-repo setups where code references span repositories.
+ * All files from all directories are parsed together; closure runs once over the merged IR.
+ */
+export async function compileRepositories(
+  dirs: string[],
+  registry: AdapterRegistry = defaultAdapters(),
+): Promise<CompileResult> {
+  const logger = new ConsoleLogger("warn");
+
+  // Stage 1 — frontend: parse every supported file from all directories.
+  const parseResults: ParseResult[] = [];
+  for (const dir of dirs) {
+    const baseCtx: CompilationContext = { repositoryRoot: dir, artifacts: [], parseResults: [], logger };
+    for (const file of listSourceFiles(dir)) {
+      const adapter = registry.select(file);
+      if (!adapter) continue;
+      const relPath = relative(dir, file).replace(/\\/g, "/");
+      parseResults.push(adapter.parse(relPath, readFileSync(file, "utf8"), baseCtx));
+    }
+  }
+
+  // Stage 2 — passes: lift parse results into the Repository IR.
+  // Use the first directory as the primary root for context.
+  const primaryRoot = dirs[0] ?? ".";
+  const ctx: CompilationContext = {
+    repositoryRoot: primaryRoot,
+    artifacts: parseResults.map((p) => p.artifact),
+    parseResults,
+    logger,
+  };
+  const ir = await BuilderEngine.fromBuilders([new PipelineBuilder()]).compile(ctx);
+
+  // Stage 2.5 — detect frameworks/tech stack from all directories.
+  const frameworks = new Set<string>();
+  for (const dir of dirs) {
+    for (const fw of detectFrameworks(dir)) {
+      frameworks.add(fw);
+    }
+  }
+
+  // Stage 3 — closure.
+  const closure = new DefaultClosureEngine().evaluate(ir);
+  return { ir: { ...ir, frameworks: [...frameworks].sort() }, closure };
+}
+
+/**
  * Compile a repository directory into a Repository IR and evaluate closure.
  * Deterministic: file traversal is sorted by the OS readdir order (stable per run);
  * the IR draft dedups by id, and the passes/closure are pure.
@@ -154,35 +201,7 @@ export async function compileRepository(
   dir: string,
   registry: AdapterRegistry = defaultAdapters(),
 ): Promise<CompileResult> {
-  const logger = new ConsoleLogger("warn");
-
-  // Stage 1 — frontend: parse every supported file with its language adapter.
-  const baseCtx: CompilationContext = { repositoryRoot: dir, artifacts: [], parseResults: [], logger };
-  const parseResults: ParseResult[] = [];
-  for (const file of listSourceFiles(dir)) {
-    const adapter = registry.select(file);
-    if (!adapter) continue;
-    // Store paths relative to repo root with forward slashes for cross-platform consistency.
-    // The absolute path is only used to read the file; the IR carries the relative path.
-    const relPath = relative(dir, file).replace(/\\/g, "/");
-    parseResults.push(adapter.parse(relPath, readFileSync(file, "utf8"), baseCtx));
-  }
-
-  // Stage 2 — passes: lift parse results into the Repository IR.
-  const ctx: CompilationContext = {
-    repositoryRoot: dir,
-    artifacts: parseResults.map((p) => p.artifact),
-    parseResults,
-    logger,
-  };
-  const ir = await BuilderEngine.fromBuilders([new PipelineBuilder()]).compile(ctx);
-
-  // Stage 2.5 — detect frameworks/tech stack from config files.
-  const frameworks = detectFrameworks(dir);
-
-  // Stage 3 — closure.
-  const closure = new DefaultClosureEngine().evaluate(ir);
-  return { ir: { ...ir, frameworks }, closure };
+  return compileRepositories([dir], registry);
 }
 
 /** Parse package.json, requirements.txt, go.mod to detect the tech stack. */
